@@ -12,6 +12,8 @@ const UserSignIn = () => {
         contraseña: '',
     });
 
+    const handleChange = (name, value) => setLogser({ ...logser, [name]: value });
+
     const { height } = useWindowDimensions();
 
     const navigation = useNavigation();
