@@ -36,7 +36,7 @@ router.get('/user/:id', getUserid)
  *    summary: Obtiene a un usuario por su id
  *    tags: [User]
  */
-router.get('/usermail', getUserMail)
+router.post('/usermail', getUserMail)
 
 /**
  * @swagger

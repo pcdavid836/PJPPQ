@@ -10,14 +10,13 @@ const UserRegister = () => {
 
     const navigation = useNavigation();
     const [user, setUser] = useState({
-        nombres: '',
-        apellidoPaterno: '',
-        apellidoMaterno: '',
-        correo: '',
-        celular: '',
-        ci: '',
-        contraseña: '',
-        contraseña2: '',
+        Correo: '',
+        Nombres: '',
+        Primer_Apellido: '',
+        Segundo_Apellido: '',
+        Celular: '',
+        CI: '',
+        Contraseña: '',
     });
 
     const handleChange = (name, value) => setUser({ ...user, [name]: value });
@@ -27,17 +26,16 @@ const UserRegister = () => {
     };
 
     const onHandleSubmit = () => {
-        const password = user.contraseña;
+        const password = user.Contraseña;
         const password2 = user.contraseña2;
         if (password !== password2) {
             ToastAndroid.show('Las contraseñas no coinciden!', ToastAndroid.SHORT);
             return;
         }
         else {
-            console.log('success!');
+            console.log(user);
             saveUser(user);
             navigation.navigate('MessageValidationScreen');
-
         }
     };
 
@@ -47,34 +45,34 @@ const UserRegister = () => {
                 <Text style={styles.title}>Crear una Cuenta</Text>
                 <CustomInput
                     placeholder="Nombre o Nombres"
-                    setValue={(text) => handleChange('nombres', text)}
+                    setValue={(text) => handleChange('Nombres', text)}
                 />
                 <CustomInput
                     placeholder="Apellido"
-                    setValue={(text) => handleChange('apellidoPaterno', text)}
+                    setValue={(text) => handleChange('Primer_Apellido', text)}
                 />
                 <CustomInput
                     placeholder="Segundo Apellido"
-                    setValue={(text) => handleChange('apellidoMaterno', text)}
+                    setValue={(text) => handleChange('Segundo_Apellido', text)}
                 />
                 <CustomInput
                     placeholder="Correo Electronico"
-                    keyboardType="emailAddress"
-                    setValue={(text) => handleChange('correo', text)}
+                    keyboardType="email"
+                    setValue={(text) => handleChange('Correo', text)}
                 />
                 <CustomInput
                     placeholder="Celular"
-                    keyboardType="phone-pad"
-                    setValue={(text) => handleChange('celular', text)}
+                    keyboardType="numeric"
+                    setValue={(text) => handleChange('Celular', text)}
                 />
                 <CustomInput
                     placeholder="CI"
-                    setValue={(text) => handleChange('ci', text)}
+                    setValue={(text) => handleChange('CI', text)}
                 />
                 <CustomInput
                     placeholder="Contraseña"
                     secureTextEntry
-                    setValue={(text) => handleChange('contraseña', text)}
+                    setValue={(text) => handleChange('Contraseña', text)}
                 />
                 <CustomInput
                     placeholder="Repite la Contraseña"

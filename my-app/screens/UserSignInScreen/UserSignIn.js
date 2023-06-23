@@ -1,15 +1,23 @@
 import React, { useState } from 'react';
-import { View, Text, Image, StyleSheet, useWindowDimensions, ScrollView } from 'react-native';
+import { View, Text, Image, StyleSheet, useWindowDimensions, ScrollView, ToastAndroid } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Logo from '../../assets/images/adaptive-icon.png';
 import CustomInput from '../../components/CustomInput';
 import CustomButton from '../../components/CustomButton';
 import { useNavigation } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getUserMail } from '../../api';
 
 const UserSignIn = () => {
+    
+    const loadUsers = async () => {
+        const res = await fetch('http://192.168.1.13:3000/user')
+        const data = await res.json()
+        console.log(data);
+    };
+
     const [logser, setLogser] = useState({
-        correo: '',
-        contraseña: '',
+        Correo: '',
+        Contraseña: '',
     });
 
     const handleChange = (name, value) => setLogser({ ...logser, [name]: value });
@@ -18,8 +26,35 @@ const UserSignIn = () => {
 
     const navigation = useNavigation();
 
-    const onSignInPressed = () => {
-        navigation.navigate('HomeScreen');
+   
+       
+    
+    const onSignInPressed = async () => {
+        const correo = logser.Correo;
+        const contraseña = logser.Contraseña;
+    
+        const user = await getUserMail(logser);
+        const email = user[0].Correo;
+        const mainpassword = user[0].Contraseña;
+        const mainId = user[0].idUsuario;
+        
+
+        console.log(user);
+
+        console.log(correo);
+        console.log(contraseña);
+
+        if (email === correo && mainpassword === contraseña) {
+            // Save the user's email to AsyncStorage
+        await AsyncStorage.setItem('userId', mainId.toString());
+
+            // Navigate to the HomeScreen
+            navigation.navigate('HomeScreen');
+        } else {
+            // Show an error message
+            ToastAndroid.show('Correo o Contraseña Incorrectos!', ToastAndroid.SHORT);
+        }
+     
     };
 
     const onForgotPasswordPressed = () => {
@@ -27,7 +62,7 @@ const UserSignIn = () => {
     };
 
     const onSignInGoogle = () => {
-        console.warn('OnSignInGoogle');
+        console.log(logser);
     };
 
     const onSignInFacebook = () => {
@@ -38,7 +73,7 @@ const UserSignIn = () => {
         navigation.navigate('UserRegister');
     };
 
-
+    
     return (
         <ScrollView showsHorizontalScrollIndicator={false}>
             <View style={styles.root}>
@@ -50,11 +85,11 @@ const UserSignIn = () => {
 
                 <CustomInput
                     placeholder="Correo Electronico"
-                    setValue={(text) => handleChange('correo', text)}
+                    setValue={(text) => handleChange('Correo', text)}
                 />
                 <CustomInput
                     placeholder="Contraseña"
-                    setValue={(text) => handleChange('contraseña', text)}
+                    setValue={(text) => handleChange('Contraseña', text)}
                     secureTextEntry
                 />
                 <CustomButton
