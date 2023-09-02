@@ -1,21 +1,16 @@
 import React from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import MapView from 'react-native-maps'
-import { NavigationContainer } from '@react-navigation/native';
-import { DrawerNavigation } from '../Navigation/DrawerNavigation';
+
 
 const Drawer = createDrawerNavigator();
 
-const HomeScreen = () => {
+const Prueba1 = () => {
 
   return (
-    <Text>Hola</Text>
-    /*
-     <NavigationContainer>
-        <DrawerNavigation />
-     </NavigationContainer>
-    */
+   
+    <Text> Hola test1 </Text>
+    
   );
 };
 
@@ -31,4 +26,4 @@ const styles = StyleSheet.create({
     height: '100%',
   },
 });
-export default HomeScreen
+export default Prueba1;
