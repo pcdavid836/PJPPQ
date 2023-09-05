@@ -10,12 +10,10 @@ const Drawer = createDrawerNavigator();
 const HomeScreen = () => {
 
   return (
-    <Text>Hola</Text>
-    /*
-     <NavigationContainer>
+     <NavigationContainer independent={true} >
         <DrawerNavigation />
      </NavigationContainer>
-    */
+   
   );
 };
 

@@ -1,3 +1,4 @@
+import 'react-native-gesture-handler';
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -15,8 +16,8 @@ const App = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="UserSignIn" component={UserSignIn} />
         <Stack.Screen name="HomeScreen" component={HomeScreen} />
+        <Stack.Screen name="UserSignIn" component={UserSignIn} />
         <Stack.Screen name="MessageValidationScreen" component={MessageValidationScreen} />
         <Stack.Screen name="UserRegister" component={UserRegister} />
         <Stack.Screen name="NewPasswordScreen" component={NewPasswordScreen} />
@@ -27,11 +28,5 @@ const App = () => {
   )
 }
 
-const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-    backgroundColor: '#F9FBFC',
-  },
-});
 
 export default App;

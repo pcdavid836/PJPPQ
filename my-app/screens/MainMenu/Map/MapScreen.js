@@ -1,15 +1,11 @@
 import React from 'react'
 import { View, Text, StyleSheet } from 'react-native'
-import { createDrawerNavigator } from '@react-navigation/drawer';
 
-
-const Drawer = createDrawerNavigator();
-
-const Prueba1 = () => {
+const MapScreen = () => {
 
   return (
    
-    <Text> Hola test1 </Text>
+    <Text> MAPA </Text>
     
   );
 };
@@ -26,4 +22,4 @@ const styles = StyleSheet.create({
     height: '100%',
   },
 });
-export default Prueba1;
+export default MapScreen;

@@ -1,15 +1,57 @@
 import React from "react"
 import { createDrawerNavigator } from "@react-navigation/drawer"
-import prueba1 from "../prueba1/prueba1"
+
+import CustomDrawer from "../../components/CustomDrawer/CustomDrawer"
+import Ionicons from 'react-native-vector-icons/Ionicons'
+
+import MapScreen from "../MainMenu/Map"
+import BookingScreen from "../MainMenu/Booking"
+import ProfileScreen from "../MainMenu/Profile"
+import CreateParkingScreen from "../MainMenu/CreateParking"
+import VehicleScreen from "../MainMenu/Vehicle"
 
 const Drawer = createDrawerNavigator()
 
 export function DrawerNavigation() {
-    return(
+    return (
 
-    <Drawer.Navigator>
-        <Drawer.Screen name = "Prueba1" component = { prueba1 } />
-    </Drawer.Navigator>
+        <Drawer.Navigator drawerContent={props => <CustomDrawer {...props} />}
+            screenOptions={{
+                headerShown: false,
+                drawerActiveBackgroundColor: '#d67574',
+                drawerActiveTintColor: '#fff',
+                drawerInactiveTintColor: '#333',
+                drawerLabelStyle: {
+                    marginLeft: -25,
+                    fontSize: 15,
+                }
+            }}>
+            <Drawer.Screen name="Mapa" component={MapScreen} options={{
+                drawerIcon: ({ color }) => (
+                    <Ionicons name="map-outline" size={22} color={color} />
+                )
+            }} />
+            <Drawer.Screen name="Perfil" component={ProfileScreen} options={{
+                drawerIcon: ({ color }) => (
+                    <Ionicons name="person-circle-outline" size={22} color={color} />
+                )
+            }} />
+            <Drawer.Screen name="Mis Vehiculos" component={VehicleScreen} options={{
+                drawerIcon: ({ color }) => (
+                    <Ionicons name="car-outline" size={22} color={color} />
+                )
+            }} />
+            <Drawer.Screen name="Reserva" component={BookingScreen} options={{
+                drawerIcon: ({ color }) => (
+                    <Ionicons name="receipt-outline" size={22} color={color} />
+                )
+            }} />
+            <Drawer.Screen name="Postular Puesto" component={CreateParkingScreen} options={{
+                drawerIcon: ({ color }) => (
+                    <Ionicons name="reader-outline" size={22} color={color} />
+                )
+            }} />
+        </Drawer.Navigator>
 
     )
 
