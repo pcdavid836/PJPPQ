@@ -1,12 +1,15 @@
-import React, { useState } from 'react';
+import {React, useState, useContext } from 'react';
 import { View, Text, Image, StyleSheet, useWindowDimensions, ScrollView, ToastAndroid } from 'react-native';
 import Logo from '../../assets/images/adaptive-icon.png';
 import CustomInput from '../../components/CustomInput';
 import CustomButton from '../../components/CustomButton';
 import { useNavigation } from '@react-navigation/native';
 import { getUserMail } from '../../api';
+import { AuthContext } from '../../context/AuthContext';
+import CryptoES from 'crypto-es';
 
 const UserSignIn = () => {
+    const {login} = useContext(AuthContext);
     //Llamado de usuarios (prueba)
     /*
     const loadUsers = async () => {
@@ -28,24 +31,36 @@ const UserSignIn = () => {
     const navigation = useNavigation();
     
     const onSignInPressed = async () => {
-        const correo = logser.Correo;
-        const contraseña = logser.Contraseña;
         
+        const correo = logser.Correo;
+        //console.log("actual: " + logser.Contraseña);
+
+        const hash = CryptoES.SHA256(logser.Contraseña);
+        const hashString = hash.toString();
+        logser.Contraseña = hashString;
+
+        //console.log("actual 2: " + logser.Contraseña);
+
+        //Realzar busqueda API y obtener correo electronico y contraseña.
         const user = await getUserMail(logser);
-        console.log(user);
+
+        //console.log(user);
         const email = user.Correo;
         const mainpassword = user.Contraseña;
-        //const mainId = user[0].idUsuario;
+        //const mainId = user.idUsuario;
         
-        
+        /* Mostrar contraseña y Email
         console.log(email);
         console.log(mainpassword);
+        */
+        
+        console.log(mainpassword);
 
-        if (email === correo && mainpassword === contraseña) {
+        if (email === correo && mainpassword === hashString) {
             // Navigate to the HomeScreen
+            login(user);
             navigation.navigate('HomeScreen');
-            // Save the user's email to AsyncStorage
-
+            
             
         } else {
             // Show an error message
@@ -64,6 +79,7 @@ const UserSignIn = () => {
 
     const onSignInFacebook = () => {
         console.warn('onSignInFacebook');
+        console.log(login);
     };
 
     const onSignUpPress = () => {
@@ -78,7 +94,6 @@ const UserSignIn = () => {
                     style={[styles.logo, { height: height * 0.3 }]}
                     resizeMode='contain'
                 />
-
                 <CustomInput
                     placeholder="Correo Electronico"
                     setValue={(text) => handleChange('Correo', text)}

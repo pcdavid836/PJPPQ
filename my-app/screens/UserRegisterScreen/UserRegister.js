@@ -4,6 +4,8 @@ import { View, Text, StyleSheet, ScrollView, ToastAndroid } from 'react-native';
 import CustomInput from '../../components/CustomInput';
 import CustomButton from '../../components/CustomButton';
 import { saveUser } from '../../api';
+import CryptoES from 'crypto-es';
+
 
 
 const UserRegister = () => {
@@ -25,7 +27,7 @@ const UserRegister = () => {
         console.warn('OnTermsOfUsePressed');
     };
 
-    const onHandleSubmit = () => {
+    const onHandleSubmit = async () => {
         const password = user.Contraseña;
         const password2 = user.contraseña2;
         if (password !== password2) {
@@ -34,8 +36,15 @@ const UserRegister = () => {
         }
         else {
             console.log(user);
+            const hash = CryptoES.SHA256(password);
+            
+            user.Contraseña = hash.toString();
+
+            console.log(hash.toString());
+
             saveUser(user);
             navigation.navigate('MessageValidationScreen');
+            
         }
     };
 

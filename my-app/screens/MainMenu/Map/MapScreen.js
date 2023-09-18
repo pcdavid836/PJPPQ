@@ -1,11 +1,15 @@
 import React from 'react'
+import MapView from 'react-native-maps'
 import { View, Text, StyleSheet } from 'react-native'
 
 const MapScreen = () => {
 
   return (
-   
-    <Text> MAPA </Text>
+   <View style={styles.container}>
+      {/*<MapView style={styles.map}/>*/}
+   </View>
+    
+
     
   );
 };

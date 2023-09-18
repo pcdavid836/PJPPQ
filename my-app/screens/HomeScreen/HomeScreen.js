@@ -1,7 +1,6 @@
 import React from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import MapView from 'react-native-maps'
 import { NavigationContainer } from '@react-navigation/native';
 import { DrawerNavigation } from '../Navigation/DrawerNavigation';
 
@@ -13,7 +12,6 @@ const HomeScreen = () => {
      <NavigationContainer independent={true} >
         <DrawerNavigation />
      </NavigationContainer>
-   
   );
 };
 

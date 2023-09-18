@@ -21,13 +21,19 @@ export const getUserMail = async (req, res) => {
             req.body.Correo, 
             req.body.Contraseña
         ]);
-        console.log(rows);
+        //console.log(rows);
         if (rows.length === 1) {
             const user = rows[0];
             const userInfo = {
                 idUsuario: user.idUsuario, // Asumiendo que el ID es un campo en la tabla Usuario
                 Correo: user.Correo, // ... Agregar otros campos relevantes aquí si es necesario
-                Contraseña: user.Contraseña
+                Contraseña: user.Contraseña,
+                Nombres: user.Nombres,
+                Primer_Apellido: user.Primer_Apellido,
+                Segundo_Apellido: user.Segundo_Apellido,
+                CI: user.CI,
+                Celular: user.Celular,
+                idRol: user.Tipo_Usuario_idTipo_Usuario,
             };
             
             res.json(userInfo);
