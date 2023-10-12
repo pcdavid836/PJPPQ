@@ -1,6 +1,6 @@
 import {React, useState, useContext } from 'react';
 import { View, Text, Image, StyleSheet, useWindowDimensions, ScrollView, ToastAndroid } from 'react-native';
-import Logo from '../../assets/images/adaptive-icon.png';
+import Logo from '../../assets/images/logoEX.jpg';
 import CustomInput from '../../components/CustomInput';
 import CustomButton from '../../components/CustomButton';
 import { useNavigation } from '@react-navigation/native';
@@ -9,7 +9,7 @@ import { AuthContext } from '../../context/AuthContext';
 import CryptoES from 'crypto-es';
 
 const UserSignIn = () => {
-    const {login} = useContext(AuthContext);
+    const {login, updateUserImage} = useContext(AuthContext);
     //Llamado de usuarios (prueba)
     /*
     const loadUsers = async () => {
@@ -54,11 +54,12 @@ const UserSignIn = () => {
         console.log(mainpassword);
         */
         
-        console.log(mainpassword);
+        //console.log(mainpassword); ver contraseña despues del proceso
 
         if (email === correo && mainpassword === hashString) {
             // Navigate to the HomeScreen
             login(user);
+            updateUserImage(user.Url_imagen);
             navigation.navigate('HomeScreen');
             
             

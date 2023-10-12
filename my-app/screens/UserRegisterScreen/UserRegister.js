@@ -35,14 +35,14 @@ const UserRegister = () => {
             return;
         }
         else {
-            console.log(user);
+            //console.log(user);
             const hash = CryptoES.SHA256(password);
             
             user.Contraseña = hash.toString();
 
-            console.log(hash.toString());
+            //console.log(hash.toString());
 
-            saveUser(user);
+            saveUser(user)
             navigation.navigate('MessageValidationScreen');
             
         }

@@ -1,5 +1,7 @@
 import { Router } from "express";
-import { createUser, getUser, updateUser, deleteUser, getUserid, getUserMail } from '../controllers/user'
+import { createUser, getUser, updateUser, deleteUser, getUserid, getUserMail, updateImageUser } from '../controllers/user'
+
+//Se recomienda ver siempre el archivo de notas
 
 const router = Router();
 
@@ -64,6 +66,15 @@ router.put('/user/:id', updateUser)
  *    tags: [User]
  */
 router.put('/userdelete/:id', deleteUser)
+
+/**
+ * @swagger
+ * /user:
+ *  put:
+ *    summary: Modifica la imagen de un usuario identificado por su id
+ *    tags: [User]
+ */
+router.put('/userimage/:id', updateImageUser)
 
 
 export default router;

@@ -33,6 +33,7 @@ export const getUserMail = async (req, res) => {
                 Segundo_Apellido: user.Segundo_Apellido,
                 CI: user.CI,
                 Celular: user.Celular,
+                Url_imagen: user.Url_imagen,
                 idRol: user.Tipo_Usuario_idTipo_Usuario,
             };
             
@@ -80,8 +81,21 @@ export const deleteUser = async (req, res) => {
 
 export const updateUser = async (req, res) => {
     const connection = await connect();
-    await connection.query('UPDATE Usuario SET ? WHERE idUsuario = ?', [
-        req.body,
+    await connection.query('UPDATE Usuario SET Nombres = ?, Primer_Apellido = ?, Segundo_Apellido = ?, CI = ?, Celular = ?, FechaActualizacion = CURRENT_TIMESTAMP WHERE idUsuario = ?', [
+        req.body.Nombres,
+        req.body.Primer_Apellido,
+        req.body.Segundo_Apellido,
+        req.body.CI,
+        req.body.Celular,
+        req.params.id
+    ]);
+    res.sendStatus(204);
+};
+
+export const updateImageUser = async (req, res) => {
+    const connection = await connect();
+    await connection.query('UPDATE Usuario SET Url_imagen = ?, FechaActualizacion = CURRENT_TIMESTAMP WHERE idUsuario = ?', [
+        req.body.Url_imagen,
         req.params.id
     ]);
     res.sendStatus(204);

@@ -12,6 +12,7 @@ export const AuthProvider = ({children}) => {
     const [isLoading, setIsLoading] = useState(false);
     const [userToken, setUserToken] = useState(null);
     const [userInfo, setUserInfo] = useState(null);
+    const [userImage, setUserImage] = useState(null);
 
     //Inicio de Sesion
 
@@ -58,12 +59,16 @@ export const AuthProvider = ({children}) => {
         }
     }
 
+    const updateUserImage = (newImageURI) => {
+        setUserImage(newImageURI);
+      };
+
     useEffect(() => {
         isLoggedIn();
     },[]);
 
     return (
-        <AuthContext.Provider value={{login, logout, isLoading, userToken, userInfo}}>
+        <AuthContext.Provider value={{login, logout, updateUserImage, isLoading, userToken, userInfo, userImage}}>
             {children}
         </AuthContext.Provider>
     ); 

@@ -10,18 +10,16 @@ import NewPasswordScreen from '../NewPasswordScreen';
 
 const Stack = createNativeStackNavigator();
 
-const AuthStack = () => {
+function AuthStack() {
   return (
-    <NavigationContainer independent={true}>
-      <Stack.Navigator screenOptions={{ headerShown: false } }>
+    <NavigationContainer independent={true} >
+      <Stack.Navigator name="AuthStack" screenOptions={{ headerShown: false }  }>
         <Stack.Screen name="UserSignIn" component={UserSignIn} />
-        <Stack.Screen name="HomeScreen" component={HomeScreen} />
-        
+        <Stack.Screen name="HomeScreen" component={HomeScreen} />  
         <Stack.Screen name="MessageValidationScreen" component={MessageValidationScreen} />
         <Stack.Screen name="UserRegister" component={UserRegister} />
         <Stack.Screen name="NewPasswordScreen" component={NewPasswordScreen} />
         <Stack.Screen name="ForgotPasswordScreen" component={ForgotPasswordScreen} />
-
       </Stack.Navigator>
     </NavigationContainer>
   )

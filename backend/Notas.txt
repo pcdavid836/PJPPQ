@@ -1,0 +1,6 @@
+1. Para abrir swagger simplemente ve a este enlace cuando ejecutes npm run dev en el backend.
+
+http://localhost:3000/docs/
+
+
+2. Para añadir nuevas rutas primero modifica el archivo app.js
