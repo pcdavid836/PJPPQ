@@ -14,8 +14,6 @@ const CarsItem = ({ cars, onModifyComplete, onDeleteComplete }) => {
   let title = "";
   let carImage = "";
 
-
-
   const twoOptionAlert = () => {
     Alert.alert(
       // Título

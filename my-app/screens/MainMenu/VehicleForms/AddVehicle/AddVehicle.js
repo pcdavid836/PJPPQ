@@ -20,7 +20,7 @@ const data = [
 
 const defaultImageUrl = "https://firebasestorage.googleapis.com/v0/b/pkpq-74307.appspot.com/o/VehicleImages%2Fvehicle_default.jpg?alt=media&token=a9055e84-5ca2-49cc-a4ee-9dab61d076fe&_gl=1*tl3swp*_ga*MTkxMTcyMTI0MC4xNjk0ODIyNzI3*_ga_CW55HF8NVT*MTY5Njk1NjY5MC4zMy4xLjE2OTY5NTY3NDIuOC4wLjA.";
 
-const AddVehicle = ({closeModal, onComplete}) => {
+const AddVehicle = ({ closeModal, onComplete }) => {
     const [progress, setProgress] = useState(0);
     const { userInfo } = useContext(AuthContext);
     const [image, setImage] = useState(defaultImageUrl);
@@ -90,8 +90,7 @@ const AddVehicle = ({closeModal, onComplete}) => {
     }
 
     async function handleSubmit() {
-        if(value === 3 ||value === 7)
-        {
+        if (value === 3 || value === 7) {
             vehicle.Placa = "N/A";
             vehicle.Marca = "N/A";
         }
@@ -108,14 +107,14 @@ const AddVehicle = ({closeModal, onComplete}) => {
             vehicle.Tipo_Vehiculo_idTipo_Vehiculo &&
             vehicle.Usuario_idUsuario &&
             vehicle.Usuario_Tipo_Usuario_idTipo_Usuario &&
-            vehicle.Url_imagen 
+            vehicle.Url_imagen
         ) {
-            
+
             saveVehicle(vehicle);
             await uploadImage(image, "image");
             closeModal();
             onComplete();
-            
+
 
         } else {
             ToastAndroid.show('Completa los campos restantes!', ToastAndroid.SHORT);
@@ -365,11 +364,11 @@ const AddVehicle = ({closeModal, onComplete}) => {
                 return (
                     <View>
                         <Text style={styles.label}>Color</Text>
-                            <TextInput
-                                style={styles.input}
-                                placeholder="¿De que color es tu vehículo?"
-                                onChangeText={(text) => handleChange('Color', text)}
-                            />
+                        <TextInput
+                            style={styles.input}
+                            placeholder="¿De que color es tu vehículo?"
+                            onChangeText={(text) => handleChange('Color', text)}
+                        />
                         <Text style={styles.label}>Descripción</Text>
                         <TextInput
                             style={[styles.input, styles.largeInput]}
@@ -431,7 +430,10 @@ const AddVehicle = ({closeModal, onComplete}) => {
                                 <View style={styles.buttonContent}>
                                     <Text style={styles.buttonText2}>Tomar fotografía </Text>
                                 </View>
-                                <Modal visible={visible} animationType='slide' onRequestClose={hide}>
+                                <Modal visible={visible} animationType='slide' onRequestClose={() => {
+                                    hide();
+                                    setImage(defaultImageUrl); // Establece la imagen en defaultImageUrl cuando se cierra el Modal
+                                }}>
                                     <CameraVehicleScren closeModal={hide} />
                                 </Modal>
                             </TouchableOpacity>

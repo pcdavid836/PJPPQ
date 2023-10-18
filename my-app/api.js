@@ -4,6 +4,11 @@ const APIUserImage = "http://192.168.1.7:3000/userimage";
 const APIVehicle = "http://192.168.1.7:3000/vehicle";
 const APIVehicleInfo = "http://192.168.1.7:3000/vehicleInfo";
 const APIVehicleDelete = "http://192.168.1.7:3000/deletevehicle";
+const APIPark = "http://192.168.1.7:3000/park";
+const APIParkTime = "http://192.168.1.7:3000/parktime";
+const APIMyPark= "http://192.168.1.7:3000/mypark";
+const APIMyPost= "http://192.168.1.7:3000/mypost";
+const APIDeletePark= "http://192.168.1.7:3000/deletepark";
 
 //Nota la ip local siempre varia en todas las redes ver la ipconfig en cmd.
 
@@ -104,6 +109,84 @@ export const updateVehicle = async (idVehicle, newData) => {
 
 export const deleteVehicle = async (idVehicle) => {
   const res = await fetch(`${APIVehicleDelete}/${idVehicle}`, {
+    method: "PUT",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+  });
+  return res;
+};
+
+export const getParks = async () => {
+  const res = await fetch(APIPark, {
+    method: "GET",
+  });
+
+  return await res.json();
+};
+
+export const getParksTime = async (idPark) => {
+  const res = await fetch(`${APIParkTime}/${idPark}`, {
+    method: "GET",
+  });
+
+  return await res.json();
+};
+
+export const getUserPark = async (idUser) => {
+  const res = await fetch(`${APIMyPark}/${idUser}`, {
+    method: "GET",
+  });
+
+  return await res.json();
+};
+
+export const postulate = async (newPostulation) => {
+  //console.log("archivo json: " + JSON.stringify(newPostulation)); 
+  const res = await fetch(APIPark, {
+    method: "POST",
+    headers: { Accept: "application/json", "Content-Type": "application/json" },
+    body: JSON.stringify(newPostulation)
+  });
+  return await res.json();
+};
+
+export const getParkById = async (idPark) => {
+  const res = await fetch(`${APIPark}/${idPark}`, {
+    method: "GET",
+  });
+
+  return await res.json();
+};
+
+export const getInfoPark = async (idMyPost) => {
+  const requestBody = {
+    idParqueo: idMyPost,
+  };
+  const res = await fetch(APIMyPost, {
+    method: "POST",
+    headers: { Accept: "application/json", "Content-Type": "application/json" },
+    body: JSON.stringify(requestBody)
+  });
+  return await res.json();
+};
+
+export const updatePost = async (idMyPost, newData) => {
+  //console.log(idMyPost, newData)
+  const res = await fetch(`${APIMyPost}/${idMyPost}`, {
+    method: "PUT",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(newData),
+  });
+  return res;
+};
+
+export const deletePark = async (idMyPost) => {
+  const res = await fetch(`${APIDeletePark}/${idMyPost}`, {
     method: "PUT",
     headers: {
       Accept: "application/json",

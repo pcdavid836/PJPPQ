@@ -1,6 +1,6 @@
 import {React, useState, useContext } from 'react';
 import { View, Text, Image, StyleSheet, useWindowDimensions, ScrollView, ToastAndroid } from 'react-native';
-import Logo from '../../assets/images/logoEX.jpg';
+import Logo from '../../assets/images/logoEX.png';
 import CustomInput from '../../components/CustomInput';
 import CustomButton from '../../components/CustomButton';
 import { useNavigation } from '@react-navigation/native';

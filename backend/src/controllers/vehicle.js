@@ -2,7 +2,7 @@ import { connect } from "../database";
 
 export const getCarsid = async (req, res) => {
     const connection = await connect()
-    const [rows] = await connection.query("SELECT * FROM Vehiculo WHERE Usuario_idUsuario = ? AND Estado = 1", [
+    const [rows] = await connection.query("SELECT * FROM Vehiculo WHERE Usuario_idUsuario = ? AND Estado = 1;", [
         req.params.id,
     ]);
     res.json(rows);
@@ -10,7 +10,7 @@ export const getCarsid = async (req, res) => {
 
 export const getCarid = async (req, res) => {
     const connection = await connect()
-    const [rows] = await connection.query("SELECT * FROM Vehiculo WHERE idVehiculo = ? AND Estado = 1", [
+    const [rows] = await connection.query("SELECT * FROM Vehiculo WHERE idVehiculo = ? AND Estado = 1;", [
         req.params.id,
     ]);
     res.json(rows);

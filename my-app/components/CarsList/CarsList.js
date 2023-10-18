@@ -13,7 +13,6 @@ const CarsList = ({ cars, onModifyComplete, onDeleteComplete }) => {
       data={cars}
       keyExtractor={(item) => item.idVehiculo + ''}
       renderItem={renderItem}
-
     />
   );
 };
