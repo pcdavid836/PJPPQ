@@ -1,25 +1,23 @@
-import { React, useContext, useState } from 'react'
-import { createDrawerNavigator } from "@react-navigation/drawer"
+import { React, useContext, useState } from 'react';
+import { createDrawerNavigator } from "@react-navigation/drawer";
 import { AuthContext } from '../../context/AuthContext';
 
-import CustomDrawer from "../../components/CustomDrawer/CustomDrawer"
-import Ionicons from 'react-native-vector-icons/Ionicons'
+import CustomDrawer from "../../components/CustomDrawer/CustomDrawer";
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
-import MapScreen from "../MainMenu/Map"
-import BookingScreen from "../MainMenu/Booking"
-import ProfileScreen from "../MainMenu/Profile"
-import CreateParkingScreen from "../MainMenu/CreateParking"
-import VehicleScreen from "../MainMenu/Vehicle"
-import MyParkScreen from "../MainMenu/MyPark"
+import MapScreen from "../MainMenu/Map";
+import BookingScreen from "../MainMenu/Booking";
+import ProfileScreen from "../MainMenu/Profile";
+import CreateParkingScreen from "../MainMenu/CreateParking";
+import VehicleScreen from "../MainMenu/Vehicle";
+import MyParkScreen from "../MainMenu/MyPark";
 
-
-const Drawer = createDrawerNavigator()
-
+const Drawer = createDrawerNavigator();
 
 export function DrawerNavigation() {
     const { userInfo } = useContext(AuthContext);
+    //console.log(userInfo);
     return (
-
         <Drawer.Navigator drawerContent={props => <CustomDrawer {...props} />}
             screenOptions={{
                 headerShown: false,
@@ -46,7 +44,7 @@ export function DrawerNavigation() {
                     <Ionicons name="car-outline" size={22} color={color} />
                 )
             }} />
-            <Drawer.Screen name="Reserva" component={BookingScreen} options={{
+            <Drawer.Screen name="Reservas" component={BookingScreen} options={{
                 drawerIcon: ({ color }) => (
                     <Ionicons name="receipt-outline" size={22} color={color} />
                 )
@@ -56,16 +54,13 @@ export function DrawerNavigation() {
                     <Ionicons name="reader-outline" size={22} color={color} />
                 )
             }} />
-            {userInfo.idRol === 2 || userInfo.idRol === 3 || userInfo.idRol === 4 &&(
-                // Bloque de código que se ejecuta si el usuario tiene el rol 2
+            {userInfo.idRol === 2 || userInfo.idRol === 3 || userInfo.idRol === 4 ? (
                 <Drawer.Screen name="Mi Parqueo" component={MyParkScreen} options={{
                     drawerIcon: ({ color }) => (
-                        <Ionicons name="reader-outline" size={22} color={color} />
+                        <Ionicons name="key-outline" size={22} color={color} />
                     )
                 }} />
-            )}
+            ) : null}
         </Drawer.Navigator>
-
-    )
-
+    );
 }

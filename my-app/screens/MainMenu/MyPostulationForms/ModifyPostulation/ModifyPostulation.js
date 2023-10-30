@@ -40,15 +40,15 @@ const ModifyPostulation = ({ closeModal, myparkId, onComplete }) => {
   };
 
   const [fastUbi, setFastUbi] = useState("");
-  // Función para obtener los detalles del vehículo
+  // Función para obtener los detalles de la postulacion
   const fetchPostInfo = async () => {
     try {
       const response = await getInfoPark(myparkId);
       //console.log('Respuesta del servidor:', response);
 
-      // Actualiza el estado con los detalles del vehículo
+      // Actualiza el estado con los detalles de la postulacion
       setMyPark(response);
-      // Establece la imagen una vez que se hayan cargado los detalles del vehículo
+      // Establece la imagen una vez que se hayan cargado los detalles de la postulacion
       setImage(response.Url_imagen);
       setDocumentUri(response.Url_validacion);
       setFastUbi(response.Ubicacion); //
@@ -131,9 +131,9 @@ const ModifyPostulation = ({ closeModal, myparkId, onComplete }) => {
   const handleLocationSelect = (locationData) => {
     // Aquí puedes acceder a los datos de ubicación, que incluyen latitud, longitud y dirección.
     // Realiza la lógica necesaria con estos datos.
-    console.log('Datos de ubicación seleccionados:', locationData);
+    //console.log('Datos de ubicación seleccionados:', locationData);
     setFastUbi(locationData.address);
-    console.log(locationData.address);
+    //console.log(locationData.address);
 
     // Ejemplo de cómo asignar la ubicación a myparkValues:
     setMyPark({
@@ -147,7 +147,7 @@ const ModifyPostulation = ({ closeModal, myparkId, onComplete }) => {
 
   async function handleSubmit() {
     // Verificar si todos los campos requeridos están definidos
-    console.log(mypark)
+    //console.log(mypark)
     mypark.Url_validacion = document;
     mypark.Tipo_Parqueo_idTipo_Parqueo = value;
     mypark.Url_imagen = image;
@@ -165,7 +165,7 @@ const ModifyPostulation = ({ closeModal, myparkId, onComplete }) => {
 
       updatePost(myparkId ,mypark);
       if (mypark.Url_imagen !== "defaultPark") {
-        //agregar if donde si la imagen es igual a su response no se debe subir a la nuve
+        //agregar if donde si la imagen es igual a su response no se debe subir a la nube
         await uploadImage(image, "image");
         await uploadFile(document, "file");
       }

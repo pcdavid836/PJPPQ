@@ -2,13 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, Modal, ScrollView, TouchableOpacity, FlatList } from 'react-native'
 import { getParksTime } from '../../../../api';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import ReserveSpace from '../ReserveSpace';
+
 
 const CardPlace = ({ park, closeModal }) => {
   let parkImage = "defaultPark";
   const [parktime, setParkTime] = useState([]);
   const [isTimeVisible, setTimeVisible] = useState(false);
   const [iconName, setIconName] = useState("chevron-down-outline");
-
+  const [isModalVisible, setModalVisible] = useState(false);
+  const hide = () => setModalVisible(false);
 
   const loadTimes = async () => {
     const data = await getParksTime(park.idParqueo);
@@ -92,9 +95,13 @@ const CardPlace = ({ park, closeModal }) => {
     closeModal();
   };
 
+  async function btnBook() {
+    // Si ya tengo una reserva con Estado 1 obtendre una alerta que indique que debo primero finalizar la actual
+    setModalVisible(true);
+  }
 
   if (park.Url_imagen === "defaultPark") {
-    parkImage = "https://www.bestsheds.com.au/wp-content/uploads/2020/05/Double-Garage-001-1RD.jpg";
+    parkImage = "https://firebasestorage.googleapis.com/v0/b/pkpq-74307.appspot.com/o/GarageImages%2FdefaulttPark.jpg?alt=media&token=829c6cfc-bfda-45ef-a172-7f6086d260c7&_gl=1*1yfph6u*_ga*MTkxMTcyMTI0MC4xNjk0ODIyNzI3*_ga_CW55HF8NVT*MTY5ODA0NDQxNi40NC4xLjE2OTgwNDQ3NjguNTguMC4w";
   } else {
     parkImage = park.Url_imagen;
   }
@@ -129,7 +136,6 @@ const CardPlace = ({ park, closeModal }) => {
           </TouchableOpacity>
         </View>
       </View>
-
       {isTimeVisible && (
         <FlatList
           contentContainerStyle={{ alignItems: 'center' }}
@@ -139,9 +145,25 @@ const CardPlace = ({ park, closeModal }) => {
         />
       )}
       <View style={styles.addToCarContainer}>
-        <TouchableOpacity style={styles.shareButton} onPress={() => clickEventListener()}>
+        <TouchableOpacity style={styles.shareButton} onPress={btnBook}>
           <Text style={styles.shareButtonText}>Solicitar Reserva</Text>
         </TouchableOpacity>
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={isModalVisible}
+          onRequestClose={() => {
+            setModalVisible(!isModalVisible);
+          }}
+        >
+          {/* Agrega un contenedor que oscurece el fondo */}
+          <View style={{ flex: 1, justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)' }}>
+            {/* Asegúrate de que el contenido del modal esté centrado */}
+            <View style={{ margin: 20, backgroundColor: "white", borderRadius: 20, padding: 35, shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 4, elevation: 5 }}>
+              <ReserveSpace parkId={park.idParqueo} parktimer={parktime} closeModal={hide} />
+            </View>
+          </View>
+        </Modal>
       </View>
     </View>
   )
@@ -177,43 +199,6 @@ const styles = StyleSheet.create({
     textAlign: 'justify',
     marginTop: 10,
     color: '#696969',
-  },
-  btnColor: {
-    height: 30,
-    width: 30,
-    borderRadius: 30,
-    marginHorizontal: 3,
-  },
-  btnSize: {
-    height: 40,
-    width: 40,
-    borderRadius: 40,
-    borderColor: '#778899',
-    borderWidth: 1,
-    marginHorizontal: 3,
-    backgroundColor: 'white',
-
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  contentColors: {
-    justifyContent: 'center',
-    marginHorizontal: 30,
-    flexDirection: 'row',
-    marginTop: 20,
-  },
-  contentSize: {
-    justifyContent: 'center',
-    marginHorizontal: 30,
-    flexDirection: 'row',
-    marginTop: 20,
-  },
-  separator: {
-    height: 2,
-    backgroundColor: '#eeeeee',
-    marginTop: 20,
-    marginHorizontal: 30,
   },
   shareButton: {
     marginTop: 10,
@@ -251,12 +236,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: 'purple',
     fontWeight: 'bold',
-    marginRight: 10, // Espacio entre el texto y el icono
+    marginRight: 10,
   },
   closeButton: {
     position: 'absolute',
     top: -30,
-    zIndex: 1, // Asegura que el botón esté sobre otros elementos
+    zIndex: 1,
   },
 })
 

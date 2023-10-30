@@ -2,7 +2,7 @@ import { connect } from "../database"
 
 export const getPark = async (req, res) => {
     const db = await connect();
-    const [rows] = await db.query('SELECT * FROM parqueo WHERE Estado = 1 AND Aprobacion = 1;')
+    const [rows] = await db.query('SELECT * FROM parqueo WHERE Estado = 1 AND Aprobacion = 1 AND Disponibilidad = 1;')
     res.json(rows);
 }
 
@@ -75,11 +75,24 @@ export const updatePostPark = async (req, res) => {
     res.sendStatus(204);
 };
 
+export const updatePark = async (req, res) => {
+    const connection = await connect();
+    await connection.query('UPDATE parqueo SET Ubicacion = ?, Descripcion = ?, Titulo = ?, Url_imagen = ?, Disponibilidad = ? WHERE idParqueo = ? AND Estado = 1 AND Aprobacion = 1;', [
+        req.body.Ubicacion,
+        req.body.Descripcion,
+        req.body.Titulo,
+        req.body.Url_imagen,
+        req.body.Disponibilidad,
+        req.params.id
+    ]);
+    res.sendStatus(204);
+};
+
 export const getPostPark = async (req, res) => {
     try {
         const connection = await connect();
         const [rows] = await connection.execute("SELECT * FROM Parqueo WHERE idParqueo = ? AND Estado = 1;", [
-            req.body.idParqueo, 
+            req.body.idParqueo,
         ]);
         //console.log(rows);
         if (rows.length === 1) {
@@ -95,8 +108,9 @@ export const getPostPark = async (req, res) => {
                 Url_validacion: park.Url_validacion,
                 Latitud: park.Latitud,
                 Longitud: park.Longitud,
+                Disponibilidad: park.Disponibilidad, // ...
             };
-            
+
             res.json(parkinfo);
         } else {
             res.status(401).json({ mensaje: "id invalida" });
@@ -114,3 +128,11 @@ export const deletePark = async (req, res) => {
     ]);
     res.sendStatus(204);
 };
+
+export const getMyAprobedPark = async (req, res) => {
+    const connection = await connect()
+    const [rows] = await connection.query("SELECT parqueo.* FROM parqueo INNER JOIN usuario_has_parqueo ON parqueo.idParqueo = usuario_has_parqueo.parqueo_idParqueo WHERE usuario_has_parqueo.usuario_idUsuario = ? AND parqueo.Aprobacion = 1 AND parqueo.Estado = 1;", [
+        req.params.id,
+    ]);
+    res.json(rows)
+}

@@ -2,7 +2,7 @@ import { connect } from "../database";
 
 export const getCarsid = async (req, res) => {
     const connection = await connect()
-    const [rows] = await connection.query("SELECT * FROM Vehiculo WHERE Usuario_idUsuario = ? AND Estado = 1;", [
+    const [rows] = await connection.query("SELECT * FROM Vehiculo WHERE usuario_idUsuario = ? AND Estado = 1;", [
         req.params.id,
     ]);
     res.json(rows);
@@ -27,8 +27,7 @@ export const createVehicle = async (req, res) => {
             Marca,
             Descripcion,
             Tipo_Vehiculo_idTipo_Vehiculo,
-            Usuario_idUsuario,
-            Usuario_Tipo_Usuario_idTipo_Usuario,
+            usuario_idUsuario,
             Url_imagen
         } = req.body;
         
@@ -38,8 +37,7 @@ export const createVehicle = async (req, res) => {
             Marca === undefined ||
             Descripcion === undefined ||
             Tipo_Vehiculo_idTipo_Vehiculo === undefined ||
-            Usuario_idUsuario === undefined ||
-            Usuario_Tipo_Usuario_idTipo_Usuario === undefined ||
+            usuario_idUsuario === undefined ||
             Url_imagen === undefined
         ) {
             console.log('Valores faltantes en la solicitud:');
@@ -48,21 +46,19 @@ export const createVehicle = async (req, res) => {
             console.log('Marca:', Marca);
             console.log('Descripcion:', Descripcion);
             console.log('Tipo_Vehiculo_idTipo_Vehiculo:', Tipo_Vehiculo_idTipo_Vehiculo);
-            console.log('Usuario_idUsuario:', Usuario_idUsuario);
-            console.log('Usuario_Tipo_Usuario_idTipo_Usuario:', Usuario_Tipo_Usuario_idTipo_Usuario);
+            console.log('Usuario_idUsuario:', usuario_idUsuario);
             console.log('Url_Imagen:', Url_imagen);
             // Alguno de los valores está ausente, puedes manejar este caso apropiadamente
             return res.status(400).json({ error: 'Faltan datos requeridos' });
         }
 
-        const [results] = await connection.execute("INSERT INTO Vehiculo (Placa, Color, Marca, Descripcion, Estado, Tipo_Vehiculo_idTipo_Vehiculo, Usuario_idUsuario, Usuario_Tipo_Usuario_idTipo_Usuario, Url_imagen, Fecha_Creacion) VALUES (?, ?, ?, ?, 1, ?, ?, ?, ?, CURRENT_TIMESTAMP)", [
+        const [results] = await connection.execute("INSERT INTO Vehiculo (Placa, Color, Marca, Descripcion, Estado, Tipo_Vehiculo_idTipo_Vehiculo, usuario_idUsuario, Url_imagen, Fecha_Creacion) VALUES (?, ?, ?, ?, 1, ?, ?, ?, CURRENT_TIMESTAMP)", [
             Placa,
             Color,
             Marca,
             Descripcion,
             Tipo_Vehiculo_idTipo_Vehiculo,
-            Usuario_idUsuario,
-            Usuario_Tipo_Usuario_idTipo_Usuario,
+            usuario_idUsuario,
             Url_imagen
         ]);
 

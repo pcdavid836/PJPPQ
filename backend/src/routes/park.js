@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getPark, getMyPark, createPark, getParkid, updatePostPark, getPostPark, deletePark } from '../controllers/park'
+import { getPark, getMyPark, createPark, getParkid, updatePostPark, getPostPark, deletePark, getMyAprobedPark, updatePark } from '../controllers/park'
 
 const router = Router();
 
@@ -60,6 +60,16 @@ router.put('/mypost/:id', updatePostPark)
  * @swagger
  * /mypost:
  *  put:
+ *    summary: Modifica a los valores basicos de un parqueo aprobado mediante su id.
+ *    tags: [Parking]
+ */
+router.put('/park/:id', updatePark)
+
+
+/**
+ * @swagger
+ * /mypost:
+ *  put:
  *    summary: Obtiene a un parqueo por su id pero cuando este este en la fase de postulaciones.
  *    tags: [Parking]
  */
@@ -73,6 +83,15 @@ router.post('/mypost', getPostPark)
  *    tags: [Parking]
  */
 router.put('/deletepark/:id', deletePark)
+
+/**
+ * @swagger
+ * /myparkaprobed/:id:
+ *  get:
+ *    summary: Obtiene un parqueo de un usuario por el id del usuario y que este aprobado en el sistema para ser mostrado en la aplicacion.
+ *    tags: [Parking]
+ */
+router.get('/myparkaprobed/:id', getMyAprobedPark)
 
 
 

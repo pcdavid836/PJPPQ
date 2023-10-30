@@ -45,15 +45,13 @@ const AddVehicle = ({ closeModal, onComplete }) => {
         Marca: 'N/A',
         Descripcion: '',
         Tipo_Vehiculo_idTipo_Vehiculo: '',
-        Usuario_idUsuario: '',
-        Usuario_Tipo_Usuario_idTipo_Usuario: '',
+        usuario_idUsuario: '',
         Url_imagen: 'defaultVehicle',
     });
 
     const handleChange = (name, value) => setVehicle({ ...vehicle, [name]: value });
 
     const [actualImage, setActualImage] = useState(defaultImageUrl);
-
 
     const renderLabel = () => {
         if (value || isFocus) {
@@ -65,6 +63,7 @@ const AddVehicle = ({ closeModal, onComplete }) => {
         }
         return null;
     };
+
     async function editImageChange() {
         try {
             let result = await ImagePicker.launchImageLibraryAsync({
@@ -96,8 +95,7 @@ const AddVehicle = ({ closeModal, onComplete }) => {
         }
         // Verifica si todos los campos requeridos están definidos
         vehicle.Tipo_Vehiculo_idTipo_Vehiculo = value;
-        vehicle.Usuario_idUsuario = userInfo.idUsuario;
-        vehicle.Usuario_Tipo_Usuario_idTipo_Usuario = userInfo.idRol;
+        vehicle.usuario_idUsuario = userInfo.idUsuario;
         vehicle.Url_imagen = image;
         if (
             vehicle.Placa &&
@@ -105,8 +103,7 @@ const AddVehicle = ({ closeModal, onComplete }) => {
             vehicle.Marca &&
             vehicle.Descripcion &&
             vehicle.Tipo_Vehiculo_idTipo_Vehiculo &&
-            vehicle.Usuario_idUsuario &&
-            vehicle.Usuario_Tipo_Usuario_idTipo_Usuario &&
+            vehicle.usuario_idUsuario &&
             vehicle.Url_imagen
         ) {
 

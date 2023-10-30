@@ -33,7 +33,6 @@ const PlacesItem = ({ park, onOpenModal }) => {
         />
       );
       break;
-    // Agrega más casos según tus necesidades
     default:
       // Si el valor no coincide con ningún caso, no se mostrará nada.
       markerContent = null;

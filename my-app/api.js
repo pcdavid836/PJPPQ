@@ -6,9 +6,21 @@ const APIVehicleInfo = "http://192.168.1.7:3000/vehicleInfo";
 const APIVehicleDelete = "http://192.168.1.7:3000/deletevehicle";
 const APIPark = "http://192.168.1.7:3000/park";
 const APIParkTime = "http://192.168.1.7:3000/parktime";
-const APIMyPark= "http://192.168.1.7:3000/mypark";
-const APIMyPost= "http://192.168.1.7:3000/mypost";
-const APIDeletePark= "http://192.168.1.7:3000/deletepark";
+const APIMyPark = "http://192.168.1.7:3000/mypark";
+const APIMyPost = "http://192.168.1.7:3000/mypost";
+const APIDeletePark = "http://192.168.1.7:3000/deletepark";
+const APISelectAllMyParks = "http://192.168.1.7:3000/myparkaprobed";
+const APISelectParkToEdit = "http://192.168.1.7:3000/parktimetoedit";
+const APIBooking = "http://192.168.1.7:3000/book";
+const APIBookingUser = "http://192.168.1.7:3000/bookuser";
+const APIBookingPark = "http://192.168.1.7:3000/bookpark";
+const APIBookingCancel = "http://192.168.1.7:3000/bookcancel";
+const APIBookingDeny = "http://192.168.1.7:3000/bookdeny";
+const APIParkVehicleEnter = "http://192.168.1.7:3000/parkvehicleenter";
+const APIParkVehicle = "http://192.168.1.7:3000/parkvehicle";
+const APIParkVehicleDeny = "http://192.168.1.7:3000/parkvehicledeny";
+const APIParkVehicleFinish = "http://192.168.1.7:3000/parkvehiclefinish";
+
 
 //Nota la ip local siempre varia en todas las redes ver la ipconfig en cmd.
 
@@ -187,6 +199,143 @@ export const updatePost = async (idMyPost, newData) => {
 
 export const deletePark = async (idMyPost) => {
   const res = await fetch(`${APIDeletePark}/${idMyPost}`, {
+    method: "PUT",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+  });
+  return res;
+};
+
+export const getUserParkAprobed = async (idUser) => {
+  const res = await fetch(`${APISelectAllMyParks}/${idUser}`, {
+    method: "GET",
+  });
+
+  return await res.json();
+};
+
+export const getParkTimetoEdit = async (idPark) => {
+  const res = await fetch(`${APISelectParkToEdit}/${idPark}`, {
+    method: "GET",
+  });
+
+  return await res.json();
+};
+
+
+export const updateParkTime = async (newData) => {
+  const res = await fetch(APIParkTime, {
+    method: "PUT",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(newData),
+  });
+  return res;
+};
+
+export const updateBasicPark = async (idPark, newData) => {
+  //console.log(idMyPost, newData)
+  const res = await fetch(`${APIPark}/${idPark}`, {
+    method: "PUT",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(newData),
+  });
+  return res;
+};
+
+export const createBooking = async (newData) => {
+  //console.log("archivo json: " + JSON.stringify(newData)); 
+  const res = await fetch(APIBooking, {
+    method: "POST",
+    headers: { Accept: "application/json", "Content-Type": "application/json" },
+    body: JSON.stringify(newData)
+  });
+  return await res.json();
+};
+
+export const getBookByUser = async (idUser) => {
+  const res = await fetch(`${APIBookingUser}/${idUser}`, {
+    method: "GET",
+  });
+
+  return await res.json();
+};
+
+export const getBookByPark = async (idPark) => {
+  const res = await fetch(`${APIBookingPark}/${idPark}`, {
+    method: "GET",
+  });
+  const data = await res.json();
+  //console.log(data);
+  return data;
+};
+
+
+export const cancelBook = async (idBook) => {
+  const res = await fetch(`${APIBookingCancel}/${idBook}`, {
+    method: "PUT",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+  });
+  return res;
+};
+
+export const denyBook = async (idBook) => {
+  const res = await fetch(`${APIBookingDeny}/${idBook}`, {
+    method: "PUT",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+  });
+  return res;
+};
+
+export const parkVehicleEnter = async (idBook, newData) => {
+  //console.log(idBook, newData)
+  const res = await fetch(`${APIParkVehicleEnter}/${idBook}`, {
+    method: "PUT",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(newData),
+  });
+  return res;
+};
+
+export const getParkVehicleByPark = async (idPark) => {
+  const res = await fetch(`${APIParkVehicle}/${idPark}`, {
+    method: "GET",
+  });
+  const data = await res.json();
+  //console.log(data);
+  return data;
+};
+
+
+export const parkVehicleFinish = async (idBook) => {
+  const res = await fetch(`${APIParkVehicleFinish}/${idBook}`, {
+    method: "PUT",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+  });
+  return res;
+};
+
+export const parkVehicleDeny = async (idBook) => {
+  const res = await fetch(`${APIParkVehicleDeny}/${idBook}`, {
     method: "PUT",
     headers: {
       Accept: "application/json",

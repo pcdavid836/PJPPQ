@@ -24,7 +24,7 @@ const MapScreen = ({ navigation }) => {
     getLocationPermission();
   }, []);
 
-  
+
 
   const loadPlaces = async () => {
     const data = await getParks();
@@ -44,13 +44,19 @@ const MapScreen = ({ navigation }) => {
     };
     setOrigin(current);
     loadPlaces();
+    mapViewRef.current.animateToRegion({
+      latitude: current.latitude,
+      longitude: current.longitude,
+      latitudeDelta: 0.005,
+      longitudeDelta: 0.005,
+    });
   }
 
   async function searchLocation() {
-    const searchUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${search+loc}&key=${GOOGLE_MAPS_KEY}`;
+    const searchUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${search + loc}&key=${GOOGLE_MAPS_KEY}`;
     const response = await fetch(searchUrl);
     const data = await response.json();
-  
+
     if (data.status === 'OK') {
       const location = data.results[0].geometry.location;
       mapViewRef.current.animateToRegion({

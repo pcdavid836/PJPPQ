@@ -93,6 +93,11 @@ const CarsItem = ({ cars, onModifyComplete, onDeleteComplete }) => {
             </View>
             <View style={styles.cardFooter}>
               <Text style={styles.mod} onPress={modifyVehicle}>Modificar</Text>
+              <Modal visible={visible} animationType='slide' onRequestClose={hide}>
+                <ModifyVehicle closeModal={hide} vehicleType={cars.Tipo_Vehiculo_idTipo_Vehiculo} vehicleId={cars.idVehiculo} onComplete={(modifiedVehicle) => {
+                  onModifyComplete(modifiedVehicle);
+                }} />
+              </Modal>
               <Text style={styles.del} onPress={twoOptionAlert}>Eliminar</Text>
             </View>
           </View>
@@ -112,6 +117,11 @@ const CarsItem = ({ cars, onModifyComplete, onDeleteComplete }) => {
             </View>
             <View style={styles.cardFooter}>
               <Text style={styles.mod} onPress={modifyVehicle}>Modificar</Text>
+              <Modal visible={visible} animationType='slide' onRequestClose={hide}>
+                <ModifyVehicle closeModal={hide} vehicleType={cars.Tipo_Vehiculo_idTipo_Vehiculo} vehicleId={cars.idVehiculo} onComplete={(modifiedVehicle) => {
+                  onModifyComplete(modifiedVehicle);
+                }} />
+              </Modal>
               <Text style={styles.del} onPress={twoOptionAlert}>Eliminar</Text>
             </View>
           </View>
@@ -132,6 +142,11 @@ const CarsItem = ({ cars, onModifyComplete, onDeleteComplete }) => {
             </View>
             <View style={styles.cardFooter}>
               <Text style={styles.mod} onPress={modifyVehicle}>Modificar</Text>
+              <Modal visible={visible} animationType='slide' onRequestClose={hide}>
+                <ModifyVehicle closeModal={hide} vehicleType={cars.Tipo_Vehiculo_idTipo_Vehiculo} vehicleId={cars.idVehiculo} onComplete={(modifiedVehicle) => {
+                  onModifyComplete(modifiedVehicle);
+                }} />
+              </Modal>
               <Text style={styles.del} onPress={twoOptionAlert}>Eliminar</Text>
             </View>
           </View>
@@ -152,6 +167,11 @@ const CarsItem = ({ cars, onModifyComplete, onDeleteComplete }) => {
             </View>
             <View style={styles.cardFooter}>
               <Text style={styles.mod} onPress={modifyVehicle}>Modificar</Text>
+              <Modal visible={visible} animationType='slide' onRequestClose={hide}>
+                <ModifyVehicle closeModal={hide} vehicleType={cars.Tipo_Vehiculo_idTipo_Vehiculo} vehicleId={cars.idVehiculo} onComplete={(modifiedVehicle) => {
+                  onModifyComplete(modifiedVehicle);
+                }} />
+              </Modal>
               <Text style={styles.del} onPress={twoOptionAlert}>Eliminar</Text>
             </View>
           </View>
@@ -172,6 +192,11 @@ const CarsItem = ({ cars, onModifyComplete, onDeleteComplete }) => {
             </View>
             <View style={styles.cardFooter}>
               <Text style={styles.mod} onPress={modifyVehicle}>Modificar</Text>
+              <Modal visible={visible} animationType='slide' onRequestClose={hide}>
+                <ModifyVehicle closeModal={hide} vehicleType={cars.Tipo_Vehiculo_idTipo_Vehiculo} vehicleId={cars.idVehiculo} onComplete={(modifiedVehicle) => {
+                  onModifyComplete(modifiedVehicle);
+                }} />
+              </Modal>
               <Text style={styles.del} onPress={twoOptionAlert}>Eliminar</Text>
             </View>
           </View>
@@ -190,6 +215,11 @@ const CarsItem = ({ cars, onModifyComplete, onDeleteComplete }) => {
             </View>
             <View style={styles.cardFooter}>
               <Text style={styles.mod} onPress={modifyVehicle}>Modificar</Text>
+              <Modal visible={visible} animationType='slide' onRequestClose={hide}>
+                <ModifyVehicle closeModal={hide} vehicleType={cars.Tipo_Vehiculo_idTipo_Vehiculo} vehicleId={cars.idVehiculo} onComplete={(modifiedVehicle) => {
+                  onModifyComplete(modifiedVehicle);
+                }} />
+              </Modal>
               <Text style={styles.del} onPress={twoOptionAlert}>Eliminar</Text>
             </View>
           </View>

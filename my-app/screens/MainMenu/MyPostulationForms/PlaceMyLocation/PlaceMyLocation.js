@@ -41,6 +41,12 @@ export default function PlaceMyLocation({ closeModal, onLocationSelect }) {
       longitude: actualLoc.coords.longitude,
     };
     setOrigin(current);
+    mapViewRef.current.animateToRegion({
+      latitude: current.latitude,
+      longitude: current.longitude,
+      latitudeDelta: 0.005,
+      longitudeDelta: 0.005,
+    });
   }
 
   async function searchLocation() {
