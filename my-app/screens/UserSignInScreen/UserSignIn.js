@@ -21,7 +21,7 @@ const UserSignIn = () => {
 
     const [logser, setLogser] = useState({
         Correo: '',
-        Contraseña: '',
+        Contrasena: '',
     });
 
     const handleChange = (name, value) => setLogser({ ...logser, [name]: value });
@@ -33,28 +33,28 @@ const UserSignIn = () => {
     const onSignInPressed = async () => {
         
         const correo = logser.Correo;
-        //console.log("actual: " + logser.Contraseña);
+        //console.log("actual: " + logser.Contrasena);
 
-        const hash = CryptoES.SHA256(logser.Contraseña);
+        const hash = CryptoES.SHA256(logser.Contrasena);
         const hashString = hash.toString();
-        logser.Contraseña = hashString;
+        logser.Contrasena = hashString;
 
-        //console.log("actual 2: " + logser.Contraseña);
+        //console.log("actual 2: " + logser.Contrasena);
 
-        //Realzar busqueda API y obtener correo electronico y contraseña.
+        //Realzar busqueda API y obtener correo electronico y Contrasena.
         const user = await getUserMail(logser);
 
         //console.log(user);
         const email = user.Correo;
-        const mainpassword = user.Contraseña;
+        const mainpassword = user.Contrasena;
         //const mainId = user.idUsuario;
         
-        /* Mostrar contraseña y Email
+        /* Mostrar Contrasena y Email
         console.log(email);
         console.log(mainpassword);
         */
         
-        //console.log(mainpassword); ver contraseña despues del proceso
+        //console.log(mainpassword); ver Contrasena despues del proceso
 
         if (email === correo && mainpassword === hashString) {
             // Navigate to the HomeScreen
@@ -65,7 +65,7 @@ const UserSignIn = () => {
             
         } else {
             // Show an error message
-            ToastAndroid.show('Correo o Contraseña Incorrectos!', ToastAndroid.SHORT);
+            ToastAndroid.show('Correo o Contrasena Incorrectos!', ToastAndroid.SHORT);
         }
      
     };
@@ -100,12 +100,12 @@ const UserSignIn = () => {
                     setValue={(text) => handleChange('Correo', text)}
                 />
                 <CustomInput
-                    placeholder="Contraseña"
-                    setValue={(text) => handleChange('Contraseña', text)}
+                    placeholder="Contrasena"
+                    setValue={(text) => handleChange('Contrasena', text)}
                     secureTextEntry
                 />
                 <CustomButton
-                    text="¿Olvidaste tu contraseña?"
+                    text="¿Olvidaste tu Contrasena?"
                     onPress={onForgotPasswordPressed}
                     type="TERTIARY"
                 />

@@ -40,6 +40,8 @@ const AddPostulation = ({ closeModal, onComplete }) => {
         }
     };
 
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
     let varFileName = '';
     const [fastUbi, setFastUbi] = useState("");
 
@@ -68,7 +70,7 @@ const AddPostulation = ({ closeModal, onComplete }) => {
         console.log('Datos de ubicación seleccionados:', locationData);
         setFastUbi(locationData.address);
         console.log(locationData.address);
-        
+
         // Ejemplo de cómo asignar la ubicación a myparkValues:
         setMyparkValues({
             ...myparkValues,
@@ -135,6 +137,7 @@ const AddPostulation = ({ closeModal, onComplete }) => {
     }
 
     async function handleSubmit() {
+        setIsSubmitting(true);
         // Verificar si todos los campos requeridos están definidos
         myparkValues.Url_validacion = document;
         myparkValues.Tipo_Parqueo_idTipo_Parqueo = value;
@@ -152,18 +155,22 @@ const AddPostulation = ({ closeModal, onComplete }) => {
             myparkValues.Longitud &&
             myparkValues.usuario_idUsuario
         ) {
-
-            postulate(myparkValues);
-            await uploadImage(image, "image");
-            await uploadFile(document, "file");
-            closeModal();
-            onComplete();
-
-
+            try {
+                // Espera a que la imagen y el documento se suban antes de postular
+                await uploadImage(image, "image");
+                await uploadFile(document, "file");
+                postulate(myparkValues);
+                onComplete();
+                closeModal();
+            } catch (error) {
+                console.error("Error al subir la imagen o el documento:", error);
+            }
         } else {
             ToastAndroid.show('Completa los campos restantes!', ToastAndroid.SHORT);
         }
+        setIsSubmitting(false);
     }
+    
 
     async function uploadImage(uri, fileType) {
         const response = await fetch(uri);
@@ -172,27 +179,31 @@ const AddPostulation = ({ closeModal, onComplete }) => {
         const storageRef = ref(storage, "GarageImages/" + new Date().getTime() + "u" + userInfo.idUsuario + "pk")
         const uploadTask = uploadBytesResumable(storageRef, blob)
 
-        // Eventos que suceden cuando se sube la imagen:
-        // Cuadro de carga (no es usado aquí pero puede ser usado en otra vista)
-        uploadTask.on("state_changed", (snapshot) => {
-            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            setProgress(progress.toFixed());
-        },
-            (error) => {
-                // Handle error
-                console.error("Error al subir la imagen:", error);
+        // Devuelve una nueva promesa
+        return new Promise((resolve, reject) => {
+            uploadTask.on("state_changed", (snapshot) => {
+                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                setProgress(progress.toFixed());
             },
-            () => {
-                getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
-                    // Imagen almacenada en base de datos y nube
-                    setImage(downloadURL);
-                    // Asigna la URL de la imagen a la variable actualImage
-                    // Luego, puedes realizar otras acciones con la URL de la imagen, si es necesario.
-                }).catch((error) => {
-                    console.error("Error al obtener la URL de la imagen:", error);
+                (error) => {
+                    // Rechaza la promesa con el error
+                    reject(error);
+                },
+                () => {
+                    getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+                        // Imagen almacenada en base de datos y nube
+                        setImage(downloadURL);
+                        myparkValues.Url_imagen = downloadURL;
+                        // Resuelve la promesa cuando la imagen se haya subido
+                        resolve();
+                    }).catch((error) => {
+                        // Rechaza la promesa con el error
+                        reject(error);
+                    });
                 });
-            });
+        });
     }
+
 
     async function uploadFile(uri, fileType) {
         const response = await fetch(uri);
@@ -201,24 +212,31 @@ const AddPostulation = ({ closeModal, onComplete }) => {
         const storageRef = ref(storage, "GarageDocuments/" + new Date().getTime() + "u" + userInfo.idUsuario + "pkd")
         const uploadTask = uploadBytesResumable(storageRef, blob)
 
-        // Eventos que suceden cuando se sube la imagen:
-        // Cuadro de carga (no es usado aquí pero puede ser usado en otra vista)
-        uploadTask.on("state_changed", (snapshot) => {
-            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            setProgress(progress.toFixed());
-        },
-            (error) => {
-                // Handle error
-                console.error("Error al subir la imagen:", error);
+        // Devuelve una nueva promesa
+        return new Promise((resolve, reject) => {
+            uploadTask.on("state_changed", (snapshot) => {
+                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                setProgress(progress.toFixed());
             },
-            () => {
-                getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
-                    setDocumentUri(downloadURL);
-                }).catch((error) => {
-                    console.error("Error al obtener la URL de la imagen:", error);
+                (error) => {
+                    // Rechaza la promesa con el error
+                    reject(error);
+                },
+                () => {
+                    getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+                        // Actualiza la URI del documento
+                        setDocumentUri(downloadURL);
+                        myparkValues.Url_validacion = downloadURL;
+                        // Resuelve la promesa cuando el archivo se haya subido
+                        resolve();
+                    }).catch((error) => {
+                        // Rechaza la promesa con el error
+                        reject(error);
+                    });
                 });
-            });
+        });
     }
+
 
 
     return (
@@ -326,7 +344,7 @@ const AddPostulation = ({ closeModal, onComplete }) => {
                         </View>
                     </View>
 
-                    <TouchableOpacity style={styles.buttonSub} onPress={() => handleSubmit()}>
+                    <TouchableOpacity style={styles.buttonSub} onPress={() => handleSubmit()} disabled={isSubmitting}>
                         <Text style={styles.buttonText}>Subir Postulación</Text>
                     </TouchableOpacity>
                 </View>

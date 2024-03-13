@@ -39,6 +39,7 @@ const ModifyPostulation = ({ closeModal, myparkId, onComplete }) => {
     }
   };
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [fastUbi, setFastUbi] = useState("");
   // Función para obtener los detalles de la postulacion
   const fetchPostInfo = async () => {
@@ -146,11 +147,9 @@ const ModifyPostulation = ({ closeModal, myparkId, onComplete }) => {
 
 
   async function handleSubmit() {
+    setIsSubmitting(true);
     // Verificar si todos los campos requeridos están definidos
-    //console.log(mypark)
-    mypark.Url_validacion = document;
     mypark.Tipo_Parqueo_idTipo_Parqueo = value;
-    mypark.Url_imagen = image;
     if (
       mypark.Ubicacion &&
       mypark.Tamaño &&
@@ -162,22 +161,22 @@ const ModifyPostulation = ({ closeModal, myparkId, onComplete }) => {
       mypark.Latitud &&
       mypark.Longitud
     ) {
-
-      updatePost(myparkId ,mypark);
-      if (mypark.Url_imagen !== "defaultPark") {
-        //agregar if donde si la imagen es igual a su response no se debe subir a la nube
+      try {
+        // Espera a que la imagen y el documento se suban antes de actualizar la publicación
         await uploadImage(image, "image");
         await uploadFile(document, "file");
+        updatePost(myparkId, mypark);
+        closeModal();
+        onComplete(mypark);
+      } catch (error) {
+        console.error("Error al subir la imagen o el documento:", error);
       }
-      
-      closeModal();
-      onComplete(mypark);
-
-
     } else {
       ToastAndroid.show('Completa los campos restantes!', ToastAndroid.SHORT);
     }
+    setIsSubmitting(false);
   }
+
 
   async function uploadImage(uri, fileType) {
     const response = await fetch(uri);
@@ -186,26 +185,29 @@ const ModifyPostulation = ({ closeModal, myparkId, onComplete }) => {
     const storageRef = ref(storage, "GarageImages/" + new Date().getTime() + "u" + userInfo.idUsuario + "pk")
     const uploadTask = uploadBytesResumable(storageRef, blob)
 
-    // Eventos que suceden cuando se sube la imagen:
-    // Cuadro de carga (no es usado aquí pero puede ser usado en otra vista)
-    uploadTask.on("state_changed", (snapshot) => {
-      const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-      setProgress(progress.toFixed());
-    },
-      (error) => {
-        // Handle error
-        console.error("Error al subir la imagen:", error);
+    // Devuelve una nueva promesa
+    return new Promise((resolve, reject) => {
+      uploadTask.on("state_changed", (snapshot) => {
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        setProgress(progress.toFixed());
       },
-      () => {
-        getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
-          // Imagen almacenada en base de datos y nube
-          setImage(downloadURL);
-          // Asigna la URL de la imagen a la variable actualImage
-          // Luego, puedes realizar otras acciones con la URL de la imagen, si es necesario.
-        }).catch((error) => {
-          console.error("Error al obtener la URL de la imagen:", error);
+        (error) => {
+          // Rechaza la promesa con el error
+          reject(error);
+        },
+        () => {
+          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+            // Imagen almacenada en base de datos y nube
+            setImage(downloadURL);
+            mypark.Url_imagen = downloadURL;
+            // Resuelve la promesa cuando la imagen se haya subido
+            resolve();
+          }).catch((error) => {
+            // Rechaza la promesa con el error
+            reject(error);
+          });
         });
-      });
+    });
   }
 
   async function uploadFile(uri, fileType) {
@@ -215,23 +217,29 @@ const ModifyPostulation = ({ closeModal, myparkId, onComplete }) => {
     const storageRef = ref(storage, "GarageDocuments/" + new Date().getTime() + "u" + userInfo.idUsuario + "pkd")
     const uploadTask = uploadBytesResumable(storageRef, blob)
 
-    // Eventos que suceden cuando se sube la imagen:
-    // Cuadro de carga (no es usado aquí pero puede ser usado en otra vista)
-    uploadTask.on("state_changed", (snapshot) => {
-      const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-      setProgress(progress.toFixed());
-    },
-      (error) => {
-        // Handle error
-        console.error("Error al subir la imagen:", error);
+    // Devuelve una nueva promesa
+    return new Promise((resolve, reject) => {
+      uploadTask.on("state_changed", (snapshot) => {
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        setProgress(progress.toFixed());
       },
-      () => {
-        getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
-          setDocumentUri(downloadURL);
-        }).catch((error) => {
-          console.error("Error al obtener la URL de la imagen:", error);
+        (error) => {
+          // Rechaza la promesa con el error
+          reject(error);
+        },
+        () => {
+          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+            // Actualiza la URI del documento
+            setDocumentUri(downloadURL);
+            mypark.Url_validacion = downloadURL;
+            // Resuelve la promesa cuando el archivo se haya subido
+            resolve();
+          }).catch((error) => {
+            // Rechaza la promesa con el error
+            reject(error);
+          });
         });
-      });
+    });
   }
 
 
@@ -344,7 +352,7 @@ const ModifyPostulation = ({ closeModal, myparkId, onComplete }) => {
             </View>
           </View>
 
-          <TouchableOpacity style={styles.buttonSub} onPress={() => handleSubmit()}>
+          <TouchableOpacity style={styles.buttonSub} onPress={() => handleSubmit()} disabled={isSubmitting}>
             <Text style={styles.buttonText}>Subir Postulación</Text>
           </TouchableOpacity>
         </View>

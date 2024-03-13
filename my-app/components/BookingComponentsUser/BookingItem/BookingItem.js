@@ -462,9 +462,6 @@ const BookingItem = ({ book, onDeleteComplete, onModifyComplete }) => {
                       <View style={styles.vehicleCard}>
                         <Image style={styles.vehicleImage} source={{ uri: image }} />
                         <View style={styles.cardFooter}>
-                          <TouchableOpacity style={styles.btnAdd} onPress={editImageChange}>
-                            <Text style={styles.buttonText2}>Subir imagen</Text>
-                          </TouchableOpacity>
                           <TouchableOpacity style={styles.btnAdd3} onPress={takePic}>
                             <Text style={styles.buttonText2}>Tomar fotografía</Text>
                           </TouchableOpacity>

@@ -26,6 +26,8 @@ const ModifyVehicle = ({ closeModal, vehicleType, vehicleId, onComplete }) => {
     }
   };
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   // Función para obtener los detalles del vehículo
   const fetchVehicleInfo = async () => {
     try {
@@ -73,25 +75,33 @@ const ModifyVehicle = ({ closeModal, vehicleType, vehicleId, onComplete }) => {
 
     // Eventos que suceden cuando se sube la imagen:
     // Cuadro de carga (no es usado aquí pero puede ser usado en otra vista)
-    uploadTask.on("state_changed", (snapshot) => {
-      const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-      setProgress(progress.toFixed());
-    },
-      (error) => {
-        // Handle error
-        console.error("Error al subir la imagen:", error);
+    return new Promise((resolve, reject) => {
+      uploadTask.on("state_changed", (snapshot) => {
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        setProgress(progress.toFixed());
       },
-      () => {
-        getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
-          setVehicle({ ...vehicle, Url_imagen: downloadURL });
-          setImage(downloadURL);
-        }).catch((error) => {
-          console.error("Error al obtener la URL de la imagen:", error);
+        (error) => {
+          // Rechaza la promesa con el error
+          reject(error);
+        },
+        () => {
+          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+            // Actualiza el estado del vehículo y la imagen
+            setImage(downloadURL);
+            vehicle.Url_imagen = downloadURL;
+            console.log(vehicle.Url_imagen);
+            // Resuelve la promesa cuando la imagen se haya subido
+            resolve();
+          }).catch((error) => {
+            // Rechaza la promesa con el error
+            reject(error);
+          });
         });
-      });
+    });
   }
 
   async function handleSubmit() {
+    setIsSubmitting(true);
     if (
       vehicle.Placa &&
       vehicle.Color &&
@@ -100,20 +110,20 @@ const ModifyVehicle = ({ closeModal, vehicleType, vehicleId, onComplete }) => {
       vehicle.Url_imagen
     ) {
 
-      if (vehicle.Url_imagen !== "defaultVehicle") {
+      try {
+        // Espera a que la imagen se suba antes de guardar el vehículo
         await uploadImage(image, "image");
+        updateVehicle(vehicle.idVehiculo, vehicle);
+        onComplete(vehicle);
+        closeModal();
+      } catch (error) {
+        console.error("Error al subir la imagen:", error);
       }
-      updateVehicle(vehicle.idVehiculo, vehicle);
-      onComplete(vehicle);
-
-      closeModal();
-
 
     } else {
       ToastAndroid.show('Completa los campos restantes!', ToastAndroid.SHORT);
     }
-
-
+    setIsSubmitting(false);
   }
 
   async function editImageChange() {
@@ -716,7 +726,7 @@ const ModifyVehicle = ({ closeModal, vehicleType, vehicleId, onComplete }) => {
               </View>
             </View>
 
-            <TouchableOpacity style={styles.buttonSub} onPress={() => handleSubmit()}>
+            <TouchableOpacity style={styles.buttonSub} onPress={() => handleSubmit()} disabled={isSubmitting}>
               <Text style={styles.buttonText}>Modificar Vehiculo</Text>
             </TouchableOpacity>
           </View>

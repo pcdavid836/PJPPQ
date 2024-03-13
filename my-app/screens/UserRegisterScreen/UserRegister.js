@@ -18,7 +18,7 @@ const UserRegister = () => {
         Segundo_Apellido: '',
         Celular: '',
         CI: '',
-        Contraseña: '',
+        Contrasena: '',
     });
 
     const handleChange = (name, value) => setUser({ ...user, [name]: value });
@@ -28,17 +28,17 @@ const UserRegister = () => {
     };
 
     const onHandleSubmit = async () => {
-        const password = user.Contraseña;
-        const password2 = user.contraseña2;
+        const password = user.Contrasena;
+        const password2 = user.Contrasena2;
         if (password !== password2) {
-            ToastAndroid.show('Las contraseñas no coinciden!', ToastAndroid.SHORT);
+            ToastAndroid.show('Las Contrasenas no coinciden!', ToastAndroid.SHORT);
             return;
         }
         else {
             //console.log(user);
             const hash = CryptoES.SHA256(password);
             
-            user.Contraseña = hash.toString();
+            user.Contrasena = hash.toString();
 
             //console.log(hash.toString());
 
@@ -79,14 +79,14 @@ const UserRegister = () => {
                     setValue={(text) => handleChange('CI', text)}
                 />
                 <CustomInput
-                    placeholder="Contraseña"
+                    placeholder="Contrasena"
                     secureTextEntry
-                    setValue={(text) => handleChange('Contraseña', text)}
+                    setValue={(text) => handleChange('Contrasena', text)}
                 />
                 <CustomInput
-                    placeholder="Repite la Contraseña"
+                    placeholder="Repite la Contrasena"
                     secureTextEntry
-                    setValue={(text) => handleChange('contraseña2', text)}
+                    setValue={(text) => handleChange('Contrasena2', text)}
                 />
                 <CustomButton
                     text="Registrarse"

@@ -17,9 +17,9 @@ export const getUserid = async (req, res) => {
 export const getUserMail = async (req, res) => {
     try {
         const connection = await connect();
-        const [rows] = await connection.execute("SELECT * FROM Usuario WHERE Correo = ? AND Contraseña = ? AND Estado = 1;", [
+        const [rows] = await connection.execute("SELECT * FROM Usuario WHERE Correo = ? AND Contrasena = ? AND Estado = 1;", [
             req.body.Correo, 
-            req.body.Contraseña
+            req.body.Contrasena
         ]);
         //console.log(rows);
         if (rows.length === 1) {
@@ -27,7 +27,7 @@ export const getUserMail = async (req, res) => {
             const userInfo = {
                 idUsuario: user.idUsuario, // Asumiendo que el ID es un campo en la tabla Usuario
                 Correo: user.Correo, // ... Agregar otros campos relevantes aquí si es necesario
-                Contraseña: user.Contraseña,
+                Contrasena: user.Contrasena,
                 Nombres: user.Nombres,
                 Primer_Apellido: user.Primer_Apellido,
                 Segundo_Apellido: user.Segundo_Apellido,
@@ -51,14 +51,14 @@ export const getUserMail = async (req, res) => {
 export const createUser = async (req, res) => {
     try {
         const connection = await connect();
-        const [results] = await connection.execute("INSERT INTO Usuario (Correo, Nombres, Primer_Apellido, Segundo_Apellido, Celular, CI, Contraseña, Estado, FechaCreacion, Tipo_Usuario_idTipo_Usuario) VALUES (?, ?, ?, ?, ?, ?, ?, 0, CURRENT_TIMESTAMP, 1)", [
+        const [results] = await connection.execute("INSERT INTO Usuario (Correo, Nombres, Primer_Apellido, Segundo_Apellido, Celular, CI, Contrasena, Estado, FechaCreacion, Tipo_Usuario_idTipo_Usuario) VALUES (?, ?, ?, ?, ?, ?, ?, 0, CURRENT_TIMESTAMP, 1)", [
             req.body.Correo,
             req.body.Nombres,
             req.body.Primer_Apellido,
             req.body.Segundo_Apellido,
             req.body.Celular,
             req.body.CI,
-            req.body.Contraseña
+            req.body.Contrasena
         ]);
 
         const newUser = {

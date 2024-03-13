@@ -28,6 +28,8 @@ const AddVehicle = ({ closeModal, onComplete }) => {
     const [isFocus, setIsFocus] = useState(false);
     const [visible, setVisible] = useState(false);
     const [capturedImageUri, setCapturedImageUri] = useState(null); // Estado para almacenar la URI de la imagen capturada
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
 
     const show = () => setVisible(true);
     const hide = (imageUri) => {
@@ -89,6 +91,7 @@ const AddVehicle = ({ closeModal, onComplete }) => {
     }
 
     async function handleSubmit() {
+        setIsSubmitting(true);
         if (value === 3 || value === 7) {
             vehicle.Placa = "N/A";
             vehicle.Marca = "N/A";
@@ -96,7 +99,8 @@ const AddVehicle = ({ closeModal, onComplete }) => {
         // Verifica si todos los campos requeridos están definidos
         vehicle.Tipo_Vehiculo_idTipo_Vehiculo = value;
         vehicle.usuario_idUsuario = userInfo.idUsuario;
-        vehicle.Url_imagen = image;
+
+        //vehicle.Url_imagen = actualImage;
         if (
             vehicle.Placa &&
             vehicle.Color &&
@@ -106,29 +110,19 @@ const AddVehicle = ({ closeModal, onComplete }) => {
             vehicle.usuario_idUsuario &&
             vehicle.Url_imagen
         ) {
-
-            saveVehicle(vehicle);
-            await uploadImage(image, "image");
-            closeModal();
-            onComplete();
-
-
+            try {
+                // Espera a que la imagen se suba antes de guardar el vehículo
+                await uploadImage(image, "image");
+                saveVehicle(vehicle);
+                onComplete();
+                closeModal();
+            } catch (error) {
+                console.error("Error al subir la imagen:", error);
+            }
         } else {
             ToastAndroid.show('Completa los campos restantes!', ToastAndroid.SHORT);
         }
-        /*
-       
-        console.log(vehicle);
-        saveVehicle(vehicle);
-        */
-        /*
-        await uploadImage(actualImage, "image");
-        console.log(actualImage);
-        vehicle.Url_imagen = actualImage;
-       
-        
-        */
-
+        setIsSubmitting(false);
     }
 
     async function takePic() {
@@ -143,29 +137,30 @@ const AddVehicle = ({ closeModal, onComplete }) => {
         const storageRef = ref(storage, "VehicleImages/" + new Date().getTime() + "u" + userInfo.idUsuario + "vh")
         const uploadTask = uploadBytesResumable(storageRef, blob)
 
-        // Eventos que suceden cuando se sube la imagen:
-        // Cuadro de carga (no es usado aquí pero puede ser usado en otra vista)
-        uploadTask.on("state_changed", (snapshot) => {
-            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            setProgress(progress.toFixed());
-        },
-            (error) => {
-                // Handle error
-                console.error("Error al subir la imagen:", error);
+        // Devuelve una nueva promesa
+        return new Promise((resolve, reject) => {
+            uploadTask.on("state_changed", (snapshot) => {
+                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                setProgress(progress.toFixed());
             },
-            () => {
-                getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
-                    // Imagen almacenada en base de datos y nube
-                    setImage(downloadURL);
-                    setActualImage(downloadURL);
-                    // Asigna la URL de la imagen a la variable actualImage
-                    // Luego, puedes realizar otras acciones con la URL de la imagen, si es necesario.
-                }).catch((error) => {
-                    console.error("Error al obtener la URL de la imagen:", error);
+                (error) => {
+                    // Rechaza la promesa con el error
+                    reject(error);
+                },
+                () => {
+                    getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+                        setImage(downloadURL);
+                        setCapturedImageUri(downloadURL);
+                        vehicle.Url_imagen = downloadURL;
+                        // Resuelve la promesa cuando la imagen se haya subido
+                        resolve();
+                    }).catch((error) => {
+                        // Rechaza la promesa con el error
+                        reject(error);
+                    });
                 });
-            });
+        });
     }
-
 
 
     const renderAdditionalText = () => {
@@ -442,7 +437,7 @@ const AddVehicle = ({ closeModal, onComplete }) => {
                         </View>
                     </View>
 
-                    <TouchableOpacity style={styles.buttonSub} onPress={() => handleSubmit()}>
+                    <TouchableOpacity style={styles.buttonSub} onPress={() => handleSubmit()} disabled={isSubmitting}>
                         <Text style={styles.buttonText}>Agregar vehículo</Text>
                     </TouchableOpacity>
                 </View>

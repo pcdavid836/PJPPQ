@@ -15,6 +15,7 @@ const ReserveSpace = ({ parkId, parktimer, closeModal }) => {
     const [timeEnd, setTimeEnd] = useState(new Date(1970, 0, 1, 0, 0)); // Set initial time to 00:00
     const dayOfWeek = date.getDay();
 
+    const [isButtonDisabled, setIsButtonDisabled] = useState(false);
     const [showDate, setShowDate] = useState(false);
     const [showTimeStart, setShowStart] = useState(false);
     const [showTimeEnd, setShowEnd] = useState(false);
@@ -53,6 +54,39 @@ const ReserveSpace = ({ parkId, parktimer, closeModal }) => {
         //console.log(parkId);
         //console.log(parktimer);
     }, []);
+
+    useEffect(() => {
+        // Verifica si el día no está disponible
+        if (!parkDay) {
+            setIsButtonDisabled(true);
+            return;
+        }
+
+        // Verifica si la fecha seleccionada es una fecha pasada
+        let now = new Date();
+        let today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        if (date < today) {
+            setIsButtonDisabled(true);
+            return;
+        }
+
+
+        // Verifica si el horario de inicio y fin están fuera del horario establecido
+        if (timeStart < openingTime || timeEnd > closingTime) {
+            setIsButtonDisabled(true);
+            return;
+        }
+
+        // Verifica si no se ha seleccionado un vehículo
+        if (!value) {
+            setIsButtonDisabled(true);
+            return;
+        }
+
+        // Si ninguna de las condiciones anteriores se cumple, habilita el botón
+        setIsButtonDisabled(false);
+    }, [date, timeStart, timeEnd, value]);
+
 
     const loadVehicles = async () => {
         const data = await getCars(userInfo.idUsuario);
@@ -167,9 +201,10 @@ const ReserveSpace = ({ parkId, parktimer, closeModal }) => {
                 />
             )}
             <Text>Horario: {parkDay ? `${formattedOpeningTime} - ${formattedClosingTime}` : "DIA NO DISPONIBLE"}</Text>
-            <TouchableOpacity style={styles.shareButton} onPress={sendBooking}>
+            <TouchableOpacity style={styles.shareButton} onPress={sendBooking} disabled={isButtonDisabled}>
                 <Text style={styles.shareButtonText}>Realizar Reserva</Text>
             </TouchableOpacity>
+
         </View>
     );
 };
