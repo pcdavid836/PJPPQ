@@ -25,7 +25,6 @@ const ModifyVehicle = ({ closeModal, vehicleType, vehicleId, onComplete }) => {
       // Aquí puedes hacer la lógica para subir la imagen a Firebase u otras acciones
     }
   };
-
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Función para obtener los detalles del vehículo
@@ -165,21 +164,24 @@ const ModifyVehicle = ({ closeModal, vehicleType, vehicleId, onComplete }) => {
                 <TextInput
                   style={styles.input}
                   placeholder="Ingresa la placa de tu vehículo"
-                  onChangeText={(text) => handleChange('Placa', text)}
+                  maxLength={15}
                   defaultValue={vehicle.Placa}
+                  onChangeText={(text) => handleChange('Placa', text.toUpperCase())}
                 />
                 <Text style={styles.label}>Color</Text>
                 <TextInput
                   style={styles.input}
                   placeholder="¿De que color es tu vehículo?"
-                  onChangeText={(text) => handleChange('Color', text)}
+                  maxLength={15}
                   defaultValue={vehicle.Color}
+                  onChangeText={(text) => handleChange('Color', text.toUpperCase())}
                 />
                 <Text style={styles.label}>Marca del vehículo</Text>
                 <TextInput
                   style={styles.input}
                   placeholder="¿Cuál es la marca de tu vehículo?"
-                  onChangeText={(text) => handleChange('Marca', text)}
+                  maxLength={25}
+                  onChangeText={(text) => handleChange('Marca', text.toUpperCase())}
                   defaultValue={vehicle.Marca}
                 />
                 <Text style={styles.label}>Descripción</Text>
@@ -191,6 +193,7 @@ const ModifyVehicle = ({ closeModal, vehicleType, vehicleId, onComplete }) => {
                   textAlignVertical="top"
                   onChangeText={(text) => handleChange('Descripcion', text)}
                   defaultValue={vehicle.Descripcion}
+                  maxLength={150}
                 />
               </View>
               <Text style={styles.labelImage}>Modifica la imagen de tu vehículo</Text>
@@ -232,507 +235,542 @@ const ModifyVehicle = ({ closeModal, vehicleType, vehicleId, onComplete }) => {
       break;
 
     case 2:
-      <ScrollView showsHorizontalScrollIndicator={false}>
-        <View style={styles.container}>
-          <View style={styles.form}>
-            <View style={styles.header}>
-              <Text style={styles.title}>Modificar Motocicleta</Text>
-            </View>
-            <View>
-              <Text style={styles.label}>Placa</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Ingresa la placa de tu vehículo"
-                onChangeText={(text) => handleChange('Placa', text)}
-                defaultValue={vehicle.Placa}
-              />
-              <Text style={styles.label}>Color</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="¿De que color es tu vehículo?"
-                onChangeText={(text) => handleChange('Color', text)}
-                defaultValue={vehicle.Color}
-              />
-              <Text style={styles.label}>Marca del vehículo</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="¿Cuál es la marca de tu vehículo?"
-                onChangeText={(text) => handleChange('Marca', text)}
-                defaultValue={vehicle.Marca}
-              />
-              <Text style={styles.label}>Descripción</Text>
-              <TextInput
-                style={[styles.input, styles.largeInput]}
-                placeholder="Menciona una breve descripción de tu vehículo"
-                multiline={true}
-                numberOfLines={6}
-                textAlignVertical="top"
-                onChangeText={(text) => handleChange('Descripcion', text)}
-                defaultValue={vehicle.Descripcion}
-              />
-            </View>
-            <Text style={styles.labelImage}>Modifica la imagen de tu vehículo</Text>
-            <View style={styles.vehicleCard}>
-              <Image style={styles.vehicleImage} source={{ uri: image }} />
-              <View style={styles.cardFooter}>
-                <TouchableOpacity style={styles.btnAdd} onPress={editImageChange}>
-                  <View style={styles.buttonContent}>
-                    <Text style={styles.buttonText2}>Subir imagen</Text>
-                  </View>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.btnAdd3} onPress={takePic}>
-                  <View style={styles.buttonContent}>
-                    <Text style={styles.buttonText2}>Tomar fotografía </Text>
-                  </View>
-                  <Modal visible={visible} animationType='slide' onRequestClose={() => {
-                    hide();
-                    setImage(definedImage); // Establece la imagen en defaultImageUrl cuando se cierra el Modal
-                  }}>
-                    <CameraVehicleScren closeModal={hide} />
-                  </Modal>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.btnAdd2} onPress={dropImage} >
-                  <View style={styles.buttonContent}>
-                    <Text style={styles.buttonText2}>Quitar imagen</Text>
-                  </View>
-                </TouchableOpacity>
+      return (
+        <ScrollView showsHorizontalScrollIndicator={false}>
+          <View style={styles.container}>
+            <View style={styles.form}>
+              <View style={styles.header}>
+                <Text style={styles.title}>Modificar Motocicleta</Text>
               </View>
+              <View>
+                <Text style={styles.label}>Placa</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Ingresa la placa de tu vehículo"
+                  maxLength={15}
+                  onChangeText={(text) => handleChange('Placa', text.toUpperCase())}
+                />
+                <Text style={styles.label}>Color</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="¿De que color es tu vehículo?"
+                  maxLength={15}
+                  defaultValue={vehicle.Color}
+                  onChangeText={(text) => handleChange('Color', text.toUpperCase())}
+                />
+                <Text style={styles.label}>Marca del vehículo</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="¿Cuál es la marca de tu vehículo?"
+                  maxLength={25}
+                  onChangeText={(text) => handleChange('Marca', text.toUpperCase())}
+                  defaultValue={vehicle.Marca}
+                />
+                <Text style={styles.label}>Descripción</Text>
+                <TextInput
+                  style={[styles.input, styles.largeInput]}
+                  placeholder="Menciona una breve descripción de tu vehículo"
+                  multiline={true}
+                  numberOfLines={6}
+                  textAlignVertical="top"
+                  onChangeText={(text) => handleChange('Descripcion', text)}
+                  defaultValue={vehicle.Descripcion}
+                  maxLength={150}
+                />
+              </View>
+              <Text style={styles.labelImage}>Modifica la imagen de tu vehículo</Text>
+              <View style={styles.vehicleCard}>
+                <Image style={styles.vehicleImage} source={{ uri: image }} />
+                <View style={styles.cardFooter}>
+                  <TouchableOpacity style={styles.btnAdd} onPress={editImageChange}>
+                    <View style={styles.buttonContent}>
+                      <Text style={styles.buttonText2}>Subir imagen</Text>
+                    </View>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.btnAdd3} onPress={takePic}>
+                    <View style={styles.buttonContent}>
+                      <Text style={styles.buttonText2}>Tomar fotografía </Text>
+                    </View>
+                    <Modal visible={visible} animationType='slide' onRequestClose={() => {
+                      hide();
+                      setImage(definedImage); // Establece la imagen en defaultImageUrl cuando se cierra el Modal
+                    }}>
+                      <CameraVehicleScren closeModal={hide} />
+                    </Modal>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.btnAdd2} onPress={dropImage} >
+                    <View style={styles.buttonContent}>
+                      <Text style={styles.buttonText2}>Quitar imagen</Text>
+                    </View>
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              <TouchableOpacity style={styles.buttonSub} onPress={() => handleSubmit()}>
+                <Text style={styles.buttonText}>Modificar Vehiculo</Text>
+              </TouchableOpacity>
             </View>
 
-            <TouchableOpacity style={styles.buttonSub} onPress={() => handleSubmit()}>
-              <Text style={styles.buttonText}>Modificar Vehiculo</Text>
-            </TouchableOpacity>
           </View>
-
-        </View>
-      </ScrollView>
+        </ScrollView>
+      )
       break;
 
     case 3:
-      <ScrollView showsHorizontalScrollIndicator={false}>
-        <View style={styles.container}>
-          <View style={styles.form}>
-            <View style={styles.header}>
-              <Text style={styles.title}>Modificar Bicicleta</Text>
-            </View>
-            <View>
-              <Text style={styles.label}>Color</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="¿De que color es tu vehículo?"
-                onChangeText={(text) => handleChange('Color', text)}
-                defaultValue={vehicle.Color}
-              />
-              <Text style={styles.label}>Descripción</Text>
-              <TextInput
-                style={[styles.input, styles.largeInput]}
-                placeholder="Menciona una breve descripción de tu vehículo"
-                multiline={true}
-                numberOfLines={6}
-                textAlignVertical="top"
-                onChangeText={(text) => handleChange('Descripcion', text)}
-                defaultValue={vehicle.Descripcion}
-              />
-            </View>
-            <Text style={styles.labelImage}>Modifica la imagen de tu vehículo</Text>
-            <View style={styles.vehicleCard}>
-              <Image style={styles.vehicleImage} source={{ uri: image }} />
-              <View style={styles.cardFooter}>
-                <TouchableOpacity style={styles.btnAdd} onPress={editImageChange}>
-                  <View style={styles.buttonContent}>
-                    <Text style={styles.buttonText2}>Subir imagen</Text>
-                  </View>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.btnAdd3} onPress={takePic}>
-                  <View style={styles.buttonContent}>
-                    <Text style={styles.buttonText2}>Tomar fotografía </Text>
-                  </View>
-                  <Modal visible={visible} animationType='slide' onRequestClose={() => {
-                    hide();
-                    setImage(definedImage); // Establece la imagen en defaultImageUrl cuando se cierra el Modal
-                  }}>
-                    <CameraVehicleScren closeModal={hide} />
-                  </Modal>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.btnAdd2} onPress={dropImage} >
-                  <View style={styles.buttonContent}>
-                    <Text style={styles.buttonText2}>Quitar imagen</Text>
-                  </View>
-                </TouchableOpacity>
+      return (
+        <ScrollView showsHorizontalScrollIndicator={false}>
+          <View style={styles.container}>
+            <View style={styles.form}>
+              <View style={styles.header}>
+                <Text style={styles.title}>Modificar Bicicleta</Text>
               </View>
+              <View>
+                <Text style={styles.label}>Color</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="¿De que color es tu vehículo?"
+                  maxLength={15}
+                  defaultValue={vehicle.Color}
+                  onChangeText={(text) => handleChange('Color', text.toUpperCase())}
+                />
+                <Text style={styles.label}>Descripción</Text>
+                <TextInput
+                  style={[styles.input, styles.largeInput]}
+                  placeholder="Menciona una breve descripción de tu vehículo"
+                  multiline={true}
+                  numberOfLines={6}
+                  textAlignVertical="top"
+                  onChangeText={(text) => handleChange('Descripcion', text)}
+                  defaultValue={vehicle.Descripcion}
+                  maxLength={150}
+                />
+              </View>
+              <Text style={styles.labelImage}>Modifica la imagen de tu vehículo</Text>
+              <View style={styles.vehicleCard}>
+                <Image style={styles.vehicleImage} source={{ uri: image }} />
+                <View style={styles.cardFooter}>
+                  <TouchableOpacity style={styles.btnAdd} onPress={editImageChange}>
+                    <View style={styles.buttonContent}>
+                      <Text style={styles.buttonText2}>Subir imagen</Text>
+                    </View>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.btnAdd3} onPress={takePic}>
+                    <View style={styles.buttonContent}>
+                      <Text style={styles.buttonText2}>Tomar fotografía </Text>
+                    </View>
+                    <Modal visible={visible} animationType='slide' onRequestClose={() => {
+                      hide();
+                      setImage(definedImage); // Establece la imagen en defaultImageUrl cuando se cierra el Modal
+                    }}>
+                      <CameraVehicleScren closeModal={hide} />
+                    </Modal>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.btnAdd2} onPress={dropImage} >
+                    <View style={styles.buttonContent}>
+                      <Text style={styles.buttonText2}>Quitar imagen</Text>
+                    </View>
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              <TouchableOpacity style={styles.buttonSub} onPress={() => handleSubmit()}>
+                <Text style={styles.buttonText}>Modificar Vehiculo</Text>
+              </TouchableOpacity>
             </View>
 
-            <TouchableOpacity style={styles.buttonSub} onPress={() => handleSubmit()}>
-              <Text style={styles.buttonText}>Modificar Vehiculo</Text>
-            </TouchableOpacity>
           </View>
-
-        </View>
-      </ScrollView>
+        </ScrollView>
+      )
       break;
 
     case 4:
-      <ScrollView showsHorizontalScrollIndicator={false}>
-        <View style={styles.container}>
-          <View style={styles.form}>
-            <View style={styles.header}>
-              <Text style={styles.title}>Modificar Camión</Text>
-            </View>
-            <View>
-              <Text style={styles.label}>Placa</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Ingresa la placa de tu vehículo"
-                onChangeText={(text) => handleChange('Placa', text)}
-                defaultValue={vehicle.Placa}
-              />
-              <Text style={styles.label}>Color</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="¿De que color es tu vehículo?"
-                onChangeText={(text) => handleChange('Color', text)}
-                defaultValue={vehicle.Color}
-              />
-              <Text style={styles.label}>Marca del vehículo</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="¿Cuál es la marca de tu vehículo?"
-                onChangeText={(text) => handleChange('Marca', text)}
-                defaultValue={vehicle.Marca}
-              />
-              <Text style={styles.label}>Descripción</Text>
-              <TextInput
-                style={[styles.input, styles.largeInput]}
-                placeholder="Menciona una breve descripción de tu vehículo"
-                multiline={true}
-                numberOfLines={6}
-                textAlignVertical="top"
-                onChangeText={(text) => handleChange('Descripcion', text)}
-                defaultValue={vehicle.Descripcion}
-              />
-            </View>
-            <Text style={styles.labelImage}>Modifica la imagen de tu vehículo</Text>
-            <View style={styles.vehicleCard}>
-              <Image style={styles.vehicleImage} source={{ uri: image }} />
-              <View style={styles.cardFooter}>
-                <TouchableOpacity style={styles.btnAdd} onPress={editImageChange}>
-                  <View style={styles.buttonContent}>
-                    <Text style={styles.buttonText2}>Subir imagen</Text>
-                  </View>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.btnAdd3} onPress={takePic}>
-                  <View style={styles.buttonContent}>
-                    <Text style={styles.buttonText2}>Tomar fotografía </Text>
-                  </View>
-                  <Modal visible={visible} animationType='slide' onRequestClose={() => {
-                    hide();
-                    setImage(definedImage); // Establece la imagen en defaultImageUrl cuando se cierra el Modal
-                  }}>
-                    <CameraVehicleScren closeModal={hide} />
-                  </Modal>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.btnAdd2} onPress={dropImage} >
-                  <View style={styles.buttonContent}>
-                    <Text style={styles.buttonText2}>Quitar imagen</Text>
-                  </View>
-                </TouchableOpacity>
+      return (
+        <ScrollView showsHorizontalScrollIndicator={false}>
+          <View style={styles.container}>
+            <View style={styles.form}>
+              <View style={styles.header}>
+                <Text style={styles.title}>Modificar Camión</Text>
               </View>
+              <View>
+                <Text style={styles.label}>Placa</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Ingresa la placa de tu vehículo"
+                  maxLength={15}
+                  defaultValue={vehicle.Placa}
+                  onChangeText={(text) => handleChange('Placa', text.toUpperCase())}
+                />
+                <Text style={styles.label}>Color</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="¿De que color es tu vehículo?"
+                  maxLength={15}
+                  defaultValue={vehicle.Color}
+                  onChangeText={(text) => handleChange('Color', text.toUpperCase())}
+                />
+                <Text style={styles.label}>Marca del vehículo</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="¿Cuál es la marca de tu vehículo?"
+                  maxLength={25}
+                  onChangeText={(text) => handleChange('Marca', text.toUpperCase())}
+                  defaultValue={vehicle.Marca}
+                />
+                <Text style={styles.label}>Descripción</Text>
+                <TextInput
+                  style={[styles.input, styles.largeInput]}
+                  placeholder="Menciona una breve descripción de tu vehículo"
+                  multiline={true}
+                  numberOfLines={6}
+                  textAlignVertical="top"
+                  onChangeText={(text) => handleChange('Descripcion', text)}
+                  defaultValue={vehicle.Descripcion}
+                  maxLength={150}
+                />
+              </View>
+              <Text style={styles.labelImage}>Modifica la imagen de tu vehículo</Text>
+              <View style={styles.vehicleCard}>
+                <Image style={styles.vehicleImage} source={{ uri: image }} />
+                <View style={styles.cardFooter}>
+                  <TouchableOpacity style={styles.btnAdd} onPress={editImageChange}>
+                    <View style={styles.buttonContent}>
+                      <Text style={styles.buttonText2}>Subir imagen</Text>
+                    </View>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.btnAdd3} onPress={takePic}>
+                    <View style={styles.buttonContent}>
+                      <Text style={styles.buttonText2}>Tomar fotografía </Text>
+                    </View>
+                    <Modal visible={visible} animationType='slide' onRequestClose={() => {
+                      hide();
+                      setImage(definedImage); // Establece la imagen en defaultImageUrl cuando se cierra el Modal
+                    }}>
+                      <CameraVehicleScren closeModal={hide} />
+                    </Modal>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.btnAdd2} onPress={dropImage} >
+                    <View style={styles.buttonContent}>
+                      <Text style={styles.buttonText2}>Quitar imagen</Text>
+                    </View>
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              <TouchableOpacity style={styles.buttonSub} onPress={() => handleSubmit()}>
+                <Text style={styles.buttonText}>Modificar Vehiculo</Text>
+              </TouchableOpacity>
             </View>
 
-            <TouchableOpacity style={styles.buttonSub} onPress={() => handleSubmit()}>
-              <Text style={styles.buttonText}>Modificar Vehiculo</Text>
-            </TouchableOpacity>
           </View>
-
-        </View>
-      </ScrollView>
+        </ScrollView>
+      )
       break;
 
     case 5:
-      <ScrollView showsHorizontalScrollIndicator={false}>
-        <View style={styles.container}>
-          <View style={styles.form}>
-            <View style={styles.header}>
-              <Text style={styles.title}>Modificar Autobus</Text>
-            </View>
-            <View>
-              <Text style={styles.label}>Placa</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Ingresa la placa de tu vehículo"
-                onChangeText={(text) => handleChange('Placa', text)}
-                defaultValue={vehicle.Placa}
-              />
-              <Text style={styles.label}>Color</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="¿De que color es tu vehículo?"
-                onChangeText={(text) => handleChange('Color', text)}
-                defaultValue={vehicle.Color}
-              />
-              <Text style={styles.label}>Marca del vehículo</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="¿Cuál es la marca de tu vehículo?"
-                onChangeText={(text) => handleChange('Marca', text)}
-                defaultValue={vehicle.Marca}
-              />
-              <Text style={styles.label}>Descripción</Text>
-              <TextInput
-                style={[styles.input, styles.largeInput]}
-                placeholder="Menciona una breve descripción de tu vehículo"
-                multiline={true}
-                numberOfLines={6}
-                textAlignVertical="top"
-                onChangeText={(text) => handleChange('Descripcion', text)}
-                defaultValue={vehicle.Descripcion}
-              />
-            </View>
-            <Text style={styles.labelImage}>Modifica la imagen de tu vehículo</Text>
-            <View style={styles.vehicleCard}>
-              <Image style={styles.vehicleImage} source={{ uri: image }} />
-              <View style={styles.cardFooter}>
-                <TouchableOpacity style={styles.btnAdd} onPress={editImageChange}>
-                  <View style={styles.buttonContent}>
-                    <Text style={styles.buttonText2}>Subir imagen</Text>
-                  </View>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.btnAdd3} onPress={takePic}>
-                  <View style={styles.buttonContent}>
-                    <Text style={styles.buttonText2}>Tomar fotografía </Text>
-                  </View>
-                  <Modal visible={visible} animationType='slide' onRequestClose={() => {
-                    hide();
-                    setImage(definedImage); // Establece la imagen en defaultImageUrl cuando se cierra el Modal
-                  }}>
-                    <CameraVehicleScren closeModal={hide} />
-                  </Modal>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.btnAdd2} onPress={dropImage} >
-                  <View style={styles.buttonContent}>
-                    <Text style={styles.buttonText2}>Quitar imagen</Text>
-                  </View>
-                </TouchableOpacity>
+      return (
+        <ScrollView showsHorizontalScrollIndicator={false}>
+          <View style={styles.container}>
+            <View style={styles.form}>
+              <View style={styles.header}>
+                <Text style={styles.title}>Modificar Autobus</Text>
               </View>
+              <View>
+                <Text style={styles.label}>Placa</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Ingresa la placa de tu vehículo"
+                  maxLength={15}
+                  onChangeText={(text) => handleChange('Placa', text.toUpperCase())}
+                />
+                <Text style={styles.label}>Color</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="¿De que color es tu vehículo?"
+                  maxLength={15}
+                  defaultValue={vehicle.Color}
+                  onChangeText={(text) => handleChange('Color', text.toUpperCase())}
+                />
+                <Text style={styles.label}>Marca del vehículo</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="¿Cuál es la marca de tu vehículo?"
+                  maxLength={25}
+                  onChangeText={(text) => handleChange('Marca', text.toUpperCase())}
+                  defaultValue={vehicle.Marca}
+                />
+                <Text style={styles.label}>Descripción</Text>
+                <TextInput
+                  style={[styles.input, styles.largeInput]}
+                  placeholder="Menciona una breve descripción de tu vehículo"
+                  multiline={true}
+                  numberOfLines={6}
+                  textAlignVertical="top"
+                  onChangeText={(text) => handleChange('Descripcion', text)}
+                  defaultValue={vehicle.Descripcion}
+                  maxLength={150}
+                />
+              </View>
+              <Text style={styles.labelImage}>Modifica la imagen de tu vehículo</Text>
+              <View style={styles.vehicleCard}>
+                <Image style={styles.vehicleImage} source={{ uri: image }} />
+                <View style={styles.cardFooter}>
+                  <TouchableOpacity style={styles.btnAdd} onPress={editImageChange}>
+                    <View style={styles.buttonContent}>
+                      <Text style={styles.buttonText2}>Subir imagen</Text>
+                    </View>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.btnAdd3} onPress={takePic}>
+                    <View style={styles.buttonContent}>
+                      <Text style={styles.buttonText2}>Tomar fotografía </Text>
+                    </View>
+                    <Modal visible={visible} animationType='slide' onRequestClose={() => {
+                      hide();
+                      setImage(definedImage); // Establece la imagen en defaultImageUrl cuando se cierra el Modal
+                    }}>
+                      <CameraVehicleScren closeModal={hide} />
+                    </Modal>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.btnAdd2} onPress={dropImage} >
+                    <View style={styles.buttonContent}>
+                      <Text style={styles.buttonText2}>Quitar imagen</Text>
+                    </View>
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              <TouchableOpacity style={styles.buttonSub} onPress={() => handleSubmit()}>
+                <Text style={styles.buttonText}>Modificar Vehiculo</Text>
+              </TouchableOpacity>
             </View>
 
-            <TouchableOpacity style={styles.buttonSub} onPress={() => handleSubmit()}>
-              <Text style={styles.buttonText}>Modificar Vehiculo</Text>
-            </TouchableOpacity>
           </View>
-
-        </View>
-      </ScrollView>
+        </ScrollView>
+      )
       break;
 
     case 6:
-      <ScrollView showsHorizontalScrollIndicator={false}>
-        <View style={styles.container}>
-          <View style={styles.form}>
-            <View style={styles.header}>
-              <Text style={styles.title}>Modificar Minibus</Text>
-            </View>
-            <View>
-              <Text style={styles.label}>Placa</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Ingresa la placa de tu vehículo"
-                onChangeText={(text) => handleChange('Placa', text)}
-                defaultValue={vehicle.Placa}
-              />
-              <Text style={styles.label}>Color</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="¿De que color es tu vehículo?"
-                onChangeText={(text) => handleChange('Color', text)}
-                defaultValue={vehicle.Color}
-              />
-              <Text style={styles.label}>Marca del vehículo</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="¿Cuál es la marca de tu vehículo?"
-                onChangeText={(text) => handleChange('Marca', text)}
-                defaultValue={vehicle.Marca}
-              />
-              <Text style={styles.label}>Descripción</Text>
-              <TextInput
-                style={[styles.input, styles.largeInput]}
-                placeholder="Menciona una breve descripción de tu vehículo"
-                multiline={true}
-                numberOfLines={6}
-                textAlignVertical="top"
-                onChangeText={(text) => handleChange('Descripcion', text)}
-                defaultValue={vehicle.Descripcion}
-              />
-            </View>
-            <Text style={styles.labelImage}>Modifica la imagen de tu vehículo</Text>
-            <View style={styles.vehicleCard}>
-              <Image style={styles.vehicleImage} source={{ uri: image }} />
-              <View style={styles.cardFooter}>
-                <TouchableOpacity style={styles.btnAdd} onPress={editImageChange}>
-                  <View style={styles.buttonContent}>
-                    <Text style={styles.buttonText2}>Subir imagen</Text>
-                  </View>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.btnAdd3} onPress={takePic}>
-                  <View style={styles.buttonContent}>
-                    <Text style={styles.buttonText2}>Tomar fotografía </Text>
-                  </View>
-                  <Modal visible={visible} animationType='slide' onRequestClose={() => {
-                    hide();
-                    setImage(definedImage); // Establece la imagen en defaultImageUrl cuando se cierra el Modal
-                  }}>
-                    <CameraVehicleScren closeModal={hide} />
-                  </Modal>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.btnAdd2} onPress={dropImage} >
-                  <View style={styles.buttonContent}>
-                    <Text style={styles.buttonText2}>Quitar imagen</Text>
-                  </View>
-                </TouchableOpacity>
+      return (
+        <ScrollView showsHorizontalScrollIndicator={false}>
+          <View style={styles.container}>
+            <View style={styles.form}>
+              <View style={styles.header}>
+                <Text style={styles.title}>Modificar Minibus</Text>
               </View>
+              <View>
+                <Text style={styles.label}>Placa</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Ingresa la placa de tu vehículo"
+                  maxLength={15}
+                  defaultValue={vehicle.Placa}
+                  onChangeText={(text) => handleChange('Placa', text.toUpperCase())}
+                />
+                <Text style={styles.label}>Color</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="¿De que color es tu vehículo?"
+                  maxLength={15}
+                  defaultValue={vehicle.Color}
+                  onChangeText={(text) => handleChange('Color', text.toUpperCase())}
+                />
+                <Text style={styles.label}>Marca del vehículo</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="¿Cuál es la marca de tu vehículo?"
+                  maxLength={25}
+                  onChangeText={(text) => handleChange('Marca', text.toUpperCase())}
+                  defaultValue={vehicle.Marca}
+                />
+                <Text style={styles.label}>Descripción</Text>
+                <TextInput
+                  style={[styles.input, styles.largeInput]}
+                  placeholder="Menciona una breve descripción de tu vehículo"
+                  multiline={true}
+                  numberOfLines={6}
+                  textAlignVertical="top"
+                  onChangeText={(text) => handleChange('Descripcion', text)}
+                  defaultValue={vehicle.Descripcion}
+                  maxLength={150}
+                />
+              </View>
+              <Text style={styles.labelImage}>Modifica la imagen de tu vehículo</Text>
+              <View style={styles.vehicleCard}>
+                <Image style={styles.vehicleImage} source={{ uri: image }} />
+                <View style={styles.cardFooter}>
+                  <TouchableOpacity style={styles.btnAdd} onPress={editImageChange}>
+                    <View style={styles.buttonContent}>
+                      <Text style={styles.buttonText2}>Subir imagen</Text>
+                    </View>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.btnAdd3} onPress={takePic}>
+                    <View style={styles.buttonContent}>
+                      <Text style={styles.buttonText2}>Tomar fotografía </Text>
+                    </View>
+                    <Modal visible={visible} animationType='slide' onRequestClose={() => {
+                      hide();
+                      setImage(definedImage); // Establece la imagen en defaultImageUrl cuando se cierra el Modal
+                    }}>
+                      <CameraVehicleScren closeModal={hide} />
+                    </Modal>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.btnAdd2} onPress={dropImage} >
+                    <View style={styles.buttonContent}>
+                      <Text style={styles.buttonText2}>Quitar imagen</Text>
+                    </View>
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              <TouchableOpacity style={styles.buttonSub} onPress={() => handleSubmit()}>
+                <Text style={styles.buttonText}>Modificar Vehiculo</Text>
+              </TouchableOpacity>
             </View>
 
-            <TouchableOpacity style={styles.buttonSub} onPress={() => handleSubmit()}>
-              <Text style={styles.buttonText}>Modificar Vehiculo</Text>
-            </TouchableOpacity>
           </View>
-
-        </View>
-      </ScrollView>
+        </ScrollView>
+      )
       break;
 
     case 7:
-      <ScrollView showsHorizontalScrollIndicator={false}>
-        <View style={styles.container}>
-          <View style={styles.form}>
-            <View style={styles.header}>
-              <Text style={styles.title}>Modificar Vehiculo</Text>
-            </View>
-            <View>
-              <Text style={styles.label}>Descripción</Text>
-              <TextInput
-                style={[styles.input, styles.largeInput]}
-                placeholder="Menciona una breve descripción de tu vehículo"
-                multiline={true}
-                numberOfLines={6}
-                textAlignVertical="top"
-                onChangeText={(text) => handleChange('Descripcion', text)}
-                defaultValue={vehicle.Descripcion}
-              />
-            </View>
-            <Text style={styles.labelImage}>Modifica la imagen de tu vehículo</Text>
-            <View style={styles.vehicleCard}>
-              <Image style={styles.vehicleImage} source={{ uri: image }} />
-              <View style={styles.cardFooter}>
-                <TouchableOpacity style={styles.btnAdd} onPress={editImageChange}>
-                  <View style={styles.buttonContent}>
-                    <Text style={styles.buttonText2}>Subir imagen</Text>
-                  </View>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.btnAdd3} onPress={takePic}>
-                  <View style={styles.buttonContent}>
-                    <Text style={styles.buttonText2}>Tomar fotografía </Text>
-                  </View>
-                  <Modal visible={visible} animationType='slide' onRequestClose={() => {
-                    hide();
-                    setImage(definedImage); // Establece la imagen en defaultImageUrl cuando se cierra el Modal
-                  }}>
-                    <CameraVehicleScren closeModal={hide} />
-                  </Modal>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.btnAdd2} onPress={dropImage} >
-                  <View style={styles.buttonContent}>
-                    <Text style={styles.buttonText2}>Quitar imagen</Text>
-                  </View>
-                </TouchableOpacity>
+      return (
+        <ScrollView showsHorizontalScrollIndicator={false}>
+          <View style={styles.container}>
+            <View style={styles.form}>
+              <View style={styles.header}>
+                <Text style={styles.title}>Modificar Vehiculo</Text>
               </View>
+              <View>
+                <Text style={styles.label}>Descripción</Text>
+                <TextInput
+                  style={[styles.input, styles.largeInput]}
+                  placeholder="Menciona una breve descripción de tu vehículo"
+                  multiline={true}
+                  numberOfLines={6}
+                  textAlignVertical="top"
+                  onChangeText={(text) => handleChange('Descripcion', text)}
+                  defaultValue={vehicle.Descripcion}
+                  maxLength={150}
+                />
+              </View>
+              <Text style={styles.labelImage}>Modifica la imagen de tu vehículo</Text>
+              <View style={styles.vehicleCard}>
+                <Image style={styles.vehicleImage} source={{ uri: image }} />
+                <View style={styles.cardFooter}>
+                  <TouchableOpacity style={styles.btnAdd} onPress={editImageChange}>
+                    <View style={styles.buttonContent}>
+                      <Text style={styles.buttonText2}>Subir imagen</Text>
+                    </View>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.btnAdd3} onPress={takePic}>
+                    <View style={styles.buttonContent}>
+                      <Text style={styles.buttonText2}>Tomar fotografía </Text>
+                    </View>
+                    <Modal visible={visible} animationType='slide' onRequestClose={() => {
+                      hide();
+                      setImage(definedImage); // Establece la imagen en defaultImageUrl cuando se cierra el Modal
+                    }}>
+                      <CameraVehicleScren closeModal={hide} />
+                    </Modal>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.btnAdd2} onPress={dropImage} >
+                    <View style={styles.buttonContent}>
+                      <Text style={styles.buttonText2}>Quitar imagen</Text>
+                    </View>
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              <TouchableOpacity style={styles.buttonSub} onPress={() => handleSubmit()}>
+                <Text style={styles.buttonText}>Modificar Vehiculo</Text>
+              </TouchableOpacity>
             </View>
 
-            <TouchableOpacity style={styles.buttonSub} onPress={() => handleSubmit()}>
-              <Text style={styles.buttonText}>Modificar Vehiculo</Text>
-            </TouchableOpacity>
           </View>
-
-        </View>
-      </ScrollView>
+        </ScrollView>
+      )
       break;
 
     default:
-      <ScrollView showsHorizontalScrollIndicator={false}>
-        <View style={styles.container}>
-          <View style={styles.form}>
-            <View style={styles.header}>
-              <Text style={styles.title}>Modificar Vehiculo</Text>
-            </View>
-            <View>
-              <Text style={styles.label}>Placa</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Ingresa la placa de tu vehículo"
-                onChangeText={(text) => handleChange('Placa', text)}
-                defaultValue={vehicle.Placa}
-              />
-              <Text style={styles.label}>Color</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="¿De que color es tu vehículo?"
-                onChangeText={(text) => handleChange('Color', text)}
-                defaultValue={vehicle.Color}
-              />
-              <Text style={styles.label}>Marca del vehículo</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="¿Cuál es la marca de tu vehículo?"
-                onChangeText={(text) => handleChange('Marca', text)}
-                defaultValue={vehicle.Marca}
-              />
-              <Text style={styles.label}>Descripción</Text>
-              <TextInput
-                style={[styles.input, styles.largeInput]}
-                placeholder="Menciona una breve descripción de tu vehículo"
-                multiline={true}
-                numberOfLines={6}
-                textAlignVertical="top"
-                onChangeText={(text) => handleChange('Descripcion', text)}
-                defaultValue={vehicle.Descripcion}
-              />
-            </View>
-            <Text style={styles.labelImage}>Modifica la imagen de tu vehículo</Text>
-            <View style={styles.vehicleCard}>
-              <Image style={styles.vehicleImage} source={{ uri: image }} />
-              <View style={styles.cardFooter}>
-                <TouchableOpacity style={styles.btnAdd} onPress={editImageChange}>
-                  <View style={styles.buttonContent}>
-                    <Text style={styles.buttonText2}>Subir imagen</Text>
-                  </View>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.btnAdd3} onPress={takePic}>
-                  <View style={styles.buttonContent}>
-                    <Text style={styles.buttonText2}>Tomar fotografía </Text>
-                  </View>
-                  <Modal visible={visible} animationType='slide' onRequestClose={() => {
-                    hide();
-                    setImage(definedImage); // Establece la imagen en defaultImageUrl cuando se cierra el Modal
-                  }}>
-                    <CameraVehicleScren closeModal={hide} />
-                  </Modal>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.btnAdd2} onPress={dropImage} >
-                  <View style={styles.buttonContent}>
-                    <Text style={styles.buttonText2}>Quitar imagen</Text>
-                  </View>
-                </TouchableOpacity>
+      return (
+        <ScrollView showsHorizontalScrollIndicator={false}>
+          <View style={styles.container}>
+            <View style={styles.form}>
+              <View style={styles.header}>
+                <Text style={styles.title}>Modificar Vehiculo</Text>
               </View>
+              <View>
+                <Text style={styles.label}>Placa</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Ingresa la placa de tu vehículo"
+                  maxLength={15}
+                  defaultValue={vehicle.Placa}
+                  onChangeText={(text) => handleChange('Placa', text.toUpperCase())}
+                />
+                <Text style={styles.label}>Color</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="¿De que color es tu vehículo?"
+                  maxLength={15}
+                  defaultValue={vehicle.Color}
+                  onChangeText={(text) => handleChange('Color', text.toUpperCase())}
+                />
+                <Text style={styles.label}>Marca del vehículo</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="¿Cuál es la marca de tu vehículo?"
+                  maxLength={25}
+                  onChangeText={(text) => handleChange('Marca', text.toUpperCase())}
+                  defaultValue={vehicle.Marca}
+                />
+                <Text style={styles.label}>Descripción</Text>
+                <TextInput
+                  style={[styles.input, styles.largeInput]}
+                  placeholder="Menciona una breve descripción de tu vehículo"
+                  multiline={true}
+                  numberOfLines={6}
+                  textAlignVertical="top"
+                  onChangeText={(text) => handleChange('Descripcion', text)}
+                  defaultValue={vehicle.Descripcion}
+                  maxLength={150}
+                />
+              </View>
+              <Text style={styles.labelImage}>Modifica la imagen de tu vehículo</Text>
+              <View style={styles.vehicleCard}>
+                <Image style={styles.vehicleImage} source={{ uri: image }} />
+                <View style={styles.cardFooter}>
+                  <TouchableOpacity style={styles.btnAdd} onPress={editImageChange}>
+                    <View style={styles.buttonContent}>
+                      <Text style={styles.buttonText2}>Subir imagen</Text>
+                    </View>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.btnAdd3} onPress={takePic}>
+                    <View style={styles.buttonContent}>
+                      <Text style={styles.buttonText2}>Tomar fotografía </Text>
+                    </View>
+                    <Modal visible={visible} animationType='slide' onRequestClose={() => {
+                      hide();
+                      setImage(definedImage); // Establece la imagen en defaultImageUrl cuando se cierra el Modal
+                    }}>
+                      <CameraVehicleScren closeModal={hide} />
+                    </Modal>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.btnAdd2} onPress={dropImage} >
+                    <View style={styles.buttonContent}>
+                      <Text style={styles.buttonText2}>Quitar imagen</Text>
+                    </View>
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              <TouchableOpacity style={styles.buttonSub} onPress={() => handleSubmit()} disabled={isSubmitting}>
+                <Text style={styles.buttonText}>Modificar Vehiculo</Text>
+              </TouchableOpacity>
             </View>
 
-            <TouchableOpacity style={styles.buttonSub} onPress={() => handleSubmit()} disabled={isSubmitting}>
-              <Text style={styles.buttonText}>Modificar Vehiculo</Text>
-            </TouchableOpacity>
           </View>
-
-        </View>
-      </ScrollView>
+        </ScrollView>
+      )
       break;
   }
 

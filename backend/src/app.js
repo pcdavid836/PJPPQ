@@ -13,6 +13,8 @@ import parkRoutes from "./routes/park";
 import parktimeRoutes from "./routes/parktime";
 import bookingRoutes from "./routes/booking";
 import parkVehicleRoutes from "./routes/parkVehicle";
+import parkFilterVehiclesRoutes from "./routes/parkFilterVehicles";
+import parkUserRoutes from "./routes/parkUser";
 
 
 const app = express();
@@ -27,6 +29,8 @@ app.use(parkRoutes);
 app.use(parktimeRoutes);
 app.use(bookingRoutes);
 app.use(parkVehicleRoutes);
+app.use(parkFilterVehiclesRoutes);
+app.use(parkUserRoutes);
 
 app.use("/docs", swaggerUI.serve, swaggerUI.setup(specs));
 

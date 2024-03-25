@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getPark, getMyPark, createPark, getParkid, updatePostPark, getPostPark, deletePark, getMyAprobedPark, updatePark } from '../controllers/park'
+import { getPark, getMyPark, createPark, getParkid, updatePostPark, getPostPark, deletePark, getMyAprobedPark, updatePark, getParkFilters } from '../controllers/park'
 
 const router = Router();
 
@@ -92,6 +92,15 @@ router.put('/deletepark/:id', deletePark)
  *    tags: [Parking]
  */
 router.get('/myparkaprobed/:id', getMyAprobedPark)
+
+/**
+ * @swagger
+ * /myparkaprobed/:id:
+ *  get:
+ *    summary: Obtiene los parqueos dependiendo su disponibilidad, tipo y el tipo de vehiculos que admiten.
+ *    tags: [Parking]
+ */
+router.post('/searchfilterparks', getParkFilters)
 
 
 

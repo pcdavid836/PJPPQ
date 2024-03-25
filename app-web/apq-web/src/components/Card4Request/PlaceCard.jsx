@@ -87,15 +87,34 @@ function PlaceCard({ place }) {
         }
     }
 
+    async function addSelectCarTypes(parqueoId) {
+        // Loop over each day of the week
+        for (let nVehicles = 1; nVehicles <= 7; nVehicles++) {
+            // Prepare the data to be sent
+            const data = {
+                tipo_vehiculo_idTipo_Vehiculo: nVehicles,
+                parqueo_idParqueo: parqueoId,
+                Estado: 0
+            };
+
+            // Send the POST request
+            const res = await axios.post('/api/requests/requestsTypeVehicle', data);
+
+            //console.log(res.data);
+        }
+    }
+
     const aprobeSub = async () => {
         setToAprobe({ Aprobacion: 1 }); // Use setToAprobe to update the state
         const res = await axios.put("/api/requests/" + place.idParqueo, toAprobe);
-        console.log(res);
+        //console.log(res);
 
         addHorariosAtencion(place.idParqueo, '08:00:00', '18:00:00');
+        addSelectCarTypes(place.idParqueo);
         setToHelper({ Tipo_Usuario_idTipo_Usuario: 2 });
         const res2 = await axios.put('/api/users/' + place.usuario_idUsuario, toHelper);
-        console.log(res2);
+        //console.log(res2);
+
 
         toggleAll(true);
         router.refresh();

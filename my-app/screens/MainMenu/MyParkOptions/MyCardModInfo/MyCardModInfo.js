@@ -1,14 +1,15 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, Image, TextInput, StyleSheet, TouchableOpacity, ScrollView, Modal, ToastAndroid, Button } from 'react-native';
+import { View, Text, Image, TextInput, StyleSheet, TouchableOpacity, ScrollView, Modal, ToastAndroid, Button, Alert } from 'react-native';
 import * as ImagePicker from "expo-image-picker";
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage'
 import { storage } from "../../../../firebaseConfig";
 import CameraParkScreen from '../../TakePhoto/CameraPark/';
 import { CheckBox } from 'react-native-elements';
-import { getInfoPark, updateBasicPark } from '../../../../api';
+import { getInfoPark, updateBasicPark, updateParkFilter, getParkVehicleFilter } from '../../../../api';
 import { AuthContext } from '../../../..//context/AuthContext';
 
 const MyCardModInfo = ({ parkId, closeModal, updateMod }) => {
+    const [parkFilters, setParkFilters] = useState([]);
     const definedImage = "https://firebasestorage.googleapis.com/v0/b/pkpq-74307.appspot.com/o/GarageImages%2FdefaulttPark.jpg?alt=media&token=829c6cfc-bfda-45ef-a172-7f6086d260c7&_gl=1*s19mo5*_ga*MTkxMTcyMTI0MC4xNjk0ODIyNzI3*_ga_CW55HF8NVT*MTY5ODAwOTA3MS40My4x.1";
     const [image, setImage] = useState(definedImage);
     const [checked, setChecked] = useState(false);
@@ -29,16 +30,15 @@ const MyCardModInfo = ({ parkId, closeModal, updateMod }) => {
     const fetchData = async () => {
         try {
             const response = await getInfoPark(parkId);
+            const parkFilterResponse = await getParkVehicleFilter(parkId);
             setMyPark(response);
+            setParkFilters(parkFilterResponse);
             setImage(response.Url_imagen);
-            setChecked(response.Disponibilidad === 1); // Make sure 'checked' reflects 'Disponibilidad'
+            setChecked(response.Disponibilidad === 1);
         } catch (error) {
             console.error('Error fetching park details.', error);
         }
     };
-
-
-
 
     // Llama a la función de obtención de detalles del vehículo al cargar el componente
     useEffect(() => {
@@ -50,11 +50,21 @@ const MyCardModInfo = ({ parkId, closeModal, updateMod }) => {
     const handleCheckBoxChange = () => {
         const newCheckedValue = !checked;
         setChecked(newCheckedValue);
+
+        // Si el nuevo valor es true, muestra la alerta
+        if (newCheckedValue) {
+            Alert.alert(
+                "Precaución",
+                "Al momento de mantener activado la disponibilidad de tu parqueo estás haciendo que este sea visto al ojo público, se recomienda configurar primero tu horario."
+            );
+        }
+
         setMyPark({
             ...mypark,
             Disponibilidad: newCheckedValue ? 1 : 0,
         });
     };
+
 
 
     async function dropImage() {
@@ -89,16 +99,26 @@ const MyCardModInfo = ({ parkId, closeModal, updateMod }) => {
     }
 
     async function handleSubmit() {
-        // Verificar si todos los campos requeridos están definidos
-        updateBasicPark(parkId, mypark);
-        //updatePost(myparkId, mypark);
-        if (mypark.Url_imagen !== "defaultPark") {
-            //agregar if donde si la imagen es igual a su response no se debe subir a la nube
-            await uploadImage(image, "image");
+        if (!mypark.Titulo) {
+            Alert.alert('Error', 'El título no puede estar vacío');
+            return;
         }
-        closeModal();
-        updateMod();
 
+        if (!mypark.Ubicacion) {
+            Alert.alert('Error', 'La ubicación no puede estar vacía');
+            return;
+        }
+
+        if (!mypark.Descripcion) {
+            Alert.alert('Error', 'La descripción no puede estar vacía');
+            return;
+        }
+
+        // Si todos los campos están llenos, procede con la actualización
+        updateBasicPark(parkId, mypark);
+        updateParkFilter(parkFilters);
+        closeModal();
+        updateMod(mypark);
     }
 
     async function uploadImage(uri, fileType) {
@@ -129,6 +149,15 @@ const MyCardModInfo = ({ parkId, closeModal, updateMod }) => {
                 });
             });
     }
+
+    const handleCheckBoxChange2 = (index) => {
+        setParkFilters(parkFilters.map((filter, i) => {
+            if (i === index) {
+                return { ...filter, Estado: filter.Estado === 1 ? 0 : 1 };
+            }
+            return filter;
+        }));
+    };
 
 
     return (
@@ -172,6 +201,7 @@ const MyCardModInfo = ({ parkId, closeModal, updateMod }) => {
                             placeholder="Ingresa el nombre de tu puesto"
                             onChangeText={(text) => handleChange('Titulo', text)}
                             defaultValue={mypark ? mypark.Titulo : ''}
+                            maxLength={45}
                         />
                         <View style={styles.checkboxContainer}>
                             <Text style={styles.label}>Disponible: </Text>
@@ -190,6 +220,7 @@ const MyCardModInfo = ({ parkId, closeModal, updateMod }) => {
                             placeholder="Ingresa la Ubicación del lugar"
                             onChangeText={(text) => handleChange('Ubicacion', text)}
                             defaultValue={mypark ? mypark.Ubicacion : ''}
+                            maxLength={150}
                         />
                         <Text style={styles.label}>Descripción</Text>
                         <TextInput
@@ -200,7 +231,31 @@ const MyCardModInfo = ({ parkId, closeModal, updateMod }) => {
                             defaultValue={mypark ? mypark.Descripcion : ''}
                             textAlignVertical="top"
                             onChangeText={(text) => handleChange('Descripcion', text)}
+                            maxLength={150}
                         />
+                        <Text style={styles.label}>Vehiculos que admites en tu parqueo:</Text>
+                        {parkFilters.map((filter, index) => {
+                            let vehicleType;
+                            switch (filter.tipo_vehiculo_idTipo_Vehiculo) {
+                                case 1: vehicleType = 'Automóvil'; break;
+                                case 2: vehicleType = 'Motocicleta'; break;
+                                case 3: vehicleType = 'Bicicleta'; break;
+                                case 4: vehicleType = 'Camión'; break;
+                                case 5: vehicleType = 'Autobus'; break;
+                                case 6: vehicleType = 'Minibus'; break;
+                                case 7: vehicleType = 'Otros'; break;
+                            }
+
+                            return (
+                                <CheckBox
+                                    key={index}
+                                    title={vehicleType}
+                                    checked={filter.Estado === 1}
+                                    onPress={() => handleCheckBoxChange2(index)}
+                                />
+                            );
+                        })}
+
                     </View>
                     <TouchableOpacity style={styles.buttonSub} onPress={() => handleSubmit()}>
                         <Text style={styles.buttonText}>Modificar Puesto</Text>

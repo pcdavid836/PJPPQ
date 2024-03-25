@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createBook, getBookByUser, getBookByPark, cancelBook, denyBook } from '../controllers/booking'
+import { createBook, getBookByUser, getBookByPark, cancelBook, denyBook, getBookByUserTrue } from '../controllers/booking'
 
 const router = Router();
 
@@ -28,6 +28,15 @@ router.post('/book', createBook)
  *    tags: [Booking]
  */
 router.get('/bookuser/:id', getBookByUser)
+
+/**
+ * @swagger
+ * /bookusertrue/:id:
+ *  get:
+ *    summary: Obtiene reservas por el id de un usuario donde los estados tengan valor a 1.
+ *    tags: [Booking]
+ */
+router.get('/bookusertrue/:id', getBookByUserTrue)
 
 /**
  * @swagger

@@ -6,7 +6,7 @@ import { getCars, createBooking } from '../../../../api';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 
-const ReserveSpace = ({ parkId, parktimer, closeModal }) => {
+const ReserveSpace = ({ parkId, parktimer, closeModal, onBookingComplete }) => {
     const { userInfo } = useContext(AuthContext);
     const [vehicles, setVehicles] = useState([]);
     const [value, setValue] = useState(null);
@@ -23,6 +23,18 @@ const ReserveSpace = ({ parkId, parktimer, closeModal }) => {
     // Convierte las horas de apertura y cierre a objetos Date
     let openingTime = parkDay ? new Date(`1970-01-01T${parkDay.hora_apertura}Z`) : null;
     let closingTime = parkDay ? new Date(`1970-01-01T${parkDay.hora_cierre}Z`) : null;
+    let now = new Date();
+    let timeStartHour = new Date();
+    timeStartHour.setHours(timeStart.getHours(), timeStart.getMinutes());
+
+
+    let timeEndHour = new Date();
+    timeEndHour.setHours(timeEnd.getHours(), timeEnd.getMinutes());
+
+
+
+
+
 
     // Ajusta las horas a la zona horaria local
     if (openingTime) {
@@ -46,6 +58,24 @@ const ReserveSpace = ({ parkId, parktimer, closeModal }) => {
         Hora_Reserva_Fin: null,
         vehiculo_idVehiculo: null
     });
+
+
+    let openingTimeArray = parkDay.hora_apertura.split(':'); // Divide la cadena en horas y minutos
+    let openingHour = parseInt(openingTimeArray[0]); // Convierte la hora a un número entero
+    let openingMinute = parseInt(openingTimeArray[1]); // Convierte los minutos a un número entero
+    let openingTimeDate = new Date();
+    openingTimeDate.setHours(openingHour, openingMinute);
+
+
+
+
+    // Convierte formattedClosingTime a un objeto Date
+    let closingTimeArray = formattedClosingTime.split(/[: ]/); // Divide la cadena en horas, minutos y AM/PM
+    let closingHour = closingTimeArray[1] === 'PM' ? parseInt(closingTimeArray[0]) + 12 : parseInt(closingTimeArray[0]); // Convierte la hora a formato de 24 horas
+    let closingMinute = parseInt(closingTimeArray[2]);
+    let closingTimeDate = new Date();
+    closingTimeDate.setHours(closingHour, closingMinute);
+
 
     const handleChange = (name, value) => setBooking({ ...booking, [name]: value });
 
@@ -83,8 +113,46 @@ const ReserveSpace = ({ parkId, parktimer, closeModal }) => {
             return;
         }
 
+        // Verifica si timeStart es menor que openingTimeDate
+        if (timeStart < openingTimeDate) {
+            setIsButtonDisabled(true);
+            return;
+        }
+
+        // Verifica si la fecha seleccionada es la fecha actual y timeStart es menor que la hora actual
+        if (date.toDateString() === now.toDateString() && timeStart < now) {
+            setIsButtonDisabled(true);
+            return;
+        }
+
+        // Verifica si timeEnd excede a closingTimeDate
+        if (timeEnd > closingTimeDate) {
+            setIsButtonDisabled(true);
+        }
+
+        // Verifica si timeEndHour es menor que timeStartHour
+        if (timeEndHour < timeStartHour) {
+            setIsButtonDisabled(true);
+            return;
+        }
+
+        // Verifica si timeStart es menor que openingTimeDate
+        if (timeStart < openingTimeDate) {
+            setIsButtonDisabled(true);
+            return;
+        }
+
+
+        // Verifica si la diferencia entre timeStartHour y timeEndHour es menor a 20 minutos
+        let differenceInMinutes = (timeEndHour.getTime() - timeStartHour.getTime()) / (1000 * 60);
+        if (differenceInMinutes < 20) {
+            setIsButtonDisabled(true);
+            return;
+        }
+
         // Si ninguna de las condiciones anteriores se cumple, habilita el botón
         setIsButtonDisabled(false);
+
     }, [date, timeStart, timeEnd, value]);
 
 
@@ -136,6 +204,8 @@ const ReserveSpace = ({ parkId, parktimer, closeModal }) => {
         if (Object.values(booking).every(value => value !== null)) {
             createBooking(booking);
             closeModal();
+            onBookingComplete();
+            Alert.alert('Éxito', 'La reserva fue realizada con éxito. Puedes comprobarlo en la vista de reservas.');
         } else {
             // Muestra una alerta al usuario con un título personalizado, mostrar alertas faltantes en caso de seleccionar tiempos excedidos y demas
             Alert.alert('Error', 'Por favor, selecciona un vehículo.');
@@ -201,9 +271,14 @@ const ReserveSpace = ({ parkId, parktimer, closeModal }) => {
                 />
             )}
             <Text>Horario: {parkDay ? `${formattedOpeningTime} - ${formattedClosingTime}` : "DIA NO DISPONIBLE"}</Text>
-            <TouchableOpacity style={styles.shareButton} onPress={sendBooking} disabled={isButtonDisabled}>
+            <TouchableOpacity
+                style={isButtonDisabled ? styles.disabledButton : styles.shareButton}
+                onPress={sendBooking}
+                disabled={isButtonDisabled}
+            >
                 <Text style={styles.shareButtonText}>Realizar Reserva</Text>
             </TouchableOpacity>
+
 
         </View>
     );
@@ -276,4 +351,14 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 16,
     },
+    disabledButton: {
+        marginTop: 10,
+        height: 45,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 30,
+        backgroundColor: 'gray',
+    },
+
 });

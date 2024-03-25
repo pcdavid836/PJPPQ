@@ -29,7 +29,7 @@ const BookingItem = ({ book, onDeleteComplete, onModifyComplete }) => {
   };
 
   const [tosend, setToSend] = useState({
-    Url_imagen_ingreso: '',
+    Url_imagen_ingreso: sendImage,
   });
 
   const handleChange = (name, value) => setToSend({ ...tosend, [name]: value });
@@ -164,11 +164,21 @@ const BookingItem = ({ book, onDeleteComplete, onModifyComplete }) => {
   }
 
   async function onUploadOrder() {
-    tosend.Url_imagen_ingreso = image;
-    const updatedBook = await parkVehicleEnter(book.idReserva, tosend);
-    uploadImage(image, "image");
-    onModifyComplete(updatedBook);
-    setConfirmModalVisible(false);
+    if (tosend.Url_imagen_ingreso === sendImage) {
+      Alert.alert(
+        "Imagen requerida",
+        "Por favor, selecciona una imagen diferente a la imagen por defecto.",
+        [
+          { text: "OK" }
+        ]
+      );
+    } else {
+      tosend.Url_imagen_ingreso = image;
+      const updatedBook = await parkVehicleEnter(book.idReserva, tosend);
+      uploadImage(image, "image");
+      onModifyComplete(updatedBook);
+      setConfirmModalVisible(false);
+    }
   }
 
 

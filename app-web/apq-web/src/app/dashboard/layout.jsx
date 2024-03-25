@@ -1,4 +1,4 @@
-import Head from "next/head";
+import Head from 'next/head'
 import SideNavbar from "../../components/SideNavbar";
 
 export default function DashboardLayout({ children }) {

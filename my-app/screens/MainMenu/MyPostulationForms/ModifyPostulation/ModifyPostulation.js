@@ -147,40 +147,62 @@ const ModifyPostulation = ({ closeModal, myparkId, onComplete }) => {
 
 
   async function handleSubmit() {
+    console.log(mypark)
     setIsSubmitting(true);
+
     // Verificar si todos los campos requeridos están definidos
     mypark.Tipo_Parqueo_idTipo_Parqueo = value;
+    mypark.usuario_idUsuario = userInfo.idUsuario;
     if (
       mypark.Ubicacion &&
       mypark.Tamaño &&
       mypark.Descripcion &&
       mypark.Tipo_Parqueo_idTipo_Parqueo &&
       mypark.Titulo &&
-      mypark.Url_imagen &&
-      mypark.Url_validacion &&
+      mypark.Url_imagen !== definedImage && // Verifica que la imagen no sea la imagen por defecto
+      mypark.Url_validacion !== 'defaultFile' && // Verifica que el documento no sea el documento por defecto
       mypark.Latitud &&
       mypark.Longitud
     ) {
       try {
+        // Muestra un mensaje de "Cargando..." mientras se suben los archivos
+        ToastAndroid.show('Cargando...', ToastAndroid.SHORT);
+
         // Espera a que la imagen y el documento se suban antes de actualizar la publicación
         await uploadImage(image, "image");
         await uploadFile(document, "file");
+
         updatePost(myparkId, mypark);
-        closeModal();
         onComplete(mypark);
+        closeModal();
       } catch (error) {
         console.error("Error al subir la imagen o el documento:", error);
       }
     } else {
-      ToastAndroid.show('Completa los campos restantes!', ToastAndroid.SHORT);
+      // Muestra un mensaje de error si no se ha subido una imagen o un documento
+      if (mypark.Url_imagen === definedImage) {
+        ToastAndroid.show('Por favor, sube una imagen.', ToastAndroid.SHORT);
+      }
+      if (mypark.Url_validacion === 'defaultFile') {
+        ToastAndroid.show('Por favor, sube un documento.', ToastAndroid.SHORT);
+      }
     }
     setIsSubmitting(false);
   }
 
 
+
   async function uploadImage(uri, fileType) {
     const response = await fetch(uri);
     const blob = await response.blob();
+    // Convertir blob a File
+    const file = new File([blob], "file", { type: blob.type });
+
+    // Verificar el tamaño del archivo
+    if (file.size > 10 * 1024 * 1024) { // 10 MB
+      ToastAndroid.show('El tamaño de la imagen excede el límite de 10 MB.', ToastAndroid.SHORT);
+      return;
+    }
 
     const storageRef = ref(storage, "GarageImages/" + new Date().getTime() + "u" + userInfo.idUsuario + "pk")
     const uploadTask = uploadBytesResumable(storageRef, blob)
@@ -213,6 +235,15 @@ const ModifyPostulation = ({ closeModal, myparkId, onComplete }) => {
   async function uploadFile(uri, fileType) {
     const response = await fetch(uri);
     const blob = await response.blob();
+
+    // Convertir blob a File
+    const file = new File([blob], "file", { type: blob.type });
+
+    // Verificar el tamaño del archivo
+    if (file.size > 200 * 1024 * 1024) { // 200 MB
+      ToastAndroid.show('El tamaño del documento excede el límite de 200 MB.', ToastAndroid.SHORT);
+      return;
+    }
 
     const storageRef = ref(storage, "GarageDocuments/" + new Date().getTime() + "u" + userInfo.idUsuario + "pkd")
     const uploadTask = uploadBytesResumable(storageRef, blob)
@@ -279,6 +310,7 @@ const ModifyPostulation = ({ closeModal, myparkId, onComplete }) => {
               placeholder="¿Cómo deseas llamar a este lugar?"
               defaultValue={mypark.Titulo}
               onChangeText={(text) => handleChange('Titulo', text)}
+              axLength={45}
             />
             <Text style={styles.label}>Ubicación</Text>
             <TextInput
@@ -286,6 +318,7 @@ const ModifyPostulation = ({ closeModal, myparkId, onComplete }) => {
               placeholder="Menciona la Dirección del lugar"
               defaultValue={mypark.Ubicacion}
               onChangeText={(text) => handleChange('Ubicacion', text)}
+              maxLength={150}
             />
             <Text style={styles.label}>Tamaño en metros cuadrados</Text>
             <TextInput
@@ -293,6 +326,7 @@ const ModifyPostulation = ({ closeModal, myparkId, onComplete }) => {
               placeholder="Menciona un tamaño aproximado del lguar a ceder"
               defaultValue={mypark.Tamaño.toString()}
               onChangeText={(text) => handleChange('Tamaño', text)}
+              maxLength={5}
             />
             <Text style={styles.label}>Descripción</Text>
             <TextInput
@@ -303,6 +337,7 @@ const ModifyPostulation = ({ closeModal, myparkId, onComplete }) => {
               numberOfLines={6}
               textAlignVertical="top"
               onChangeText={(text) => handleChange('Descripcion', text)}
+              maxLength={150}
             />
             <View style={{ margin: 10 }}>
               <Text style={styles.label}>Indicar Dirección del establecimiento</Text>

@@ -88,7 +88,7 @@ const MyParkScreen = ({ navigation }) => {
       <SearchBar
         containerStyle={styles.searchBar}
         inputContainerStyle={styles.searchInput}
-        placeholder="Buscar Calles, Plazas, Plazas..."
+        placeholder="Buscar Calles, Avenidas, Plazas..."
         onChangeText={setSearch}
         onSubmitEditing={searchLocation}
         value={search}

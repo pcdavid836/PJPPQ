@@ -13,7 +13,7 @@ import * as ImagePicker from "expo-image-picker";
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage'
 import { storage } from "../../../firebaseConfig";
 import Ionicons from 'react-native-vector-icons/Ionicons'
-import  StackNavigationGroup from '../../Navigation/StackNavigationGroup';
+import StackNavigationGroup from '../../Navigation/StackNavigationGroup';
 import CameraProfileScreen from '../TakePhoto/CameraProfile/CameraProfileScreen';
 
 
@@ -47,12 +47,12 @@ const ProfileScreen = () => {
   useEffect(() => {
     if (actualImage.Url_imagen === "default") {
       actualImage.Url_imagen = 'https://firebasestorage.googleapis.com/v0/b/pkpq-74307.appspot.com/o/ProfileImages%2Fuser_default.png?alt=media&token=d6b24730-d87d-4be5-9275-df4a44f5c323';
-        updateUserImage(actualImage.Url_imagen); // Llama a la función para actualizar userImage en el contexto
+      updateUserImage(actualImage.Url_imagen); // Llama a la función para actualizar userImage en el contexto
     }
-    
+
     // Actualiza la imagen cuando cambie userImage
     setActualImage({ Url_imagen: userImage });
-}, [userImage]);
+  }, [userImage]);
 
 
 
@@ -64,9 +64,9 @@ const ProfileScreen = () => {
   const [progress, setProgress] = useState(0);
 
 
- const TakePicture = () => {
-  show();
-};
+  const TakePicture = () => {
+    show();
+  };
 
 
   async function editImageChange() {
@@ -120,15 +120,21 @@ const ProfileScreen = () => {
   }
 
   const onSaveUpdate = () => {
-    //console.log(actualUser);
-    updateUser(userInfo.idUsuario, actualUser);
+    // Verifica que todos los campos estén llenos
+    if (!actualUser.Nombres || !actualUser.Primer_Apellido || !actualUser.Segundo_Apellido || !actualUser.CI || !actualUser.Celular) {
+      ToastAndroid.show('Por favor, completa todos los campos!', ToastAndroid.SHORT);
+      return;
+    }
 
-    ToastAndroid.show('Cambios realizados con exito!', ToastAndroid.SHORT);
+    // Si todos los campos están llenos, procede a actualizar el usuario
+    updateUser(userInfo.idUsuario, actualUser);
+    ToastAndroid.show('Cambios realizados con éxito!', ToastAndroid.SHORT);
   };
+
 
   return (
     <View>
-        <StackNavigationGroup />
+      <StackNavigationGroup />
       <View style={styles.header}>
         <Image
           style={styles.avatar}
@@ -161,10 +167,10 @@ const ProfileScreen = () => {
             </View>
           </MenuOptions>
         </Menu>
-          <Modal visible={visible} animationType='slide' onRequestClose={hide}>
-            <CameraProfileScreen closeModal={hide}/>
-            
-          </Modal>
+        <Modal visible={visible} animationType='slide' onRequestClose={hide}>
+          <CameraProfileScreen closeModal={hide} />
+
+        </Modal>
 
         <Text style={styles.name}>{userInfo.Correo}</Text>
         <Text style={styles.info}>{userInfo.Rol}</Text>
@@ -177,6 +183,7 @@ const ProfileScreen = () => {
             placeholder={'Nombre'}
             placeholderTextColor="#999"
             onChangeText={(text) => handleChange('Nombres', text)}
+            maxLength={45}
           />
           <Text style={styles.label}>Apellido</Text>
           <TextInput
@@ -184,6 +191,7 @@ const ProfileScreen = () => {
             defaultValue={userInfo.Primer_Apellido}
             placeholder="Apellido"
             placeholderTextColor="#999"
+            maxLength={45}
             onChangeText={(text) => handleChange('Primer_Apellido', text)}
           />
           <Text style={styles.label}>Segundo Apellido</Text>
@@ -192,6 +200,7 @@ const ProfileScreen = () => {
             defaultValue={userInfo.Segundo_Apellido}
             placeholder="Segundo Apellido"
             placeholderTextColor="#999"
+            maxLength={45}
             onChangeText={(text) => handleChange('Segundo_Apellido', text)}
           />
           <Text style={styles.label}>Carnet de Identidad</Text>
@@ -200,7 +209,8 @@ const ProfileScreen = () => {
             placeholder="CI"
             defaultValue={userInfo.CI}
             placeholderTextColor="#999"
-            onChangeText={(text) => handleChange('CI', text)}
+            onChangeText={(text) => handleChange('CI', text.toUpperCase())}
+            maxLength={10}
           />
           <Text style={styles.label}>Celular</Text>
           <TextInput
@@ -209,6 +219,8 @@ const ProfileScreen = () => {
             placeholder="Celular"
             placeholderTextColor="#999"
             onChangeText={(text) => handleChange('Celular', text)}
+            keyboardType="numeric"
+            maxLength={15}
           />
           <View style={styles.btnContainer}>
             <TouchableOpacity style={[styles.button, styles.pass]}>
@@ -227,7 +239,7 @@ const ProfileScreen = () => {
       </View>
     </View>
 
-    
+
   );
 };
 

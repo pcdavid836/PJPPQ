@@ -19,6 +19,7 @@ const UserRegister = () => {
         Celular: '',
         CI: '',
         Contrasena: '',
+        Url_imagen: 'default',
     });
 
     const handleChange = (name, value) => setUser({ ...user, [name]: value });

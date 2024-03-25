@@ -1,4 +1,4 @@
-import {React, useState, useContext } from 'react';
+import { React, useState, useContext, useEffect } from 'react';
 import { View, Text, Image, StyleSheet, useWindowDimensions, ScrollView, ToastAndroid } from 'react-native';
 import Logo from '../../assets/images/logoEX.png';
 import CustomInput from '../../components/CustomInput';
@@ -6,10 +6,18 @@ import CustomButton from '../../components/CustomButton';
 import { useNavigation } from '@react-navigation/native';
 import { getUserMail } from '../../api';
 import { AuthContext } from '../../context/AuthContext';
+//import { GoogleSignIn, GoogleSignInButton, statusCodes } from '@react-native-google-signin/google-signin'
 import CryptoES from 'crypto-es';
 
 const UserSignIn = () => {
-    const {login, updateUserImage} = useContext(AuthContext);
+    const { login, updateUserImage } = useContext(AuthContext);
+    const configureGoogleSignIn = () => {
+        GoogleSignIn.configure({
+            webClientId: "121681989018-befic7f8r6cd1ahrjq2oilngsi3n6uu4.apps.googleusercontent.com",
+            androidClientId: "121681989018-befic7f8r6cd1ahrjq2oilngsi3n6uu4.apps.googleusercontent.com",
+            iosClientId: "",
+        });
+    };
     //Llamado de usuarios (prueba)
     /*
     const loadUsers = async () => {
@@ -18,7 +26,15 @@ const UserSignIn = () => {
         console.log(data);
     };
     */
+/*
+    useEffect(() => {
+        configureGoogleSignIn();
+    });
 
+    const signIn = () => {
+        console.log('pressed')
+    };
+*/
     const [logser, setLogser] = useState({
         Correo: '',
         Contrasena: '',
@@ -29,9 +45,14 @@ const UserSignIn = () => {
     const { height } = useWindowDimensions();
 
     const navigation = useNavigation();
-    
+
     const onSignInPressed = async () => {
-        
+
+        if (logser.Correo === '' || logser.Contrasena === '') {
+            ToastAndroid.show('Debes llenar los datos requeridos!', ToastAndroid.SHORT);
+            return;
+        }
+
         const correo = logser.Correo;
         //console.log("actual: " + logser.Contrasena);
 
@@ -48,12 +69,12 @@ const UserSignIn = () => {
         const email = user.Correo;
         const mainpassword = user.Contrasena;
         //const mainId = user.idUsuario;
-        
+
         /* Mostrar Contrasena y Email
         console.log(email);
         console.log(mainpassword);
         */
-        
+
         //console.log(mainpassword); ver Contrasena despues del proceso
 
         if (email === correo && mainpassword === hashString) {
@@ -61,13 +82,13 @@ const UserSignIn = () => {
             login(user);
             updateUserImage(user.Url_imagen);
             navigation.navigate('HomeScreen');
-            
-            
+
+
         } else {
             // Show an error message
             ToastAndroid.show('Correo o Contrasena Incorrectos!', ToastAndroid.SHORT);
         }
-     
+
     };
 
     const onForgotPasswordPressed = () => {
@@ -98,28 +119,24 @@ const UserSignIn = () => {
                 <CustomInput
                     placeholder="Correo Electronico"
                     setValue={(text) => handleChange('Correo', text)}
+                    maxLength={45}
                 />
                 <CustomInput
-                    placeholder="Contrasena"
+                    placeholder="Contraseña"
                     setValue={(text) => handleChange('Contrasena', text)}
                     secureTextEntry
+                    maxLength={16}
                 />
                 <CustomButton
-                    text="¿Olvidaste tu Contrasena?"
+                    text="¿Olvidaste tu Contraseña?"
                     onPress={onForgotPasswordPressed}
                     type="TERTIARY"
                 />
                 <CustomButton
                     text="Iniciar Sesión"
                     onPress={onSignInPressed}
-
                 />
-                <CustomButton
-                    text="Iniciar sesión con Google"
-                    onPress={onSignInGoogle}
-                    bgColor="#FAE9EA"
-                    fgColor="#DD4D44"
-                />
+               
                 <CustomButton
                     text="Iniciar sesión con Facebook"
                     onPress={onSignInFacebook}

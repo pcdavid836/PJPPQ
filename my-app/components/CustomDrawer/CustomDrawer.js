@@ -7,11 +7,13 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 
 const CustomDrawer = (props) => {
     const { logout, userInfo, userImage, updateUserImage } = useContext(AuthContext);
+    //console.log('primero:', userInfo)
 
     
     const [actualCustomImage, setActualCustomImage] = useState({
         Url_imagen: userInfo.Url_imagen,
     });
+    //console.log('segundo:' + actualCustomImage.Url_imagen)
     //Ver informacion de la imagen que llega
     //console.log("Imagen actual " + actualCustomImage.Url_imagen);
     //console.log("Imagen actual userImage " + userImage);

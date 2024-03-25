@@ -10,6 +10,7 @@ const CustomInput = ({value, setValue, placeholder, secureTextEntry}) => {
         placeholder={placeholder}
         style={styles.input}
         secureTextEntry={secureTextEntry}
+        maxLength={45}
         />
     </View>
   );

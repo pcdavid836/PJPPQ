@@ -136,3 +136,48 @@ export const getMyAprobedPark = async (req, res) => {
     ]);
     res.json(rows)
 }
+
+export const getParkFilters = async (req, res) => {
+    try {
+        const { Disponibilidad, Tipo_Parqueo_idTipo_Parqueo, tipo_vehiculo_ids } = req.body;
+
+        // Verificar que los datos necesarios estén presentes en la solicitud
+        if (!Disponibilidad || !Tipo_Parqueo_idTipo_Parqueo || !tipo_vehiculo_ids) {
+            return res.status(400).json({ mensaje: "Faltan datos requeridos en la solicitud" });
+        }
+
+        const connection = await connect();
+        const [rows] = await connection.execute(`
+            SELECT DISTINCT p.*
+            FROM parqueo p
+            JOIN vehiculos_filtro vf ON p.idParqueo = vf.parqueo_idParqueo
+            WHERE p.Estado = 1
+            AND p.Aprobacion = 1
+            AND p.Disponibilidad IN (${Disponibilidad.map(() => '?').join(', ')})
+            AND p.Tipo_Parqueo_idTipo_Parqueo = ?
+            AND vf.Estado = 1
+            AND vf.tipo_vehiculo_idTipo_Vehiculo IN (${tipo_vehiculo_ids.map(() => '?').join(', ')});
+        `, [...Disponibilidad, Tipo_Parqueo_idTipo_Parqueo, ...tipo_vehiculo_ids]);
+        if (rows.length > 0) {
+            const parks = rows.map(park => ({
+                idParqueo: park.idParqueo,
+                Ubicacion: park.Ubicacion,
+                Tamaño: park.Tamaño,
+                Descripcion: park.Descripcion,
+                Tipo_Parqueo_idTipo_Parqueo: park.Tipo_Parqueo_idTipo_Parqueo,
+                Titulo: park.Titulo,
+                Url_imagen: park.Url_imagen,
+                Url_validacion: park.Url_validacion,
+                Latitud: park.Latitud,
+                Longitud: park.Longitud,
+                Disponibilidad: park.Disponibilidad,
+            }));
+            return res.json(parks);
+        } else {
+            return res.status(404).json({ mensaje: "No se encontraron parqueos que coincidan con los criterios de búsqueda" });
+        }
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ mensaje: "Error en el servidor" });
+    }
+};

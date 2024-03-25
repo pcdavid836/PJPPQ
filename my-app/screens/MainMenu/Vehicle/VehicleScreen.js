@@ -40,12 +40,19 @@ const VehicleScreen = () => {
     <View>
       <View style={styles.header}>
         <Text style={styles.title}>Mis Vehículos</Text>
-        <TouchableOpacity style={styles.btnAdd} onPress={CreateVehicle}>
-          <View style={styles.buttonContent}>
-            <Ionicons name="add-circle-outline" size={20} style={{ marginRight: 8, color: 'white' }} />
-            <Text style={styles.buttonText}>Añadir vehículo</Text>
-          </View>
-        </TouchableOpacity>
+        {cars.length <= 3 && (
+          <TouchableOpacity
+            style={styles.btnAdd}
+            onPress={CreateVehicle}
+          >
+            <View style={styles.buttonContent}>
+              <Ionicons name="add-circle-outline" size={20} style={{ marginRight: 8, color: 'white' }} />
+              <Text style={styles.buttonText}>Añadir vehículo</Text>
+            </View>
+          </TouchableOpacity>
+        )}
+
+
         <Modal visible={visible} animationType='slide' onRequestClose={hide}>
           <AddVehicle closeModal={hide} onComplete={loadCars} />
         </Modal>

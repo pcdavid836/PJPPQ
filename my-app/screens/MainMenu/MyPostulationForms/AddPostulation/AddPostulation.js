@@ -67,9 +67,9 @@ const AddPostulation = ({ closeModal, onComplete }) => {
     const handleLocationSelect = (locationData) => {
         // Aquí puedes acceder a los datos de ubicación, que incluyen latitud, longitud y dirección.
         // Realiza la lógica necesaria con estos datos.
-        console.log('Datos de ubicación seleccionados:', locationData);
+        //console.log('Datos de ubicación seleccionados:', locationData);
         setFastUbi(locationData.address);
-        console.log(locationData.address);
+        //console.log(locationData.address);
 
         // Ejemplo de cómo asignar la ubicación a myparkValues:
         setMyparkValues({
@@ -137,44 +137,65 @@ const AddPostulation = ({ closeModal, onComplete }) => {
     }
 
     async function handleSubmit() {
+        //console.log(myparkValues)
         setIsSubmitting(true);
+
         // Verificar si todos los campos requeridos están definidos
         myparkValues.Url_validacion = document;
         myparkValues.Tipo_Parqueo_idTipo_Parqueo = value;
         myparkValues.usuario_idUsuario = userInfo.idUsuario;
         myparkValues.Url_imagen = image;
+
         if (
             myparkValues.Ubicacion &&
             myparkValues.Tamaño &&
             myparkValues.Descripcion &&
             myparkValues.Tipo_Parqueo_idTipo_Parqueo &&
             myparkValues.Titulo &&
-            myparkValues.Url_imagen &&
-            myparkValues.Url_validacion &&
+            myparkValues.Url_imagen !== definedImage && // Verifica que la imagen no sea la imagen por defecto
+            myparkValues.Url_validacion !== 'defaultFile' && // Verifica que el documento no sea el documento por defecto
             myparkValues.Latitud &&
             myparkValues.Longitud &&
             myparkValues.usuario_idUsuario
         ) {
             try {
+                // Muestra un mensaje de "Cargando..." mientras se suben los archivos
+                ToastAndroid.show('Cargando...', ToastAndroid.SHORT);
+
                 // Espera a que la imagen y el documento se suban antes de postular
                 await uploadImage(image, "image");
                 await uploadFile(document, "file");
+
                 postulate(myparkValues);
-                onComplete();
                 closeModal();
+                onComplete(myparkValues);
             } catch (error) {
                 console.error("Error al subir la imagen o el documento:", error);
             }
         } else {
-            ToastAndroid.show('Completa los campos restantes!', ToastAndroid.SHORT);
+            // Muestra un mensaje de error si no se ha subido una imagen o un documento
+            if (myparkValues.Url_imagen === definedImage) {
+                ToastAndroid.show('Por favor, sube una imagen.', ToastAndroid.SHORT);
+            }
+            if (myparkValues.Url_validacion === 'defaultFile') {
+                ToastAndroid.show('Por favor, sube un documento.', ToastAndroid.SHORT);
+            }
         }
         setIsSubmitting(false);
     }
-    
+
 
     async function uploadImage(uri, fileType) {
         const response = await fetch(uri);
         const blob = await response.blob();
+        // Convertir blob a File
+        const file = new File([blob], "file", { type: blob.type });
+
+        // Verificar el tamaño del archivo
+        if (file.size > 10 * 1024 * 1024) { // 10 MB
+            ToastAndroid.show('El tamaño de la imagen excede el límite de 10 MB.', ToastAndroid.SHORT);
+            return;
+        }
 
         const storageRef = ref(storage, "GarageImages/" + new Date().getTime() + "u" + userInfo.idUsuario + "pk")
         const uploadTask = uploadBytesResumable(storageRef, blob)
@@ -208,6 +229,15 @@ const AddPostulation = ({ closeModal, onComplete }) => {
     async function uploadFile(uri, fileType) {
         const response = await fetch(uri);
         const blob = await response.blob();
+
+        // Convertir blob a File
+        const file = new File([blob], "file", { type: blob.type });
+
+        // Verificar el tamaño del archivo
+        if (file.size > 200 * 1024 * 1024) { // 200 MB
+            ToastAndroid.show('El tamaño del documento excede el límite de 200 MB.', ToastAndroid.SHORT);
+            return;
+        }
 
         const storageRef = ref(storage, "GarageDocuments/" + new Date().getTime() + "u" + userInfo.idUsuario + "pkd")
         const uploadTask = uploadBytesResumable(storageRef, blob)
@@ -274,18 +304,22 @@ const AddPostulation = ({ closeModal, onComplete }) => {
                             style={styles.input}
                             placeholder="¿Cómo deseas llamar a este lugar?"
                             onChangeText={(text) => handleChange('Titulo', text)}
+                            maxLength={45}
                         />
                         <Text style={styles.label}>Ubicación</Text>
                         <TextInput
                             style={styles.input}
                             placeholder="Menciona la Dirección del lugar"
                             onChangeText={(text) => handleChange('Ubicacion', text)}
+                            maxLength={150}
                         />
                         <Text style={styles.label}>Tamaño en metros cuadrados</Text>
                         <TextInput
                             style={styles.input}
-                            placeholder="Menciona un tamaño aproximado del lguar a ceder"
+                            placeholder="Menciona un tamaño aproximado del lugar a ceder"
                             onChangeText={(text) => handleChange('Tamaño', text)}
+                            keyboardType="numeric"
+                            maxLength={5}
                         />
                         <Text style={styles.label}>Descripción</Text>
                         <TextInput
@@ -295,6 +329,7 @@ const AddPostulation = ({ closeModal, onComplete }) => {
                             numberOfLines={6}
                             textAlignVertical="top"
                             onChangeText={(text) => handleChange('Descripcion', text)}
+                            maxLength={150}
                         />
                         <View style={{ margin: 10 }}>
                             <Text style={styles.label}>Indicar Dirección del establecimiento</Text>
@@ -311,7 +346,7 @@ const AddPostulation = ({ closeModal, onComplete }) => {
                             </Modal>
                         </View>
                         <View style={{ margin: 10 }}>
-                            <Text style={styles.label}>Subir documento de propiedad</Text>
+                            <Text style={styles.label}>Subir documento de propiedad (Limite 200MB)</Text>
                             <Button style={styles.buttonSub} title={'Subir archivo'} onPress={pickDocument} />
                             <Text style={{ textAlign: 'center' }}>{fileName}</Text>
                         </View>

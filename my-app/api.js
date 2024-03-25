@@ -1,25 +1,31 @@
-const APIUser = "http://192.168.1.10:3000/user";
-const APIUsermail = "http://192.168.1.10:3000/usermail";
-const APIUserImage = "http://192.168.1.10:3000/userimage";
-const APIVehicle = "http://192.168.1.10:3000/vehicle";
-const APIVehicleInfo = "http://192.168.1.10:3000/vehicleInfo";
-const APIVehicleDelete = "http://192.168.1.10:3000/deletevehicle";
-const APIPark = "http://192.168.1.10:3000/park";
-const APIParkTime = "http://192.168.1.10:3000/parktime";
-const APIMyPark = "http://192.168.1.10:3000/mypark";
-const APIMyPost = "http://192.168.1.10:3000/mypost";
-const APIDeletePark = "http://192.168.1.10:3000/deletepark";
-const APISelectAllMyParks = "http://192.168.1.10:3000/myparkaprobed";
-const APISelectParkToEdit = "http://192.168.1.10:3000/parktimetoedit";
-const APIBooking = "http://192.168.1.10:3000/book";
-const APIBookingUser = "http://192.168.1.10:3000/bookuser";
-const APIBookingPark = "http://192.168.1.10:3000/bookpark";
-const APIBookingCancel = "http://192.168.1.10:3000/bookcancel";
-const APIBookingDeny = "http://192.168.1.10:3000/bookdeny";
-const APIParkVehicleEnter = "http://192.168.1.10:3000/parkvehicleenter";
-const APIParkVehicle = "http://192.168.1.10:3000/parkvehicle";
-const APIParkVehicleDeny = "http://192.168.1.10:3000/parkvehicledeny";
-const APIParkVehicleFinish = "http://192.168.1.10:3000/parkvehiclefinish";
+const APIUser = "http://192.168.1.9:3000/user";
+const APIUsermail = "http://192.168.1.9:3000/usermail";
+const APIUserImage = "http://192.168.1.9:3000/userimage";
+const APIVehicle = "http://192.168.1.9:3000/vehicle";
+const APIVehicleInfo = "http://192.168.1.9:3000/vehicleInfo";
+const APIVehicleDelete = "http://192.168.1.9:3000/deletevehicle";
+const APIPark = "http://192.168.1.9:3000/park";
+const APIParkTime = "http://192.168.1.9:3000/parktime";
+const APIParkFilterVehicle = "http://192.168.1.9:3000/parkvehiclefilter";
+const APIParkFilterVehicleEdit = "http://192.168.1.9:3000/parkvehiclefilteredit";
+const APIMyPark = "http://192.168.1.9:3000/mypark";
+const APIMyPost = "http://192.168.1.9:3000/mypost";
+const APIDeletePark = "http://192.168.1.9:3000/deletepark";
+const APISelectAllMyParks = "http://192.168.1.9:3000/myparkaprobed";
+const APISelectParkToEdit = "http://192.168.1.9:3000/parktimetoedit";
+const APIBooking = "http://192.168.1.9:3000/book";
+const APIBookingUser = "http://192.168.1.9:3000/bookuser";
+const APIBookingUserTrue = "http://192.168.1.9:3000/bookusertrue";
+const APIBookingPark = "http://192.168.1.9:3000/bookpark";
+const APIBookingCancel = "http://192.168.1.9:3000/bookcancel";
+const APIBookingDeny = "http://192.168.1.9:3000/bookdeny";
+const APIParkVehicleEnter = "http://192.168.1.9:3000/parkvehicleenter";
+const APIParkVehicle = "http://192.168.1.9:3000/parkvehicle";
+const APIParkVehicleDeny = "http://192.168.1.9:3000/parkvehicledeny";
+const APIParkVehicleFinish = "http://192.168.1.9:3000/parkvehiclefinish";
+const APIParkOwner = "http://192.168.1.9:3000/parkuser";
+const APISearchFilterParks = "http://192.168.1.9:3000/searchfilterparks";
+
 
 
 //Nota la ip local siempre varia en todas las redes ver la ipconfig en cmd.
@@ -216,6 +222,7 @@ export const getUserParkAprobed = async (idUser) => {
   return await res.json();
 };
 
+
 export const getParkTimetoEdit = async (idPark) => {
   const res = await fetch(`${APISelectParkToEdit}/${idPark}`, {
     method: "GET",
@@ -236,6 +243,38 @@ export const updateParkTime = async (newData) => {
   });
   return res;
 };
+
+//ESTE ES PARA EL FORMULARIO DE MODIFICACION DE PARQUEOS
+export const getParkVehicleFilter = async (idPark) => {
+  const res = await fetch(`${APIParkFilterVehicleEdit}/${idPark}`, {
+    method: "GET",
+  });
+
+  return await res.json();
+};
+
+
+export const updateParkFilter = async (newData) => {
+  const res = await fetch(APIParkFilterVehicle, {
+    method: "PUT",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(newData),
+  });
+  return res;
+};
+
+
+export const getParkFilterVehicle = async (idPark) => {
+  const res = await fetch(`${APIParkFilterVehicle}/${idPark}`, {
+    method: "GET",
+  });
+
+  return await res.json();
+};
+
 
 export const updateBasicPark = async (idPark, newData) => {
   //console.log(idMyPost, newData)
@@ -262,6 +301,14 @@ export const createBooking = async (newData) => {
 
 export const getBookByUser = async (idUser) => {
   const res = await fetch(`${APIBookingUser}/${idUser}`, {
+    method: "GET",
+  });
+
+  return await res.json();
+};
+
+export const getBookByUserTrue = async (idUser) => {
+  const res = await fetch(`${APIBookingUserTrue}/${idUser}`, {
     method: "GET",
   });
 
@@ -343,4 +390,22 @@ export const parkVehicleDeny = async (idBook) => {
     },
   });
   return res;
+};
+
+export const getParkOwnerByIdPark = async (idPark) => {
+  const res = await fetch(`${APIParkOwner}/${idPark}`, {
+    method: "GET",
+  });
+
+  return await res.json();
+};
+
+export const getParksByFilter = async (searchData) => {
+  //console.log(JSON.stringify(searchData));
+  const res = await fetch(APISearchFilterParks, {
+    method: "POST",
+    headers: { Accept: "application/json", "Content-Type": "application/json" },
+    body: JSON.stringify(searchData)
+  });
+  return await res.json();
 };

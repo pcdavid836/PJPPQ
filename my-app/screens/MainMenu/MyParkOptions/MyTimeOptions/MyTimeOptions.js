@@ -11,23 +11,29 @@ const MyTimeOptions = ({ parkToEdit, closeModal, onComplete }) => {
     const [selectedTime, setSelectedTime] = useState(new Date());
     const [showPicker, setShowPicker] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
+    const [timeDifference, setTimeDifference] = useState(false);
 
     const handleTimeChange = (event, selectedTime) => {
         setShowPicker(false);
         if (selectedTime) {
-            const itemIndex = parktime.findIndex((el) => el.idHorario === selectedItem.idHorario);
-            const updatedParkTime = [...parktime];
             // Ajusta 'selectedTime' a la zona horaria local
             selectedTime.setMinutes(selectedTime.getMinutes() - selectedTime.getTimezoneOffset());
             // Convierte 'selectedTime' a una cadena de tiempo en formato "HH:MM:SS"
             const timeString = selectedTime.toISOString().split('T')[1].split('.')[0];
+
+            // Verifica si la hora seleccionada es mayor que 23:59
+            if (timeString > '23:59:00') {
+                // Muestra una alerta al usuario
+                alert('La hora seleccionada no puede ser mayor que 23:59');
+                return;
+            }
+
+            const itemIndex = parktime.findIndex((el) => el.idHorario === selectedItem.idHorario);
+            const updatedParkTime = [...parktime];
             updatedParkTime[itemIndex][selectedItem.timeType] = timeString;
             setParkTime(updatedParkTime);
         }
     };
-    
-
-
 
     const getDayOfWeek = (number) => {
         switch (number) {
@@ -46,7 +52,7 @@ const MyTimeOptions = ({ parkToEdit, closeModal, onComplete }) => {
             case 7:
                 return 'Domingo';
             default:
-                return 'Día Desconocido Juercoles';
+                return 'Día Desconocido, Juercoles';
         }
     };
 
@@ -79,11 +85,38 @@ const MyTimeOptions = ({ parkToEdit, closeModal, onComplete }) => {
         }
     };
 
-
+    //Cargar tiempos anteriores
 
     useEffect(() => {
+        alert('Atención: Cada día debe corresponder a un formato de 24 horas y no puede cruzar horarios de distintos días en caso de atender en un horario nocturno (las horas, 23:59 y 00:00 están bloqueadas).');
         loadTimes();
+
     }, []);
+
+    useEffect(() => {
+        // Verifica si hay al menos 20 minutos de diferencia entre la hora de apertura y cierre
+        const timeDiff = parktime.some(item => {
+            const [startHours, startMinutes] = item.hora_apertura.split(':');
+            const [endHours, endMinutes] = item.hora_cierre.split(':');
+            const difference = (endHours - startHours) * 60 + (endMinutes - startMinutes);
+            return difference < 20;
+        });
+
+        // Actualiza el estado de timeDifference
+        setTimeDifference(timeDiff);
+    }, [parktime]); // Recalcula timeDifference cada vez que parktime cambia
+
+    useEffect(() => {
+        // Verifica si la hora de cierre es menor o igual que la hora de apertura
+        const timeDiff = parktime.some(item => {
+            const [startHours, startMinutes] = item.hora_apertura.split(':');
+            const [endHours, endMinutes] = item.hora_cierre.split(':');
+            return endHours < startHours || (endHours === startHours && endMinutes <= startMinutes);
+        });
+
+        // Actualiza el estado de timeDifference
+        setTimeDifference(timeDiff);
+    }, [parktime]); // Recalcula timeDifference cada vez que parktime cambia
 
 
     const handleCheckChange = (item) => {
@@ -97,7 +130,7 @@ const MyTimeOptions = ({ parkToEdit, closeModal, onComplete }) => {
         updatedParkTime[itemIndex].Estado = updatedParkTime[itemIndex].isChecked ? 1 : 0;
         setParkTime(updatedParkTime);
     };
-    
+
 
     const renderItem = ({ item }) => (
         <View style={{ paddingBottom: 10 }}>
@@ -127,12 +160,26 @@ const MyTimeOptions = ({ parkToEdit, closeModal, onComplete }) => {
         </View>
     );
 
-    async function handleSubmit() {
-        //console.log(parktime);
+    const handleSubmit = () => {
+        // Verifica si hay al menos 20 minutos de diferencia entre la hora de apertura y cierre
+        const timeDifference = parktime.some(item => {
+            const [startHours, startMinutes] = item.hora_apertura.split(':');
+            const [endHours, endMinutes] = item.hora_cierre.split(':');
+            const difference = (endHours - startHours) * 60 + (endMinutes - startMinutes);
+            return difference < 20;
+        });
+
+        if (timeDifference) {
+            // Muestra una alerta al usuario
+            alert('Debe haber al menos 20 minutos de diferencia entre la hora de apertura y cierre');
+            return;
+        }
+
+        // Si todo está bien, proceder con la solicitud
         updateParkTime(parktime);
         closeModal();
         onComplete(parktime);
-    }
+    };
 
     return (
         <ScrollView style={styles.container}>
@@ -155,7 +202,18 @@ const MyTimeOptions = ({ parkToEdit, closeModal, onComplete }) => {
                         onChange={handleTimeChange}
                     />
                 )}
-                <TouchableOpacity style={styles.buttonSub} onPress={() => handleSubmit()}>
+                <TouchableOpacity
+                    style={[styles.buttonSub, { backgroundColor: timeDifference ? 'gray' : '#1cab00' }]}
+                    onPress={() => {
+                        if (timeDifference) {
+                            // Muestra un cuadro de alerta con las reglas
+                            alert('Atención: La hora de cierre debe ser mayor que la hora de apertura.');
+                        } else {
+                            handleSubmit();
+                        }
+                    }}
+                    disabled={timeDifference}
+                >
                     <Text style={styles.buttonText}>Subir Horario</Text>
                 </TouchableOpacity>
             </View>

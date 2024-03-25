@@ -1,26 +1,69 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, StyleSheet, Image, Modal, ScrollView, TouchableOpacity, FlatList } from 'react-native'
-import { getParksTime } from '../../../../api';
+import { getParksTime, getBookByUserTrue, getParkFilterVehicle, getParkOwnerByIdPark } from '../../../../api';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import ReserveSpace from '../ReserveSpace';
+import { AuthContext } from '../../../../context/AuthContext';
+import auto from '../../../../assets/images/kindOfCar/coche.png';
+import bici from '../../../../assets/images/kindOfCar/bicicleta.png';
+import bus from '../../../../assets/images/kindOfCar/bus.png';
+import camion from '../../../../assets/images/kindOfCar/camion.png';
+import mini from '../../../../assets/images/kindOfCar/minibus.png';
+import otro from '../../../../assets/images/kindOfCar/mistery.png';
+import moto from '../../../../assets/images/kindOfCar/moto.png';
+
 
 
 const CardPlace = ({ park, closeModal }) => {
   let parkImage = "defaultPark";
+  const { userInfo } = useContext(AuthContext);
   const [parktime, setParkTime] = useState([]);
+  const [parkVehicleType, setParkVehicles] = useState([]);
+  const [parkOwners, setParkOwners] = useState([]);
   const [isTimeVisible, setTimeVisible] = useState(false);
   const [iconName, setIconName] = useState("chevron-down-outline");
   const [isModalVisible, setModalVisible] = useState(false);
+  const [activeBooking, setActiveBooking] = useState(null);
   const hide = () => setModalVisible(false);
+
+  const [actualUser, setActualUser] = useState({
+    idUsuario: userInfo.idUsuario,
+  });
+
+  const loadOwners = async () => {
+    const data = await getParkOwnerByIdPark(park.idParqueo);
+    setParkOwners(data);
+    //console.log(data);
+  };
 
   const loadTimes = async () => {
     const data = await getParksTime(park.idParqueo);
     setParkTime(data);
+    //console.log(data);
+  };
+
+  const loatFilterVehicles = async () => {
+    const data = await getParkFilterVehicle(park.idParqueo);
+    setParkVehicles(data);
+    //console.log(data);
+  };
+
+  const loadBooks = async () => {
+    const data = await getBookByUserTrue(actualUser.idUsuario);
+    setActiveBooking(data);
+    //console.log(data);
   };
 
   useEffect(() => {
+    //console.log(actualUser.idUsuario);
+
     loadTimes();
+    loatFilterVehicles();
+    loadBooks();
+    loadOwners();
   }, []);
+
+  const isUserOwner = parkOwners.some(owner => owner.usuario_idUsuario === userInfo.idUsuario);
 
   const getDayOfWeek = (number) => {
     switch (number) {
@@ -42,6 +85,27 @@ const CardPlace = ({ park, closeModal }) => {
         return 'Día Desconocido';
     }
   };
+  const getVehicleImageUri = (vehicleType) => {
+    switch (vehicleType) {
+      case 1:
+        return auto;
+      case 2:
+        return moto;
+      case 3:
+        return bici;
+      case 4:
+        return camion;
+      case 5:
+        return bus;
+      case 6:
+        return mini;
+      case 7:
+        return otro;
+      default:
+        return coche;
+    }
+  };
+
   const getAvailabilityText = () => {
     if (park.Disponibilidad === 1) {
       return "Abierto";
@@ -128,6 +192,18 @@ const CardPlace = ({ park, closeModal }) => {
             <Text style={styles.dispT}>Disponibilidad: </Text>
             <Text style={{ ...styles.disp, color: getAvailabilityColor() }}>{getAvailabilityText()}</Text>
           </View>
+          <View style={styles.headerContent}>
+            <Text style={styles.recommendedText}>Recomendado:</Text>
+            <View style={styles.vehicleImagesContainer}>
+              {parkVehicleType.map((vehicle, index) => (
+                <Image
+                  key={index}
+                  style={styles.vehicleImage}
+                  source={getVehicleImageUri(vehicle.tipo_vehiculo_idTipo_Vehiculo)}
+                />
+              ))}
+            </View>
+          </View>
           <TouchableOpacity onPress={toggleTimeVisibility}>
             <View style={styles.headerContent}>
               <Text style={styles.price}>Horarios de atención</Text>
@@ -145,7 +221,11 @@ const CardPlace = ({ park, closeModal }) => {
         />
       )}
       <View style={styles.addToCarContainer}>
-        <TouchableOpacity style={styles.shareButton} onPress={btnBook}>
+        <TouchableOpacity
+          style={parktime.length > 0 ? styles.shareButton : styles.disabledButton}
+          onPress={btnBook}
+          disabled={isUserOwner}
+        >
           <Text style={styles.shareButtonText}>Solicitar Reserva</Text>
         </TouchableOpacity>
         <Modal
@@ -160,7 +240,7 @@ const CardPlace = ({ park, closeModal }) => {
           <View style={{ flex: 1, justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)' }}>
             {/* Asegúrate de que el contenido del modal esté centrado */}
             <View style={{ margin: 20, backgroundColor: "white", borderRadius: 20, padding: 35, shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 4, elevation: 5 }}>
-              <ReserveSpace parkId={park.idParqueo} parktimer={parktime} closeModal={hide} />
+              <ReserveSpace parkId={park.idParqueo} parktimer={parktime} closeModal={hide} onBookingComplete={closeCard} />
             </View>
           </View>
         </Modal>
@@ -243,6 +323,29 @@ const styles = StyleSheet.create({
     top: -30,
     zIndex: 1,
   },
+  disabledButton: {
+    marginTop: 10,
+    height: 45,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 30,
+    backgroundColor: 'gray',
+  },
+  recommendedText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginRight: 5,
+  },
+  vehicleImagesContainer: {
+    flexDirection: 'row', // Alinea las imágenes horizontalmente
+  },
+  vehicleImage: {
+    width: 25,
+    height: 25,
+    margin: 2, // Añade un pequeño espacio entre las imágenes
+  },
+
 })
 
 export default CardPlace

@@ -42,9 +42,9 @@ const AddVehicle = ({ closeModal, onComplete }) => {
     };
 
     const [vehicle, setVehicle] = useState({
-        Placa: 'N/A',
-        Color: 'N/A',
-        Marca: 'N/A',
+        Placa: '',
+        Color: '',
+        Marca: '',
         Descripcion: '',
         Tipo_Vehiculo_idTipo_Vehiculo: '',
         usuario_idUsuario: '',
@@ -91,14 +91,13 @@ const AddVehicle = ({ closeModal, onComplete }) => {
     }
 
     async function handleSubmit() {
-        setIsSubmitting(true);
-        if (value === 3 || value === 7) {
-            vehicle.Placa = "N/A";
-            vehicle.Marca = "N/A";
-        }
         // Verifica si todos los campos requeridos están definidos
         vehicle.Tipo_Vehiculo_idTipo_Vehiculo = value;
         vehicle.usuario_idUsuario = userInfo.idUsuario;
+
+        console.log(vehicle);
+        console.log(value);
+        setIsSubmitting(true);
 
         //vehicle.Url_imagen = actualImage;
         if (
@@ -114,7 +113,7 @@ const AddVehicle = ({ closeModal, onComplete }) => {
                 // Espera a que la imagen se suba antes de guardar el vehículo
                 await uploadImage(image, "image");
                 saveVehicle(vehicle);
-                onComplete();
+                onComplete(vehicle);
                 closeModal();
             } catch (error) {
                 console.error("Error al subir la imagen:", error);
@@ -173,19 +172,22 @@ const AddVehicle = ({ closeModal, onComplete }) => {
                         <TextInput
                             style={styles.input}
                             placeholder="Ingresa la placa de tu vehículo"
-                            onChangeText={(text) => handleChange('Placa', text)}
+                            maxLength={15}
+                            onChangeText={(text) => handleChange('Placa', text.toUpperCase())}
                         />
                         <Text style={styles.label}>Color</Text>
                         <TextInput
                             style={styles.input}
                             placeholder="¿De que color es tu vehículo?"
-                            onChangeText={(text) => handleChange('Color', text)}
+                            maxLength={15}
+                            onChangeText={(text) => handleChange('Color', text.toUpperCase())}
                         />
                         <Text style={styles.label}>Marca del vehículo</Text>
                         <TextInput
                             style={styles.input}
                             placeholder="¿Cuál es la marca de tu vehículo?"
-                            onChangeText={(text) => handleChange('Marca', text)}
+                            maxLength={25}
+                            onChangeText={(text) => handleChange('Marca', text.toUpperCase())}
                         />
                         <Text style={styles.label}>Descripción</Text>
                         <TextInput
@@ -194,6 +196,7 @@ const AddVehicle = ({ closeModal, onComplete }) => {
                             multiline={true}
                             numberOfLines={6}
                             textAlignVertical="top"
+                            maxLength={150}
                             onChangeText={(text) => handleChange('Descripcion', text)}
                         />
                     </View>
@@ -206,19 +209,22 @@ const AddVehicle = ({ closeModal, onComplete }) => {
                         <TextInput
                             style={styles.input}
                             placeholder="Ingresa la placa de tu vehículo"
-                            onChangeText={(text) => handleChange('Placa', text)}
+                            maxLength={15}
+                            onChangeText={(text) => handleChange('Placa', text.toUpperCase())}
                         />
                         <Text style={styles.label}>Color</Text>
                         <TextInput
                             style={styles.input}
                             placeholder="¿De que color es tu vehículo?"
-                            onChangeText={(text) => handleChange('Color', text)}
+                            maxLength={15}
+                            onChangeText={(text) => handleChange('Color', text.toUpperCase())}
                         />
                         <Text style={styles.label}>Marca del vehículo</Text>
                         <TextInput
                             style={styles.input}
                             placeholder="¿Cuál es la marca de tu vehículo?"
-                            onChangeText={(text) => handleChange('Marca', text)}
+                            maxLength={25}
+                            onChangeText={(text) => handleChange('Marca', text.toUpperCase())}
                         />
                         <Text style={styles.label}>Descripción</Text>
                         <TextInput
@@ -227,19 +233,23 @@ const AddVehicle = ({ closeModal, onComplete }) => {
                             multiline={true}
                             numberOfLines={6}
                             textAlignVertical="top"
+                            maxLength={150}
                             onChangeText={(text) => handleChange('Descripcion', text)}
                         />
                     </View>
                 );
                 break;
             case 3:
+                vehicle.Placa = "N/A";
+                vehicle.Marca = "N/A";
                 return (
                     <View>
                         <Text style={styles.label}>Color</Text>
                         <TextInput
                             style={styles.input}
                             placeholder="¿De que color es tu vehículo?"
-                            onChangeText={(text) => handleChange('Color', text)}
+                            maxLength={15}
+                            onChangeText={(text) => handleChange('Color', text.toUpperCase())}
                         />
                         <Text style={styles.label}>Descripción</Text>
                         <TextInput
@@ -248,6 +258,7 @@ const AddVehicle = ({ closeModal, onComplete }) => {
                             multiline={true}
                             numberOfLines={6}
                             textAlignVertical="top"
+                            maxLength={150}
                             onChangeText={(text) => handleChange('Descripcion', text)}
                         />
                     </View>
@@ -266,7 +277,8 @@ const AddVehicle = ({ closeModal, onComplete }) => {
                         <TextInput
                             style={styles.input}
                             placeholder="¿De que color es tu vehículo?"
-                            onChangeText={(text) => handleChange('Color', text)}
+                            maxLength={15}
+                            onChangeText={(text) => handleChange('Color', text.toUpperCase())}
                         />
                         <Text style={styles.label}>Marca del vehículo</Text>
                         <TextInput
@@ -281,6 +293,7 @@ const AddVehicle = ({ closeModal, onComplete }) => {
                             multiline={true}
                             numberOfLines={6}
                             textAlignVertical="top"
+                            maxLength={150}
                             onChangeText={(text) => handleChange('Descripcion', text)}
                         />
                     </View>
@@ -293,19 +306,22 @@ const AddVehicle = ({ closeModal, onComplete }) => {
                         <TextInput
                             style={styles.input}
                             placeholder="Ingresa la placa de tu vehículo"
-                            onChangeText={(text) => handleChange('Placa', text)}
+                            maxLength={15}
+                            onChangeText={(text) => handleChange('Placa', text.toUpperCase())}
                         />
                         <Text style={styles.label}>Color</Text>
                         <TextInput
                             style={styles.input}
                             placeholder="¿De que color es tu vehículo?"
-                            onChangeText={(text) => handleChange('Color', text)}
+                            maxLength={15}
+                            onChangeText={(text) => handleChange('Color', text.toUpperCase())}
                         />
                         <Text style={styles.label}>Marca del vehículo</Text>
                         <TextInput
                             style={styles.input}
                             placeholder="¿Cuál es la marca de tu vehículo?"
-                            onChangeText={(text) => handleChange('Marca', text)}
+                            maxLength={25}
+                            onChangeText={(text) => handleChange('Marca', text.toUpperCase())}
                         />
                         <Text style={styles.label}>Descripción</Text>
                         <TextInput
@@ -314,6 +330,7 @@ const AddVehicle = ({ closeModal, onComplete }) => {
                             multiline={true}
                             numberOfLines={6}
                             textAlignVertical="top"
+                            maxLength={150}
                             onChangeText={(text) => handleChange('Descripcion', text)}
                         />
                     </View>
@@ -326,19 +343,22 @@ const AddVehicle = ({ closeModal, onComplete }) => {
                         <TextInput
                             style={styles.input}
                             placeholder="Ingresa la placa de tu vehículo"
-                            onChangeText={(text) => handleChange('Placa', text)}
+                            maxLength={15}
+                            onChangeText={(text) => handleChange('Placa', text.toUpperCase())}
                         />
                         <Text style={styles.label}>Color</Text>
                         <TextInput
                             style={styles.input}
                             placeholder="¿De que color es tu vehículo?"
-                            onChangeText={(text) => handleChange('Color', text)}
+                            maxLength={15}
+                            onChangeText={(text) => handleChange('Color', text.toUpperCase())}
                         />
                         <Text style={styles.label}>Marca del vehículo</Text>
                         <TextInput
                             style={styles.input}
                             placeholder="¿Cuál es la marca de tu vehículo?"
-                            onChangeText={(text) => handleChange('Marca', text)}
+                            maxLength={25}
+                            onChangeText={(text) => handleChange('Marca', text.toUpperCase())}
                         />
                         <Text style={styles.label}>Descripción</Text>
                         <TextInput
@@ -347,20 +367,18 @@ const AddVehicle = ({ closeModal, onComplete }) => {
                             multiline={true}
                             numberOfLines={6}
                             textAlignVertical="top"
+                            maxLength={150}
                             onChangeText={(text) => handleChange('Descripcion', text)}
                         />
                     </View>
                 );
                 break;
             case 7:
+                vehicle.Placa = "N/A";
+                vehicle.Marca = "N/A";
+                vehicle.Color = "N/A";
                 return (
                     <View>
-                        <Text style={styles.label}>Color</Text>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="¿De que color es tu vehículo?"
-                            onChangeText={(text) => handleChange('Color', text)}
-                        />
                         <Text style={styles.label}>Descripción</Text>
                         <TextInput
                             style={[styles.input, styles.largeInput]}
@@ -368,6 +386,7 @@ const AddVehicle = ({ closeModal, onComplete }) => {
                             multiline={true}
                             numberOfLines={6}
                             textAlignVertical="top"
+                            maxLength={150}
                             onChangeText={(text) => handleChange('Descripcion', text)}
                         />
                     </View>
