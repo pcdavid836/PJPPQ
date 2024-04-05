@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, Alert } from 'react-native';
-import CustomButton from '../../components/CustomButton';
-import { useNavigation } from '@react-navigation/native';
-import { updateUserPassword } from '../../api';
+import { View, Text, StyleSheet, ScrollView, TextInput, Alert, TouchableOpacity } from 'react-native';
+import CustomButton from '../../../components/CustomButton';
+import { updateUserPassword } from '../../../api';
 import CryptoES from 'crypto-es';
 
-const NewPasswordScreen = ({ route }) => {
-    const { user } = route.params;
-    const [newPassword, setNewPassword] = useState('');
+const UpdatePasswordScreen = ({ user, closeModal }) => {
+    //console.log(user.usuar.idUsuario); consoleario); consolesuario);
 
     const [newinfo, setNewInfo] = useState({
         Codex: '',
@@ -17,7 +15,9 @@ const NewPasswordScreen = ({ route }) => {
 
     const handleChange = (name, value) => setNewInfo({ ...newinfo, [name]: value });
 
-    const navigation = useNavigation();
+    const onCancel = async () => {
+        closeModal();
+    }
 
     const onNewConfirm = async () => {
         if (newinfo.Contrasena1 !== newinfo.Contrasena2) {
@@ -33,13 +33,13 @@ const NewPasswordScreen = ({ route }) => {
             return;
         }
         const hash = CryptoES.SHA256(newinfo.Contrasena1);
-        if (user.Contrasena === hash.toString()) {
+        if (user.usuario.Contrasena === hash.toString()) {
             Alert.alert("Error", "Debes ingresar una contraseña diferente a la anterior.");
             return;
         }
         try {
             const newData = {
-                idUsuario: user.idUsuario,
+                idUsuario: user.usuario.idUsuario,
                 Codigo: newinfo.Codex,
                 Contrasena: hash.toString()
             };
@@ -47,7 +47,7 @@ const NewPasswordScreen = ({ route }) => {
             const result = await response.json();
             if (response.ok) {
                 Alert.alert("Éxito", "Contraseña actualizada correctamente.");
-                navigation.navigate('UserSignIn');
+                closeModal(); // Cierra el modal
             } else {
                 Alert.alert("Error", result.mensaje);
             }
@@ -58,9 +58,6 @@ const NewPasswordScreen = ({ route }) => {
     };
 
 
-    const onSignInPressed = () => {
-        console.warn('Backtosignin');
-    };
 
     return (
         <ScrollView showsHorizontalScrollIndicator={false}>
@@ -94,15 +91,18 @@ const NewPasswordScreen = ({ route }) => {
                         autoCapitalize="none"
                     />
                 </View>
-                <CustomButton
-                    text="Enviar"
-                    onPress={onNewConfirm}
-                    style={styles.button}
-                />
+                <View style={{ alignItems: 'center', marginBottom: 20, width: '80%' }}>
+                    <TouchableOpacity style={[styles.button, { backgroundColor: '#3B71F3', width: '80%' }]} onPress={onNewConfirm}>
+                        <Text style={styles.buttonText}>Enviar</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[styles.button, { backgroundColor: '#fff', borderWidth: 1, borderColor: '#e8e8e8' }]} onPress={onCancel}>
+                        <Text style={[styles.buttonText, { color: '#000' }]}>Cancelar</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
         </ScrollView>
-    );
-};
+    )
+}
 
 const styles = StyleSheet.create({
     root: {
@@ -130,7 +130,15 @@ const styles = StyleSheet.create({
     },
     button: {
         width: '80%', // Ancho del botón
+        marginTop: 10, // Margen superior
+        padding: 15,
+        alignItems: 'center',
+        borderRadius: 5,
+    },
+    buttonText: {
+        fontWeight: 'bold',
+        color: 'white',
     },
 });
 
-export default NewPasswordScreen;
+export default UpdatePasswordScreen

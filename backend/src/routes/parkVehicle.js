@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createRecord, postEnter, getParkVehicleByParkId, denyAparkment, aprobeAparkment } from '../controllers/parkVehicle'
+import { createRecord, postEnter, getParkVehicleByParkId, denyAparkment, aprobeAparkment, getFilteredParkVehicleByParkId } from '../controllers/parkVehicle'
 
 const router = Router();
 
@@ -49,11 +49,20 @@ router.put('/parkvehiclefinish/:id', aprobeAparkment)
 
 /**
  * @swagger
- * /parkvehicledeny/:id:
+ * /parkvehicledeny:
  *  get:
  *    summary: Cancela la operacion en caso de que alguien realice un engaño.
  *    tags: [ParkVehicle]
  */
-router.put('/parkvehicledeny/:id', denyAparkment)
+router.put('/parkvehicledeny', denyAparkment)
+
+/**
+ * @swagger
+ * /parkvehiclefilter:
+ *  post:
+ *    summary: Obtiene una lista de control de vehiculos en un parqueo dependiendo de valores determinados por un usuario.
+ *    tags: [ParkVehicle]
+ */
+router.post('/parkvehiclefilter', getFilteredParkVehicleByParkId)
 
 export default router;

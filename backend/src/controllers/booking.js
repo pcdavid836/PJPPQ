@@ -60,11 +60,33 @@ export const getBookByUserTrue = async (req, res) => {
 
 export const getBookByPark = async (req, res) => {
     const connection = await connect()
-    const [rows] = await connection.query("SELECT r.*, v.Tipo_Vehiculo_idTipo_Vehiculo AS Tipo_Vehiculo_id, v.Color, v.Placa, v.Url_imagen AS Url_imagen_Vehiculo, v.Descripcion FROM reserva r JOIN vehiculo v ON r.vehiculo_idVehiculo = v.idVehiculo WHERE r.Parqueo_idParqueo = ? ORDER BY r.Estado DESC, r.idReserva DESC;", [
+    const [rows] = await connection.query(`
+        SELECT 
+            r.*, 
+            v.Tipo_Vehiculo_idTipo_Vehiculo AS Tipo_Vehiculo_id, 
+            v.Color, v.Placa, 
+            v.Url_imagen AS Url_imagen_Vehiculo, 
+            v.Descripcion,
+            u.idUsuario,
+            u.Nombres,
+            u.Primer_Apellido,
+            u.Segundo_Apellido,
+            u.Celular
+        FROM 
+            reserva r 
+        JOIN 
+            vehiculo v ON r.vehiculo_idVehiculo = v.idVehiculo 
+        JOIN 
+            usuario u ON r.Usuario_idUsuario = u.idUsuario
+        WHERE 
+            r.Parqueo_idParqueo = ? 
+        ORDER BY 
+            r.Estado DESC, r.idReserva DESC
+    `, [
         req.params.id,
     ]);
     res.json(rows);
-}
+};
 
 export const cancelBook = async (req, res) => {
     const connection = await connect();
@@ -90,3 +112,39 @@ export const denyBook = async (req, res) => {
     res.sendStatus(204);
 };
 
+export const getFilteredParkBooks = async (req, res) => {
+    const connection = await connect();
+    const { Parqueo_idParqueo, Estado, Fecha_Reserva, Rechazado, Cancelado, Realizado } = req.body;
+
+    const [rows] = await connection.query(`
+        SELECT 
+            r.*, 
+            v.Tipo_Vehiculo_idTipo_Vehiculo AS Tipo_Vehiculo_id, 
+            v.Color, v.Placa, 
+            v.Url_imagen AS Url_imagen_Vehiculo, 
+            v.Descripcion,
+            u.idUsuario,
+            u.Nombres,
+            u.Primer_Apellido,
+            u.Segundo_Apellido,
+            u.Celular
+        FROM 
+            reserva r 
+        JOIN 
+            vehiculo v ON r.vehiculo_idVehiculo = v.idVehiculo 
+        JOIN 
+            usuario u ON r.Usuario_idUsuario = u.idUsuario
+        WHERE 
+            r.Parqueo_idParqueo = ? 
+            AND r.Estado = ? 
+            AND r.Fecha_Reserva = ? 
+            AND (r.Rechazado = ? OR r.Cancelado = ?) 
+            AND r.Realizado = ? 
+        ORDER BY 
+            r.idReserva DESC
+    `, [
+        Parqueo_idParqueo, Estado, Fecha_Reserva, Rechazado, Cancelado, Realizado
+    ]);
+
+    res.json(rows);
+};

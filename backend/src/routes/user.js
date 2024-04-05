@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createUser, getUser, updateUser, deleteUser, getUserid, getUserMail, updateImageUser } from '../controllers/user'
+import { createUser, getUser, updateUser, deleteUser, getUserid, getUserMail, updateImageUser, getUserMailExistence, sendVerificationSMS, sendVerificationEmail, updatePassword } from '../controllers/user'
 
 //Se recomienda ver siempre el archivo de notas
 
@@ -69,12 +69,47 @@ router.put('/userdelete/:id', deleteUser)
 
 /**
  * @swagger
- * /user:
+ * /userimage/{id}:
  *  put:
  *    summary: Modifica la imagen de un usuario identificado por su id
  *    tags: [User]
  */
 router.put('/userimage/:id', updateImageUser)
 
+/**
+ * @swagger
+ * /usermailexist:
+ *  post:
+ *    summary: Obtiene a un usuario por su correo para ver la existencia de este
+ *    tags: [User]
+ */
+router.post('/usermailexist', getUserMailExistence)
+
+/**
+ * @swagger
+ * /verify:
+ *  post:
+ *    summary: Envia un codigo sms al numero de celular de un usuario
+ *    tags: [User]
+ */
+router.post('/verify', sendVerificationSMS)
+
+/**
+ * @swagger
+ * /passwordSearchRecover:
+ *  post:
+ *    summary: Envia un codigo por email a un usuario para que este recupere su contraseña.
+ *    tags: [User]
+ */
+router.post('/passwordsearchrecover', sendVerificationEmail)
+
+/**
+ * @swagger
+ * /updatepassword:
+ *  put:
+ *    summary: Mediante el id de un usuario y un codigo modifica la contraseña de un usuario.
+ *    tags: [User]
+ */
+router.put('/updatepassword', updatePassword)
 
 export default router;

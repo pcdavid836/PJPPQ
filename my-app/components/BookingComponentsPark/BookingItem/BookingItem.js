@@ -1,9 +1,57 @@
 import React, { useState, useContext } from 'react';
-import { View, Text, StyleSheet, Image, Modal, Alert, TouchableOpacity, Button } from 'react-native'
-import { denyBook } from '../../../api'
+import { View, Text, StyleSheet, Image, Modal, Alert, TouchableOpacity, Button, TextInput } from 'react-native'
+import { denyBook, createReportParkUser } from '../../../api'
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import { SelectCountry } from 'react-native-element-dropdown';
+
 
 const BookingItem = ({ book, onDeleteComplete }) => {
+  //console.log(book);
   const [image, setImage] = useState(book.Url_imagen_Vehiculo);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [secondModalVisible, setSecondModalVisible] = useState(false);
+
+  const local_data = [
+    {
+      value: 'Informacion incorrecta',
+      lable: 'Informacion incorrecta',
+      image: {
+        uri: 'https://www.vigcenter.com/public/all/images/default-image.jpg',
+      },
+    },
+    {
+      value: 'Solicitudes spam',
+      lable: 'Solicitudes spam',
+      image: {
+        uri: 'https://www.vigcenter.com/public/all/images/default-image.jpg',
+      },
+    },
+    {
+      value: 'Incumplimiento de horario',
+      lable: 'Incumplimiento de horario',
+      image: {
+        uri: 'https://www.vigcenter.com/public/all/images/default-image.jpg',
+      },
+    },
+    {
+      value: 'Otro',
+      lable: 'Otro',
+      image: {
+        uri: 'https://www.vigcenter.com/public/all/images/default-image.jpg',
+      },
+    },
+  ];
+
+  const [report, setReport] = useState();
+
+  const [reporInfo, setReportInfo] = useState({
+    Motivo: '',
+    Descripcion: '',
+    usuario_idUsuario: book.idUsuario,
+    parqueo_idParqueo: book.Parqueo_idParqueo,
+  });
+
+  const handleChange = (name, value) => setReportInfo({ ...reporInfo, [name]: value });
 
   // Formatear la fecha y la hora
   const date = new Date(book.Fecha_Reserva);
@@ -16,6 +64,24 @@ const BookingItem = ({ book, onDeleteComplete }) => {
   const endTime = new Date(`1970-01-01T${book.Hora_Reserva_Fin}Z`);
   endTime.setHours(endTime.getHours() + 4); // Ajusta la hora
   const formattedEndTime = endTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
+
+  const handleSubmit = () => {
+    // Comprueba si algún valor de reporInfo es nulo o vacío
+    const isReportInfoComplete = Object.values(reporInfo).every(value => value !== '' && value != null);
+
+    if (isReportInfoComplete) {
+      // Llama a la función createReportParkUser con reporInfo como argumento
+      createReportParkUser(reporInfo);
+      console.log('Enviando reporte:', reporInfo);
+      setSecondModalVisible(false); // Ocultar modal después de enviar
+
+      // Muestra una alerta de éxito
+      Alert.alert('Éxito', 'Reporte exitoso');
+    } else {
+      // Si algún campo está vacío, muestra una alerta
+      Alert.alert('Error', 'Por favor, completa todos los campos del reporte.');
+    }
+  };
 
   const twoOptionAlert = () => {
     Alert.alert(
@@ -52,7 +118,9 @@ const BookingItem = ({ book, onDeleteComplete }) => {
               <Text style={styles.productTitle}>{title}</Text>
             </View>
             <View style={styles.productCard}>
-              <Image source={{ uri: image }} style={styles.productImage} />
+              <TouchableOpacity onPress={() => setModalVisible(true)}>
+                <Image source={{ uri: image }} style={styles.productImage} />
+              </TouchableOpacity>
               <View style={styles.productInfo}>
                 <Text style={styles.productName}>Placa: <Text style={styles.productPriceText}>{book.Placa}</Text></Text>
                 <Text style={styles.productName}>Color: <Text style={styles.productPriceText}>{book.Color}</Text></Text>
@@ -78,6 +146,103 @@ const BookingItem = ({ book, onDeleteComplete }) => {
               )}
             </View>
           </View>
+          {/* Primer Modal */}
+          <Modal
+            animationType="fade"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => {
+              setModalVisible(!modalVisible);
+            }}
+          >
+            <View style={styles.centeredView}>
+              <View style={styles.modalView}>
+
+                <View style={{ padding: 10, marginBottom: 10 }}>
+                  <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
+                    <Ionicons name="close-circle-outline" size={30} color="gray" />
+                  </TouchableOpacity>
+                  <Text style={{ fontWeight: 'bold', textAlign: 'center', paddingBottom: 10, fontSize: 20 }}>Automóvil</Text>
+                  <Text style={{ fontWeight: 'bold' }} >Placa: {book.Placa}</Text>
+                  <Text style={{ fontWeight: 'bold' }} >Color: {book.Color}</Text>
+                  <Text style={{ textAlign: 'justify', paddingBottom: 10 }} >{book.Descripcion}</Text>
+                  <Image
+                    source={{ uri: book.Url_imagen_Vehiculo }}
+                    style={{ width: 250, height: 125, resizeMode: 'contain' }}
+                  />
+                  <Text style={{ fontWeight: 'bold', paddingTop: 10 }} >Dueñ@: <Text>{book.Nombres} {book.Primer_Apellido} {book.Segundo_Apellido}</Text></Text>
+                  <Text style={{ fontWeight: 'bold', paddingTop: 10 }} >Celular: {book.Celular}</Text>
+                </View>
+
+
+                <TouchableOpacity
+                  style={{ ...styles.openButton, backgroundColor: '#b8281d', padding: 10, borderRadius: 10 }}
+                  onPress={() => setSecondModalVisible(true)}
+                >
+                  <Text style={styles.textStyle}>Reportar Usuario</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
+
+          {/* Segundo Modal */}
+          <Modal
+            animationType="none"
+            transparent={true}
+            visible={secondModalVisible}
+            onRequestClose={() => {
+              setSecondModalVisible(!secondModalVisible);
+            }}
+          >
+            <View style={styles.centeredView}>
+              <View style={styles.modalView}>
+                <Text style={styles.modalTitle}>Reportar Usuario</Text>
+                <SelectCountry
+                  style={styles.dropdown}
+                  selectedTextStyle={styles.selectedTextStyle}
+                  placeholderStyle={styles.placeholderStyle}
+                  imageStyle={styles.imageStyle}
+                  iconStyle={styles.iconStyle}
+                  maxHeight={200}
+                  value={report}
+                  data={local_data}
+                  valueField="value"
+                  labelField="lable"
+                  imageField="image"
+                  placeholder="Motivo..."
+                  searchPlaceholder="Buscar..."
+                  onChange={e => {
+                    setReport(e.value);
+                    handleChange('Motivo', e.value);
+                  }}
+                />
+                <TextInput
+                  multiline={true}
+                  numberOfLines={6}
+                  textAlignVertical="top"
+                  maxLength={200}
+                  style={styles.modalTextInput}
+                  placeholder="Escribe aquí tu reporte..."
+                  onChangeText={(text) => handleChange('Descripcion', text)}
+                // ... más propiedades si necesitas ...
+                />
+                <View style={styles.modalButtonContainer}>
+                  <TouchableOpacity
+                    style={styles.modalButton}
+                    onPress={() => setSecondModalVisible(false)}
+                  >
+                    <Text style={styles.textStyle}>Cerrar</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.modalButton}
+                    onPress={handleSubmit}
+                  >
+                    <Text style={styles.textStyle}>Enviar</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
         </View>
       )
       break;
@@ -90,7 +255,9 @@ const BookingItem = ({ book, onDeleteComplete }) => {
               <Text style={styles.productTitle}>{title}</Text>
             </View>
             <View style={styles.productCard}>
-              <Image source={{ uri: image }} style={styles.productImage} />
+              <TouchableOpacity onPress={() => setModalVisible(true)}>
+                <Image source={{ uri: image }} style={styles.productImage} />
+              </TouchableOpacity>
               <View style={styles.productInfo}>
                 <Text style={styles.productName}>Placa: <Text style={styles.productPriceText}>{book.Placa}</Text></Text>
                 <Text style={styles.productName}>Color: <Text style={styles.productPriceText}>{book.Color}</Text></Text>
@@ -116,6 +283,103 @@ const BookingItem = ({ book, onDeleteComplete }) => {
               )}
             </View>
           </View>
+          {/* Primer Modal */}
+          <Modal
+            animationType="fade"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => {
+              setModalVisible(!modalVisible);
+            }}
+          >
+            <View style={styles.centeredView}>
+              <View style={styles.modalView}>
+
+                <View style={{ padding: 10, marginBottom: 10 }}>
+                  <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
+                    <Ionicons name="close-circle-outline" size={30} color="gray" />
+                  </TouchableOpacity>
+                  <Text style={{ fontWeight: 'bold', textAlign: 'center', paddingBottom: 10, fontSize: 20 }}>Automóvil</Text>
+                  <Text style={{ fontWeight: 'bold' }} >Placa: {book.Placa}</Text>
+                  <Text style={{ fontWeight: 'bold' }} >Color: {book.Color}</Text>
+                  <Text style={{ textAlign: 'justify', paddingBottom: 10 }} >{book.Descripcion}</Text>
+                  <Image
+                    source={{ uri: book.Url_imagen_Vehiculo }}
+                    style={{ width: 250, height: 125, resizeMode: 'contain' }}
+                  />
+                  <Text style={{ fontWeight: 'bold', paddingTop: 10 }} >Dueñ@: <Text>{book.Nombres} {book.Primer_Apellido} {book.Segundo_Apellido}</Text></Text>
+                  <Text style={{ fontWeight: 'bold', paddingTop: 10 }} >Celular: {book.Celular}</Text>
+                </View>
+
+
+                <TouchableOpacity
+                  style={{ ...styles.openButton, backgroundColor: '#b8281d', padding: 10, borderRadius: 10 }}
+                  onPress={() => setSecondModalVisible(true)}
+                >
+                  <Text style={styles.textStyle}>Reportar Usuario</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
+
+          {/* Segundo Modal */}
+          <Modal
+            animationType="none"
+            transparent={true}
+            visible={secondModalVisible}
+            onRequestClose={() => {
+              setSecondModalVisible(!secondModalVisible);
+            }}
+          >
+            <View style={styles.centeredView}>
+              <View style={styles.modalView}>
+                <Text style={styles.modalTitle}>Reportar Usuario</Text>
+                <SelectCountry
+                  style={styles.dropdown}
+                  selectedTextStyle={styles.selectedTextStyle}
+                  placeholderStyle={styles.placeholderStyle}
+                  imageStyle={styles.imageStyle}
+                  iconStyle={styles.iconStyle}
+                  maxHeight={200}
+                  value={report}
+                  data={local_data}
+                  valueField="value"
+                  labelField="lable"
+                  imageField="image"
+                  placeholder="Motivo..."
+                  searchPlaceholder="Buscar..."
+                  onChange={e => {
+                    setReport(e.value);
+                    handleChange('Motivo', e.value);
+                  }}
+                />
+                <TextInput
+                  multiline={true}
+                  numberOfLines={6}
+                  textAlignVertical="top"
+                  maxLength={200}
+                  style={styles.modalTextInput}
+                  placeholder="Escribe aquí tu reporte..."
+                  onChangeText={(text) => handleChange('Descripcion', text)}
+                // ... más propiedades si necesitas ...
+                />
+                <View style={styles.modalButtonContainer}>
+                  <TouchableOpacity
+                    style={styles.modalButton}
+                    onPress={() => setSecondModalVisible(false)}
+                  >
+                    <Text style={styles.textStyle}>Cerrar</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.modalButton}
+                    onPress={handleSubmit}
+                  >
+                    <Text style={styles.textStyle}>Enviar</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
         </View>
       )
       break;
@@ -128,7 +392,9 @@ const BookingItem = ({ book, onDeleteComplete }) => {
               <Text style={styles.productTitle}>{title}</Text>
             </View>
             <View style={styles.productCard}>
-              <Image source={{ uri: image }} style={styles.productImage} />
+              <TouchableOpacity onPress={() => setModalVisible(true)}>
+                <Image source={{ uri: image }} style={styles.productImage} />
+              </TouchableOpacity>
               <View style={styles.productInfo}>
                 <Text style={styles.productName}>Color: <Text style={styles.productPriceText}>{book.Color}</Text></Text>
                 <Text style={styles.productDescription}>{book.Descripcion}</Text>
@@ -153,6 +419,103 @@ const BookingItem = ({ book, onDeleteComplete }) => {
               )}
             </View>
           </View>
+          {/* Primer Modal */}
+          <Modal
+            animationType="fade"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => {
+              setModalVisible(!modalVisible);
+            }}
+          >
+            <View style={styles.centeredView}>
+              <View style={styles.modalView}>
+
+                <View style={{ padding: 10, marginBottom: 10 }}>
+                  <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
+                    <Ionicons name="close-circle-outline" size={30} color="gray" />
+                  </TouchableOpacity>
+                  <Text style={{ fontWeight: 'bold', textAlign: 'center', paddingBottom: 10, fontSize: 20 }}>Automóvil</Text>
+                  <Text style={{ fontWeight: 'bold' }} >Placa: {book.Placa}</Text>
+                  <Text style={{ fontWeight: 'bold' }} >Color: {book.Color}</Text>
+                  <Text style={{ textAlign: 'justify', paddingBottom: 10 }} >{book.Descripcion}</Text>
+                  <Image
+                    source={{ uri: book.Url_imagen_Vehiculo }}
+                    style={{ width: 250, height: 125, resizeMode: 'contain' }}
+                  />
+                  <Text style={{ fontWeight: 'bold', paddingTop: 10 }} >Dueñ@: <Text>{book.Nombres} {book.Primer_Apellido} {book.Segundo_Apellido}</Text></Text>
+                  <Text style={{ fontWeight: 'bold', paddingTop: 10 }} >Celular: {book.Celular}</Text>
+                </View>
+
+
+                <TouchableOpacity
+                  style={{ ...styles.openButton, backgroundColor: '#b8281d', padding: 10, borderRadius: 10 }}
+                  onPress={() => setSecondModalVisible(true)}
+                >
+                  <Text style={styles.textStyle}>Reportar Usuario</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
+
+          {/* Segundo Modal */}
+          <Modal
+            animationType="none"
+            transparent={true}
+            visible={secondModalVisible}
+            onRequestClose={() => {
+              setSecondModalVisible(!secondModalVisible);
+            }}
+          >
+            <View style={styles.centeredView}>
+              <View style={styles.modalView}>
+                <Text style={styles.modalTitle}>Reportar Usuario</Text>
+                <SelectCountry
+                  style={styles.dropdown}
+                  selectedTextStyle={styles.selectedTextStyle}
+                  placeholderStyle={styles.placeholderStyle}
+                  imageStyle={styles.imageStyle}
+                  iconStyle={styles.iconStyle}
+                  maxHeight={200}
+                  value={report}
+                  data={local_data}
+                  valueField="value"
+                  labelField="lable"
+                  imageField="image"
+                  placeholder="Motivo..."
+                  searchPlaceholder="Buscar..."
+                  onChange={e => {
+                    setReport(e.value);
+                    handleChange('Motivo', e.value);
+                  }}
+                />
+                <TextInput
+                  multiline={true}
+                  numberOfLines={6}
+                  textAlignVertical="top"
+                  maxLength={200}
+                  style={styles.modalTextInput}
+                  placeholder="Escribe aquí tu reporte..."
+                  onChangeText={(text) => handleChange('Descripcion', text)}
+                // ... más propiedades si necesitas ...
+                />
+                <View style={styles.modalButtonContainer}>
+                  <TouchableOpacity
+                    style={styles.modalButton}
+                    onPress={() => setSecondModalVisible(false)}
+                  >
+                    <Text style={styles.textStyle}>Cerrar</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.modalButton}
+                    onPress={handleSubmit}
+                  >
+                    <Text style={styles.textStyle}>Enviar</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
         </View>
       )
       break;
@@ -165,7 +528,9 @@ const BookingItem = ({ book, onDeleteComplete }) => {
               <Text style={styles.productTitle}>{title}</Text>
             </View>
             <View style={styles.productCard}>
-              <Image source={{ uri: image }} style={styles.productImage} />
+              <TouchableOpacity onPress={() => setModalVisible(true)}>
+                <Image source={{ uri: image }} style={styles.productImage} />
+              </TouchableOpacity>
               <View style={styles.productInfo}>
                 <Text style={styles.productName}>Placa: <Text style={styles.productPriceText}>{book.Placa}</Text></Text>
                 <Text style={styles.productName}>Color: <Text style={styles.productPriceText}>{book.Color}</Text></Text>
@@ -191,6 +556,103 @@ const BookingItem = ({ book, onDeleteComplete }) => {
               )}
             </View>
           </View>
+          {/* Primer Modal */}
+          <Modal
+            animationType="fade"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => {
+              setModalVisible(!modalVisible);
+            }}
+          >
+            <View style={styles.centeredView}>
+              <View style={styles.modalView}>
+
+                <View style={{ padding: 10, marginBottom: 10 }}>
+                  <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
+                    <Ionicons name="close-circle-outline" size={30} color="gray" />
+                  </TouchableOpacity>
+                  <Text style={{ fontWeight: 'bold', textAlign: 'center', paddingBottom: 10, fontSize: 20 }}>Automóvil</Text>
+                  <Text style={{ fontWeight: 'bold' }} >Placa: {book.Placa}</Text>
+                  <Text style={{ fontWeight: 'bold' }} >Color: {book.Color}</Text>
+                  <Text style={{ textAlign: 'justify', paddingBottom: 10 }} >{book.Descripcion}</Text>
+                  <Image
+                    source={{ uri: book.Url_imagen_Vehiculo }}
+                    style={{ width: 250, height: 125, resizeMode: 'contain' }}
+                  />
+                  <Text style={{ fontWeight: 'bold', paddingTop: 10 }} >Dueñ@: <Text>{book.Nombres} {book.Primer_Apellido} {book.Segundo_Apellido}</Text></Text>
+                  <Text style={{ fontWeight: 'bold', paddingTop: 10 }} >Celular: {book.Celular}</Text>
+                </View>
+
+
+                <TouchableOpacity
+                  style={{ ...styles.openButton, backgroundColor: '#b8281d', padding: 10, borderRadius: 10 }}
+                  onPress={() => setSecondModalVisible(true)}
+                >
+                  <Text style={styles.textStyle}>Reportar Usuario</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
+
+          {/* Segundo Modal */}
+          <Modal
+            animationType="none"
+            transparent={true}
+            visible={secondModalVisible}
+            onRequestClose={() => {
+              setSecondModalVisible(!secondModalVisible);
+            }}
+          >
+            <View style={styles.centeredView}>
+              <View style={styles.modalView}>
+                <Text style={styles.modalTitle}>Reportar Usuario</Text>
+                <SelectCountry
+                  style={styles.dropdown}
+                  selectedTextStyle={styles.selectedTextStyle}
+                  placeholderStyle={styles.placeholderStyle}
+                  imageStyle={styles.imageStyle}
+                  iconStyle={styles.iconStyle}
+                  maxHeight={200}
+                  value={report}
+                  data={local_data}
+                  valueField="value"
+                  labelField="lable"
+                  imageField="image"
+                  placeholder="Motivo..."
+                  searchPlaceholder="Buscar..."
+                  onChange={e => {
+                    setReport(e.value);
+                    handleChange('Motivo', e.value);
+                  }}
+                />
+                <TextInput
+                  multiline={true}
+                  numberOfLines={6}
+                  textAlignVertical="top"
+                  maxLength={200}
+                  style={styles.modalTextInput}
+                  placeholder="Escribe aquí tu reporte..."
+                  onChangeText={(text) => handleChange('Descripcion', text)}
+                // ... más propiedades si necesitas ...
+                />
+                <View style={styles.modalButtonContainer}>
+                  <TouchableOpacity
+                    style={styles.modalButton}
+                    onPress={() => setSecondModalVisible(false)}
+                  >
+                    <Text style={styles.textStyle}>Cerrar</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.modalButton}
+                    onPress={handleSubmit}
+                  >
+                    <Text style={styles.textStyle}>Enviar</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
         </View>
       )
       break;
@@ -203,7 +665,9 @@ const BookingItem = ({ book, onDeleteComplete }) => {
               <Text style={styles.productTitle}>{title}</Text>
             </View>
             <View style={styles.productCard}>
-              <Image source={{ uri: image }} style={styles.productImage} />
+              <TouchableOpacity onPress={() => setModalVisible(true)}>
+                <Image source={{ uri: image }} style={styles.productImage} />
+              </TouchableOpacity>
               <View style={styles.productInfo}>
                 <Text style={styles.productName}>Placa: <Text style={styles.productPriceText}>{book.Placa}</Text></Text>
                 <Text style={styles.productName}>Color: <Text style={styles.productPriceText}>{book.Color}</Text></Text>
@@ -229,6 +693,103 @@ const BookingItem = ({ book, onDeleteComplete }) => {
               )}
             </View>
           </View>
+          {/* Primer Modal */}
+          <Modal
+            animationType="fade"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => {
+              setModalVisible(!modalVisible);
+            }}
+          >
+            <View style={styles.centeredView}>
+              <View style={styles.modalView}>
+
+                <View style={{ padding: 10, marginBottom: 10 }}>
+                  <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
+                    <Ionicons name="close-circle-outline" size={30} color="gray" />
+                  </TouchableOpacity>
+                  <Text style={{ fontWeight: 'bold', textAlign: 'center', paddingBottom: 10, fontSize: 20 }}>Automóvil</Text>
+                  <Text style={{ fontWeight: 'bold' }} >Placa: {book.Placa}</Text>
+                  <Text style={{ fontWeight: 'bold' }} >Color: {book.Color}</Text>
+                  <Text style={{ textAlign: 'justify', paddingBottom: 10 }} >{book.Descripcion}</Text>
+                  <Image
+                    source={{ uri: book.Url_imagen_Vehiculo }}
+                    style={{ width: 250, height: 125, resizeMode: 'contain' }}
+                  />
+                  <Text style={{ fontWeight: 'bold', paddingTop: 10 }} >Dueñ@: <Text>{book.Nombres} {book.Primer_Apellido} {book.Segundo_Apellido}</Text></Text>
+                  <Text style={{ fontWeight: 'bold', paddingTop: 10 }} >Celular: {book.Celular}</Text>
+                </View>
+
+
+                <TouchableOpacity
+                  style={{ ...styles.openButton, backgroundColor: '#b8281d', padding: 10, borderRadius: 10 }}
+                  onPress={() => setSecondModalVisible(true)}
+                >
+                  <Text style={styles.textStyle}>Reportar Usuario</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
+
+          {/* Segundo Modal */}
+          <Modal
+            animationType="none"
+            transparent={true}
+            visible={secondModalVisible}
+            onRequestClose={() => {
+              setSecondModalVisible(!secondModalVisible);
+            }}
+          >
+            <View style={styles.centeredView}>
+              <View style={styles.modalView}>
+                <Text style={styles.modalTitle}>Reportar Usuario</Text>
+                <SelectCountry
+                  style={styles.dropdown}
+                  selectedTextStyle={styles.selectedTextStyle}
+                  placeholderStyle={styles.placeholderStyle}
+                  imageStyle={styles.imageStyle}
+                  iconStyle={styles.iconStyle}
+                  maxHeight={200}
+                  value={report}
+                  data={local_data}
+                  valueField="value"
+                  labelField="lable"
+                  imageField="image"
+                  placeholder="Motivo..."
+                  searchPlaceholder="Buscar..."
+                  onChange={e => {
+                    setReport(e.value);
+                    handleChange('Motivo', e.value);
+                  }}
+                />
+                <TextInput
+                  multiline={true}
+                  numberOfLines={6}
+                  textAlignVertical="top"
+                  maxLength={200}
+                  style={styles.modalTextInput}
+                  placeholder="Escribe aquí tu reporte..."
+                  onChangeText={(text) => handleChange('Descripcion', text)}
+                // ... más propiedades si necesitas ...
+                />
+                <View style={styles.modalButtonContainer}>
+                  <TouchableOpacity
+                    style={styles.modalButton}
+                    onPress={() => setSecondModalVisible(false)}
+                  >
+                    <Text style={styles.textStyle}>Cerrar</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.modalButton}
+                    onPress={handleSubmit}
+                  >
+                    <Text style={styles.textStyle}>Enviar</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
         </View>
       )
       break;
@@ -241,7 +802,9 @@ const BookingItem = ({ book, onDeleteComplete }) => {
               <Text style={styles.productTitle}>{title}</Text>
             </View>
             <View style={styles.productCard}>
-              <Image source={{ uri: image }} style={styles.productImage} />
+              <TouchableOpacity onPress={() => setModalVisible(true)}>
+                <Image source={{ uri: image }} style={styles.productImage} />
+              </TouchableOpacity>
               <View style={styles.productInfo}>
                 <Text style={styles.productName}>Placa: <Text style={styles.productPriceText}>{book.Placa}</Text></Text>
                 <Text style={styles.productName}>Color: <Text style={styles.productPriceText}>{book.Color}</Text></Text>
@@ -267,6 +830,103 @@ const BookingItem = ({ book, onDeleteComplete }) => {
               )}
             </View>
           </View>
+          {/* Primer Modal */}
+          <Modal
+            animationType="fade"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => {
+              setModalVisible(!modalVisible);
+            }}
+          >
+            <View style={styles.centeredView}>
+              <View style={styles.modalView}>
+
+                <View style={{ padding: 10, marginBottom: 10 }}>
+                  <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
+                    <Ionicons name="close-circle-outline" size={30} color="gray" />
+                  </TouchableOpacity>
+                  <Text style={{ fontWeight: 'bold', textAlign: 'center', paddingBottom: 10, fontSize: 20 }}>Automóvil</Text>
+                  <Text style={{ fontWeight: 'bold' }} >Placa: {book.Placa}</Text>
+                  <Text style={{ fontWeight: 'bold' }} >Color: {book.Color}</Text>
+                  <Text style={{ textAlign: 'justify', paddingBottom: 10 }} >{book.Descripcion}</Text>
+                  <Image
+                    source={{ uri: book.Url_imagen_Vehiculo }}
+                    style={{ width: 250, height: 125, resizeMode: 'contain' }}
+                  />
+                  <Text style={{ fontWeight: 'bold', paddingTop: 10 }} >Dueñ@: <Text>{book.Nombres} {book.Primer_Apellido} {book.Segundo_Apellido}</Text></Text>
+                  <Text style={{ fontWeight: 'bold', paddingTop: 10 }} >Celular: {book.Celular}</Text>
+                </View>
+
+
+                <TouchableOpacity
+                  style={{ ...styles.openButton, backgroundColor: '#b8281d', padding: 10, borderRadius: 10 }}
+                  onPress={() => setSecondModalVisible(true)}
+                >
+                  <Text style={styles.textStyle}>Reportar Usuario</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
+
+          {/* Segundo Modal */}
+          <Modal
+            animationType="none"
+            transparent={true}
+            visible={secondModalVisible}
+            onRequestClose={() => {
+              setSecondModalVisible(!secondModalVisible);
+            }}
+          >
+            <View style={styles.centeredView}>
+              <View style={styles.modalView}>
+                <Text style={styles.modalTitle}>Reportar Usuario</Text>
+                <SelectCountry
+                  style={styles.dropdown}
+                  selectedTextStyle={styles.selectedTextStyle}
+                  placeholderStyle={styles.placeholderStyle}
+                  imageStyle={styles.imageStyle}
+                  iconStyle={styles.iconStyle}
+                  maxHeight={200}
+                  value={report}
+                  data={local_data}
+                  valueField="value"
+                  labelField="lable"
+                  imageField="image"
+                  placeholder="Motivo..."
+                  searchPlaceholder="Buscar..."
+                  onChange={e => {
+                    setReport(e.value);
+                    handleChange('Motivo', e.value);
+                  }}
+                />
+                <TextInput
+                  multiline={true}
+                  numberOfLines={6}
+                  textAlignVertical="top"
+                  maxLength={200}
+                  style={styles.modalTextInput}
+                  placeholder="Escribe aquí tu reporte..."
+                  onChangeText={(text) => handleChange('Descripcion', text)}
+                // ... más propiedades si necesitas ...
+                />
+                <View style={styles.modalButtonContainer}>
+                  <TouchableOpacity
+                    style={styles.modalButton}
+                    onPress={() => setSecondModalVisible(false)}
+                  >
+                    <Text style={styles.textStyle}>Cerrar</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.modalButton}
+                    onPress={handleSubmit}
+                  >
+                    <Text style={styles.textStyle}>Enviar</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
         </View>
       )
       break;
@@ -279,7 +939,9 @@ const BookingItem = ({ book, onDeleteComplete }) => {
               <Text style={styles.productTitle}>{title}</Text>
             </View>
             <View style={styles.productCard}>
-              <Image source={{ uri: image }} style={styles.productImage} />
+              <TouchableOpacity onPress={() => setModalVisible(true)}>
+                <Image source={{ uri: image }} style={styles.productImage} />
+              </TouchableOpacity>
               <View style={styles.productInfo}>
                 <Text style={styles.productDescription}>{book.Descripcion}</Text>
                 <Text style={styles.productPrice}>Fecha: <Text style={styles.productPriceText}>{formattedDate}</Text></Text>
@@ -303,6 +965,103 @@ const BookingItem = ({ book, onDeleteComplete }) => {
               )}
             </View>
           </View>
+          {/* Primer Modal */}
+          <Modal
+            animationType="fade"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => {
+              setModalVisible(!modalVisible);
+            }}
+          >
+            <View style={styles.centeredView}>
+              <View style={styles.modalView}>
+
+                <View style={{ padding: 10, marginBottom: 10 }}>
+                  <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
+                    <Ionicons name="close-circle-outline" size={30} color="gray" />
+                  </TouchableOpacity>
+                  <Text style={{ fontWeight: 'bold', textAlign: 'center', paddingBottom: 10, fontSize: 20 }}>Automóvil</Text>
+                  <Text style={{ fontWeight: 'bold' }} >Placa: {book.Placa}</Text>
+                  <Text style={{ fontWeight: 'bold' }} >Color: {book.Color}</Text>
+                  <Text style={{ textAlign: 'justify', paddingBottom: 10 }} >{book.Descripcion}</Text>
+                  <Image
+                    source={{ uri: book.Url_imagen_Vehiculo }}
+                    style={{ width: 250, height: 125, resizeMode: 'contain' }}
+                  />
+                  <Text style={{ fontWeight: 'bold', paddingTop: 10 }} >Dueñ@: <Text>{book.Nombres} {book.Primer_Apellido} {book.Segundo_Apellido}</Text></Text>
+                  <Text style={{ fontWeight: 'bold', paddingTop: 10 }} >Celular: {book.Celular}</Text>
+                </View>
+
+
+                <TouchableOpacity
+                  style={{ ...styles.openButton, backgroundColor: '#b8281d', padding: 10, borderRadius: 10 }}
+                  onPress={() => setSecondModalVisible(true)}
+                >
+                  <Text style={styles.textStyle}>Reportar Usuario</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
+
+          {/* Segundo Modal */}
+          <Modal
+            animationType="none"
+            transparent={true}
+            visible={secondModalVisible}
+            onRequestClose={() => {
+              setSecondModalVisible(!secondModalVisible);
+            }}
+          >
+            <View style={styles.centeredView}>
+              <View style={styles.modalView}>
+                <Text style={styles.modalTitle}>Reportar Usuario</Text>
+                <SelectCountry
+                  style={styles.dropdown}
+                  selectedTextStyle={styles.selectedTextStyle}
+                  placeholderStyle={styles.placeholderStyle}
+                  imageStyle={styles.imageStyle}
+                  iconStyle={styles.iconStyle}
+                  maxHeight={200}
+                  value={report}
+                  data={local_data}
+                  valueField="value"
+                  labelField="lable"
+                  imageField="image"
+                  placeholder="Motivo..."
+                  searchPlaceholder="Buscar..."
+                  onChange={e => {
+                    setReport(e.value);
+                    handleChange('Motivo', e.value);
+                  }}
+                />
+                <TextInput
+                  multiline={true}
+                  numberOfLines={6}
+                  textAlignVertical="top"
+                  maxLength={200}
+                  style={styles.modalTextInput}
+                  placeholder="Escribe aquí tu reporte..."
+                  onChangeText={(text) => handleChange('Descripcion', text)}
+                // ... más propiedades si necesitas ...
+                />
+                <View style={styles.modalButtonContainer}>
+                  <TouchableOpacity
+                    style={styles.modalButton}
+                    onPress={() => setSecondModalVisible(false)}
+                  >
+                    <Text style={styles.textStyle}>Cerrar</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.modalButton}
+                    onPress={handleSubmit}
+                  >
+                    <Text style={styles.textStyle}>Enviar</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
         </View>
       )
       break;
@@ -506,6 +1265,63 @@ const styles = StyleSheet.create({
   buttonContent: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16
+  },
+  closeButton: {
+    position: 'absolute',
+    top: -10,
+    left: 250,
+    zIndex: 1,
+  },
+  dropdown: {
+    margin: 16,
+    height: 50,
+    width: 200,
+    backgroundColor: '#EEEEEE',
+    borderRadius: 22,
+    paddingHorizontal: 8,
+  },
+  imageStyle: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+  },
+  placeholderStyle: {
+    fontSize: 16,
+  },
+  selectedTextStyle: {
+    fontSize: 16,
+    marginLeft: 8,
+  },
+  iconStyle: {
+    width: 20,
+    height: 20,
+  },
+  modalTitle: {
+    fontWeight: 'bold',
+    fontSize: 20,
+    marginBottom: 15,
+  },
+  modalTextInput: {
+    width: 200,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    marginBottom: 15,
+    height: 120,
+  },
+  modalButtonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  modalButton: {
+    backgroundColor: '#2196F3',
+    padding: 10,
+    borderRadius: 5,
   },
 });
 

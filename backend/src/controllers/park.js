@@ -1,5 +1,10 @@
 import { connect } from "../database"
 
+//COMO DATO CURIOSO PUEDES HACER QUE EN CASO DE QUE EXISTA UNA RESERVA ANTIGUA PUEDES COMPROBAR EN LA CONSULTA DE ELEGIR HORARIO
+//MOSTRAR UNA ALERTA QUE INDIQUE QYE YA EXISTE UNA RESERVA ANTERIOR ASI EVITAS QUE ALGUIEN INTENTE CREAR UNA RESERVA DOBLE
+
+//EN POSTULACIONES AñADE EL BUSCAR CODIGO DE ESTABLECIMIENTO Y CREA A CADA PARQUEO 2 COLUMNAS UNA PARA ACTIVAR O DESACTIVAR CODIGOS Y OTRA PARA ALMACENAR EL CODIGO SECRETO
+
 export const getPark = async (req, res) => {
     const db = await connect();
     const [rows] = await db.query('SELECT * FROM parqueo WHERE Estado = 1 AND Aprobacion = 1 AND Disponibilidad = 1;')
@@ -27,7 +32,7 @@ export const createPark = async (req, res) => {
         const connection = await connect();
 
         // Insertar un nuevo registro en la tabla parqueo
-        const [results] = await connection.execute("INSERT INTO parqueo (Ubicacion, Tamaño, Descripcion, Disponibilidad, Estado, Tipo_Parqueo_idTipo_Parqueo, Titulo, Url_imagen, Url_validacion, Aprobacion, Fecha_Creacion, Latitud, Longitud) VALUES (?, ?, ?, 0, 1, ?, ?, ?, ?, 0, CURRENT_TIMESTAMP, ?, ?);", [
+        const [results] = await connection.execute("INSERT INTO parqueo (Ubicacion, Tamaño, Descripcion, Disponibilidad, Estado, Tipo_Parqueo_idTipo_Parqueo, Titulo, Url_imagen, Url_validacion, Aprobacion, Fecha_Creacion, Latitud, Longitud, Lleno) VALUES (?, ?, ?, 0, 1, ?, ?, ?, ?, 0, CURRENT_TIMESTAMP, ?, ?, 0);", [
             req.body.Ubicacion,
             req.body.Tamaño,
             req.body.Descripcion,
@@ -77,16 +82,18 @@ export const updatePostPark = async (req, res) => {
 
 export const updatePark = async (req, res) => {
     const connection = await connect();
-    await connection.query('UPDATE parqueo SET Ubicacion = ?, Descripcion = ?, Titulo = ?, Url_imagen = ?, Disponibilidad = ? WHERE idParqueo = ? AND Estado = 1 AND Aprobacion = 1;', [
+    await connection.query('UPDATE parqueo SET Ubicacion = ?, Descripcion = ?, Titulo = ?, Url_imagen = ?, Disponibilidad = ?, Lleno = ? WHERE idParqueo = ? AND Estado = 1 AND Aprobacion = 1;', [
         req.body.Ubicacion,
         req.body.Descripcion,
         req.body.Titulo,
         req.body.Url_imagen,
         req.body.Disponibilidad,
+        req.body.Lleno,
         req.params.id
     ]);
     res.sendStatus(204);
 };
+
 
 export const getPostPark = async (req, res) => {
     try {
@@ -108,7 +115,8 @@ export const getPostPark = async (req, res) => {
                 Url_validacion: park.Url_validacion,
                 Latitud: park.Latitud,
                 Longitud: park.Longitud,
-                Disponibilidad: park.Disponibilidad, // ...
+                Disponibilidad: park.Disponibilidad,
+                Lleno: park.Lleno,
             };
 
             res.json(parkinfo);
@@ -121,6 +129,7 @@ export const getPostPark = async (req, res) => {
     }
 };
 
+//ESTO NO SE USA PARA NADA, SOLO FUE AGREGADO CON FINES DE APRENDISAJE
 export const deletePark = async (req, res) => {
     const connection = await connect();
     await connection.query('UPDATE Parqueo SET Estado = 0 WHERE idParqueo = ?', [
@@ -128,6 +137,8 @@ export const deletePark = async (req, res) => {
     ]);
     res.sendStatus(204);
 };
+//
+
 
 export const getMyAprobedPark = async (req, res) => {
     const connection = await connect()
@@ -171,6 +182,7 @@ export const getParkFilters = async (req, res) => {
                 Latitud: park.Latitud,
                 Longitud: park.Longitud,
                 Disponibilidad: park.Disponibilidad,
+                Lleno: park.Lleno,
             }));
             return res.json(parks);
         } else {

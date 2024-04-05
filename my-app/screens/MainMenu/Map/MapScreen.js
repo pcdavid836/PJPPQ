@@ -155,10 +155,6 @@ const MapScreen = ({ navigation }) => {
     setModalVisibleFilter(false);
   };
 
-
-
-
-
   const loadPlaces = async () => {
     const data = await getParks();
     setParks(data);
@@ -171,8 +167,6 @@ const MapScreen = ({ navigation }) => {
     });
     //console.log(dogSearch);
   };
-
-
 
   const loadPlacesFail = async () => {
     const data = await getParks();

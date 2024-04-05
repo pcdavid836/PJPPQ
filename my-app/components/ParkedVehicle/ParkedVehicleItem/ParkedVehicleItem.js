@@ -1,12 +1,61 @@
 import React, { useState, useContext } from 'react';
-import { View, Text, StyleSheet, Image, Modal, Alert, TouchableOpacity, Button } from 'react-native'
-import { parkVehicleDeny, parkVehicleFinish } from '../../../api'
+import { View, Text, StyleSheet, Image, Modal, Alert, TouchableOpacity, Button, TextInput } from 'react-native'
+import { parkVehicleDeny, parkVehicleFinish, createReportParkUser } from '../../../api'
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import { SelectCountry } from 'react-native-element-dropdown';
 
 
 const ParkedVehicleItem = ({ vehicles, onDeleteComplete }) => {
+
+    const local_data = [
+        {
+            value: 'Informacion incorrecta',
+            lable: 'Informacion incorrecta',
+            image: {
+                uri: 'https://www.vigcenter.com/public/all/images/default-image.jpg',
+            },
+        },
+        {
+            value: 'Solicitudes spam',
+            lable: 'Solicitudes spam',
+            image: {
+                uri: 'https://www.vigcenter.com/public/all/images/default-image.jpg',
+            },
+        },
+        {
+            value: 'Incumplimiento de horario',
+            lable: 'Incumplimiento de horario',
+            image: {
+                uri: 'https://www.vigcenter.com/public/all/images/default-image.jpg',
+            },
+        },
+        {
+            value: 'Otro',
+            lable: 'Otro',
+            image: {
+                uri: 'https://www.vigcenter.com/public/all/images/default-image.jpg',
+            },
+        },
+    ];
+
+    const [report, setReport] = useState();
+
+    const [reporInfo, setReportInfo] = useState({
+        Motivo: '',
+        Descripcion: '',
+        usuario_idUsuario: vehicles.idUsuario,
+        parqueo_idParqueo: vehicles.Parqueo_idParqueo,
+    });
+
+    const handleChange = (name, value) => setReportInfo({ ...reporInfo, [name]: value });
+
     let veh = "";
     const [image, setImage] = useState(vehicles.Url_Imagen);
     const [modalVisible, setModalVisible] = useState(false);
+    const [secondModalVisible, setSecondModalVisible] = useState(false);
+    //console.log(vehicles)
+
+
 
     switch (vehicles.idTipo_Vehiculo) {
         case 1:
@@ -60,15 +109,13 @@ const ParkedVehicleItem = ({ vehicles, onDeleteComplete }) => {
 
     const twoOptionAlert = () => {
         Alert.alert(
-            // Título
             'Eliminar registro',
-            // Cuerpo
             '¿Estás seguro?',
             [
                 {
                     text: 'Sí',
                     onPress: () => {
-                        parkVehicleDeny(vehicles.idParqueo_Vehiculo).then(() => {
+                        parkVehicleDeny(vehicles.idParqueo_Vehiculo, vehicles.reserva_idReserva).then(() => {
                             onDeleteComplete();
                         });
                     },
@@ -108,6 +155,24 @@ const ParkedVehicleItem = ({ vehicles, onDeleteComplete }) => {
         );
     };
 
+    const handleSubmit = () => {
+        // Comprueba si algún valor de reporInfo es nulo o vacío
+        const isReportInfoComplete = Object.values(reporInfo).every(value => value !== '' && value != null);
+
+        if (isReportInfoComplete) {
+            // Llama a la función createReportParkUser con reporInfo como argumento
+            createReportParkUser(reporInfo);
+            console.log('Enviando reporte:', reporInfo);
+            setSecondModalVisible(false); // Ocultar modal después de enviar
+
+            // Muestra una alerta de éxito
+            Alert.alert('Éxito', 'Reporte exitoso');
+        } else {
+            // Si algún campo está vacío, muestra una alerta
+            Alert.alert('Error', 'Por favor, completa todos los campos del reporte.');
+        }
+    };
+
 
     const renderAdditionalText = () => {
         const numericValue = parseInt(vehicles.idTipo_Vehiculo);
@@ -115,10 +180,19 @@ const ParkedVehicleItem = ({ vehicles, onDeleteComplete }) => {
             case 1:
                 return (
                     <View style={{ padding: 10, marginBottom: 10 }}>
-                        <Text style={{ fontWeight: 'bold', textAlign: 'center', paddingBottom: 10 }}>{veh}</Text>
+                        <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
+                            <Ionicons name="close-circle-outline" size={30} color="gray" />
+                        </TouchableOpacity>
+                        <Text style={{ fontWeight: 'bold', textAlign: 'center', paddingBottom: 10, fontSize: 20 }}>{veh}</Text>
                         <Text style={{ fontWeight: 'bold' }} >Placa: {vehicles.Placa}</Text>
                         <Text style={{ fontWeight: 'bold' }} >Color: {vehicles.Color}</Text>
-                        <Text style={{ textAlign: 'justify' }} >{vehicles.Descripcion}</Text>
+                        <Text style={{ textAlign: 'justify', paddingBottom: 10 }} >{vehicles.Descripcion}</Text>
+                        <Image
+                            source={{ uri: vehicles.Url_Imagen }}
+                            style={{ width: 250, height: 125, resizeMode: 'contain' }}
+                        />
+                        <Text style={{ fontWeight: 'bold', paddingTop: 10 }} >Dueñ@: <Text>{vehicles.Nombres} {vehicles.Primer_Apellido} {vehicles.Segundo_Apellido}</Text></Text>
+                        <Text style={{ fontWeight: 'bold', paddingTop: 10 }} >Celular: {vehicles.Celular}</Text>
                     </View>
                 );
                 break;
@@ -129,6 +203,12 @@ const ParkedVehicleItem = ({ vehicles, onDeleteComplete }) => {
                         <Text>Placa: {vehicles.Placa}</Text>
                         <Text>Color: {vehicles.Color}</Text>
                         <Text>Descripcion: {vehicles.Descripcion}</Text>
+                        <Image
+                            source={{ uri: vehicles.Url_Imagen }}
+                            style={{ width: 250, height: 125, resizeMode: 'contain' }}
+                        />
+                        <Text style={{ fontWeight: 'bold', paddingTop: 10 }} >Dueñ@: <Text>{vehicles.Nombres} {vehicles.Primer_Apellido} {vehicles.Segundo_Apellido}</Text></Text>
+                        <Text style={{ fontWeight: 'bold', paddingTop: 10 }} >Celular: {vehicles.Celular}</Text>
                     </View>
                 );
                 break;
@@ -138,6 +218,12 @@ const ParkedVehicleItem = ({ vehicles, onDeleteComplete }) => {
                         <Text style={styles.modalText}>{veh}</Text>
                         <Text>Color: {vehicles.Color}</Text>
                         <Text>Descripcion: {vehicles.Descripcion}</Text>
+                        <Image
+                            source={{ uri: vehicles.Url_Imagen }}
+                            style={{ width: 250, height: 125, resizeMode: 'contain' }}
+                        />
+                        <Text style={{ fontWeight: 'bold', paddingTop: 10 }} >Dueñ@: <Text>{vehicles.Nombres} {vehicles.Primer_Apellido} {vehicles.Segundo_Apellido}</Text></Text>
+                        <Text style={{ fontWeight: 'bold', paddingTop: 10 }} >Celular: {vehicles.Celular}</Text>
                     </View>
                 );
                 break;
@@ -148,6 +234,12 @@ const ParkedVehicleItem = ({ vehicles, onDeleteComplete }) => {
                         <Text>Placa: {vehicles.Placa}</Text>
                         <Text>Color: {vehicles.Color}</Text>
                         <Text>Descripcion: {vehicles.Descripcion}</Text>
+                        <Image
+                            source={{ uri: vehicles.Url_Imagen }}
+                            style={{ width: 250, height: 125, resizeMode: 'contain' }}
+                        />
+                        <Text style={{ fontWeight: 'bold', paddingTop: 10 }} >Dueñ@: <Text>{vehicles.Nombres} {vehicles.Primer_Apellido} {vehicles.Segundo_Apellido}</Text></Text>
+                        <Text style={{ fontWeight: 'bold', paddingTop: 10 }} >Celular: {vehicles.Celular}</Text>
                     </View>
                 );
                 break;
@@ -158,6 +250,12 @@ const ParkedVehicleItem = ({ vehicles, onDeleteComplete }) => {
                         <Text>Placa: {vehicles.Placa}</Text>
                         <Text>Color: {vehicles.Color}</Text>
                         <Text>Descripcion: {vehicles.Descripcion}</Text>
+                        <Image
+                            source={{ uri: vehicles.Url_Imagen }}
+                            style={{ width: 250, height: 125, resizeMode: 'contain' }}
+                        />
+                        <Text style={{ fontWeight: 'bold', paddingTop: 10 }} >Dueñ@: <Text>{vehicles.Nombres} {vehicles.Primer_Apellido} {vehicles.Segundo_Apellido}</Text></Text>
+                        <Text style={{ fontWeight: 'bold', paddingTop: 10 }} >Celular: {vehicles.Celular}</Text>
                     </View>
                 );
                 break;
@@ -168,6 +266,12 @@ const ParkedVehicleItem = ({ vehicles, onDeleteComplete }) => {
                         <Text>Placa: {vehicles.Placa}</Text>
                         <Text>Color: {vehicles.Color}</Text>
                         <Text>Descripcion: {vehicles.Descripcion}</Text>
+                        <Image
+                            source={{ uri: vehicles.Url_Imagen }}
+                            style={{ width: 250, height: 125, resizeMode: 'contain' }}
+                        />
+                        <Text style={{ fontWeight: 'bold', paddingTop: 10 }} >Dueñ@: <Text>{vehicles.Nombres} {vehicles.Primer_Apellido} {vehicles.Segundo_Apellido}</Text></Text>
+                        <Text style={{ fontWeight: 'bold', paddingTop: 10 }} >Celular: {vehicles.Celular}</Text>
                     </View>
                 );
                 break;
@@ -176,6 +280,12 @@ const ParkedVehicleItem = ({ vehicles, onDeleteComplete }) => {
                     <View>
                         <Text style={styles.modalText}>{veh}</Text>
                         <Text>Descripcion: {vehicles.Descripcion}</Text>
+                        <Image
+                            source={{ uri: vehicles.Url_Imagen }}
+                            style={{ width: 250, height: 125, resizeMode: 'contain' }}
+                        />
+                        <Text style={{ fontWeight: 'bold', paddingTop: 10 }} >Dueñ@: <Text>{vehicles.Nombres} {vehicles.Primer_Apellido} {vehicles.Segundo_Apellido}</Text></Text>
+                        <Text style={{ fontWeight: 'bold', paddingTop: 10 }} >Celular: {vehicles.Celular}</Text>
                     </View>
                 );
                 break;
@@ -194,32 +304,92 @@ const ParkedVehicleItem = ({ vehicles, onDeleteComplete }) => {
                     <TouchableOpacity onPress={() => setModalVisible(true)}>
                         <Image source={{ uri: image }} style={styles.productImage} />
                     </TouchableOpacity>
-
+                    {/* Primer Modal */}
                     <Modal
                         animationType="fade"
                         transparent={true}
                         visible={modalVisible}
                         onRequestClose={() => {
-                            Alert.alert("Modal has been closed.");
                             setModalVisible(!modalVisible);
                         }}
                     >
                         <View style={styles.centeredView}>
                             <View style={styles.modalView}>
+
                                 {renderAdditionalText()}
+
 
                                 <TouchableOpacity
                                     style={{ ...styles.openButton, backgroundColor: '#b8281d', padding: 10, borderRadius: 10 }}
-                                    onPress={() => setModalVisible(!modalVisible)}
+                                    onPress={() => setSecondModalVisible(true)}
                                 >
-                                    <Text style={styles.textStyle}>Cerrar</Text>
+                                    <Text style={styles.textStyle}>Reportar Usuario</Text>
                                 </TouchableOpacity>
                             </View>
                         </View>
                     </Modal>
 
+                    {/* Segundo Modal */}
+                    <Modal
+                        animationType="none"
+                        transparent={true}
+                        visible={secondModalVisible}
+                        onRequestClose={() => {
+                            setSecondModalVisible(!secondModalVisible);
+                        }}
+                    >
+                        <View style={styles.centeredView}>
+                            <View style={styles.modalView}>
+                                <Text style={styles.modalTitle}>Reportar Usuario</Text>
+                                <SelectCountry
+                                    style={styles.dropdown}
+                                    selectedTextStyle={styles.selectedTextStyle}
+                                    placeholderStyle={styles.placeholderStyle}
+                                    imageStyle={styles.imageStyle}
+                                    iconStyle={styles.iconStyle}
+                                    maxHeight={200}
+                                    value={report}
+                                    data={local_data}
+                                    valueField="value"
+                                    labelField="lable"
+                                    imageField="image"
+                                    placeholder="Motivo..."
+                                    searchPlaceholder="Buscar..."
+                                    onChange={e => {
+                                        setReport(e.value);
+                                        handleChange('Motivo', e.value);
+                                    }}
+                                />
+                                <TextInput
+                                    multiline={true}
+                                    numberOfLines={6}
+                                    textAlignVertical="top"
+                                    maxLength={200}
+                                    style={styles.modalTextInput}
+                                    placeholder="Escribe aquí tu reporte..."
+                                    onChangeText={(text) => handleChange('Descripcion', text)}
+                                // ... más propiedades si necesitas ...
+                                />
+                                <View style={styles.modalButtonContainer}>
+                                    <TouchableOpacity
+                                        style={styles.modalButton}
+                                        onPress={() => setSecondModalVisible(false)}
+                                    >
+                                        <Text style={styles.textStyle}>Cerrar</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        style={styles.modalButton}
+                                        onPress={handleSubmit}
+                                    >
+                                        <Text style={styles.textStyle}>Enviar</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        </View>
+                    </Modal>
+
                     <View style={styles.productInfo}>
-                        <View style={{ backgroundColor: '#ddc8f7', padding: 5, marginBottom:10}}>
+                        <View style={{ backgroundColor: '#ddc8f7', padding: 5, marginBottom: 10 }}>
                             <Text style={styles.productPrice}>Fecha Reservada: <Text style={styles.productPriceText}>{formattedDatedateBooked}</Text></Text>
                             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                                 <Text style={styles.productPrice}>Ingreso: <Text style={styles.productPriceText}>{formattedStartTimeBooked} </Text></Text>
@@ -373,6 +543,63 @@ const styles = StyleSheet.create({
     buttonContent: {
         flexDirection: 'row',
         alignItems: 'center',
+    },
+    textStyle: {
+        color: 'white',
+        fontWeight: 'bold',
+        fontSize: 16
+    },
+    closeButton: {
+        position: 'absolute',
+        top: -10,
+        left: 250,
+        zIndex: 1,
+    },
+    dropdown: {
+        margin: 16,
+        height: 50,
+        width: 200,
+        backgroundColor: '#EEEEEE',
+        borderRadius: 22,
+        paddingHorizontal: 8,
+    },
+    imageStyle: {
+        width: 24,
+        height: 24,
+        borderRadius: 12,
+    },
+    placeholderStyle: {
+        fontSize: 16,
+    },
+    selectedTextStyle: {
+        fontSize: 16,
+        marginLeft: 8,
+    },
+    iconStyle: {
+        width: 20,
+        height: 20,
+    },
+    modalTitle: {
+        fontWeight: 'bold',
+        fontSize: 20,
+        marginBottom: 15,
+    },
+    modalTextInput: {
+        width: 200,
+        padding: 10,
+        borderWidth: 1,
+        borderColor: '#ccc',
+        marginBottom: 15,
+        height: 120,
+    },
+    modalButtonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    modalButton: {
+        backgroundColor: '#2196F3',
+        padding: 10,
+        borderRadius: 5,
     },
 });
 

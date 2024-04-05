@@ -37,19 +37,89 @@ export const postEnter = async (req, res) => {
 
 export const getParkVehicleByParkId = async (req, res) => {
     const connection = await connect()
-    const [rows] = await connection.query("SELECT v.Placa, v.Color, v.Descripcion, v.Tipo_Vehiculo_idTipo_Vehiculo AS idTipo_Vehiculo, v.Url_imagen AS Url_Imagen, r.Fecha_Reserva, r.Hora_Reserva_Inicio, r.Hora_Reserva_Fin, pv.* FROM vehiculo v JOIN reserva r ON v.idVehiculo = r.vehiculo_idVehiculo JOIN parqueo_vehiculo pv ON r.Parqueo_idParqueo = pv.Parqueo_idParqueo AND r.idReserva = pv.reserva_idReserva WHERE pv.ConfirmacionEntrada = 1 AND pv.Cancelado = 0 AND pv.Parqueo_idParqueo = ? ORDER BY pv.Estado DESC, pv.idParqueo_Vehiculo DESC;", [
+    const [rows] = await connection.query(`
+        SELECT 
+            v.Placa, v.Color, v.Descripcion, 
+            v.Tipo_Vehiculo_idTipo_Vehiculo AS idTipo_Vehiculo, 
+            v.Url_imagen AS Url_Imagen, 
+            r.Fecha_Reserva, r.Hora_Reserva_Inicio, r.Hora_Reserva_Fin,
+            u.Nombres, u.Primer_Apellido, u.Segundo_Apellido, u.idUsuario, u.Celular,
+            pv.* 
+        FROM 
+            vehiculo v 
+        JOIN 
+            reserva r ON v.idVehiculo = r.vehiculo_idVehiculo 
+        JOIN 
+            parqueo_vehiculo pv ON r.Parqueo_idParqueo = pv.Parqueo_idParqueo AND r.idReserva = pv.reserva_idReserva 
+        JOIN
+            usuario u ON r.Usuario_idUsuario = u.idUsuario
+        WHERE 
+            pv.ConfirmacionEntrada = 1 
+            AND pv.Cancelado = 0 
+            AND pv.Parqueo_idParqueo = ? 
+        ORDER BY 
+            pv.Estado DESC, pv.idParqueo_Vehiculo DESC
+    `, [
         req.params.id,
     ]);
     res.json(rows);
-}
+};
+
+
+export const getFilteredParkVehicleByParkId = async (req, res) => {
+    const connection = await connect();
+    const { Parqueo_idParqueo, Fecha_Creacion, Estado, ConfirmacionSalida, Cancelado } = req.body; // Ahora los datos vienen del cuerpo de la solicitud
+
+    const [rows] = await connection.query(`
+        SELECT 
+            v.Placa, v.Color, v.Descripcion, 
+            v.Tipo_Vehiculo_idTipo_Vehiculo AS idTipo_Vehiculo, 
+            v.Url_imagen AS Url_Imagen, 
+            r.Fecha_Reserva, r.Hora_Reserva_Inicio, r.Hora_Reserva_Fin, 
+            u.Nombres, u.Primer_Apellido, u.Segundo_Apellido, u.idUsuario, u.Celular,
+            pv.* 
+        FROM 
+            vehiculo v 
+        JOIN 
+            reserva r ON v.idVehiculo = r.vehiculo_idVehiculo 
+        JOIN 
+            parqueo_vehiculo pv ON r.Parqueo_idParqueo = pv.Parqueo_idParqueo AND r.idReserva = pv.reserva_idReserva 
+        JOIN
+            usuario u ON r.Usuario_idUsuario = u.idUsuario
+        WHERE 
+            DATE(pv.Fecha_Creacion) = ? 
+            AND pv.ConfirmacionSalida = ? 
+            AND pv.Estado = ? 
+            AND pv.Parqueo_idParqueo = ? 
+            AND pv.Cancelado = ? 
+        ORDER BY 
+            pv.Estado DESC, pv.idParqueo_Vehiculo DESC
+    `, [
+        Fecha_Creacion, ConfirmacionSalida, Estado, Parqueo_idParqueo, Cancelado
+    ]);
+
+    res.json(rows);
+};
+
+
 
 export const denyAparkment = async (req, res) => {
     const connection = await connect();
-    await connection.query('UPDATE parqueo_vehiculo SET Cancelado = 1, Estado = 0 WHERE idParqueo_Vehiculo = ?;', [
-        req.params.id
-    ]);
+    const { idParqueo_Vehiculo, idReserva } = req.body;
+
+    await connection.query('START TRANSACTION');
+    try {
+        await connection.query('UPDATE parqueo_vehiculo SET Cancelado = 1, Estado = 0 WHERE idParqueo_Vehiculo = ?;', [idParqueo_Vehiculo]);
+        await connection.query('UPDATE reserva SET Realizado = 0, Rechazado = 1 WHERE idReserva = ?;', [idReserva]);
+        await connection.query('COMMIT');
+    } catch (error) {
+        await connection.query('ROLLBACK');
+        throw error;
+    }
+
     res.sendStatus(204);
 };
+
 
 export const aprobeAparkment = async (req, res) => {
     const connection = await connect();

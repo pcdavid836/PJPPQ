@@ -13,6 +13,8 @@ const MyCardModInfo = ({ parkId, closeModal, updateMod }) => {
     const definedImage = "https://firebasestorage.googleapis.com/v0/b/pkpq-74307.appspot.com/o/GarageImages%2FdefaulttPark.jpg?alt=media&token=829c6cfc-bfda-45ef-a172-7f6086d260c7&_gl=1*s19mo5*_ga*MTkxMTcyMTI0MC4xNjk0ODIyNzI3*_ga_CW55HF8NVT*MTY5ODAwOTA3MS40My4x.1";
     const [image, setImage] = useState(definedImage);
     const [checked, setChecked] = useState(false);
+    const [checkedLleno, setCheckedLleno] = useState(false);
+
     const { userInfo } = useContext(AuthContext);
     const [progress, setProgress] = useState(0);
     const [mypark, setMyPark] = useState(null);
@@ -35,10 +37,12 @@ const MyCardModInfo = ({ parkId, closeModal, updateMod }) => {
             setParkFilters(parkFilterResponse);
             setImage(response.Url_imagen);
             setChecked(response.Disponibilidad === 1);
+            setCheckedLleno(response.Lleno === 1); // Establece el estado de 'Lleno'
         } catch (error) {
             console.error('Error fetching park details.', error);
         }
     };
+
 
     // Llama a la función de obtención de detalles del vehículo al cargar el componente
     useEffect(() => {
@@ -65,6 +69,15 @@ const MyCardModInfo = ({ parkId, closeModal, updateMod }) => {
         });
     };
 
+    const handleCheckBoxChangeLleno = () => {
+        const newCheckedValue = !checkedLleno;
+        setCheckedLleno(newCheckedValue);
+
+        setMyPark({
+            ...mypark,
+            Lleno: newCheckedValue ? 1 : 0,
+        });
+    };
 
 
     async function dropImage() {
@@ -208,6 +221,17 @@ const MyCardModInfo = ({ parkId, closeModal, updateMod }) => {
                             <CheckBox
                                 checked={checked}
                                 onPress={handleCheckBoxChange}
+                                iconType="material-community"
+                                checkedIcon="checkbox-outline"
+                                uncheckedIcon={'checkbox-blank-outline'}
+                                title={"Activo"}
+                            />
+                        </View>
+                        <View style={styles.checkboxContainer}>
+                            <Text style={styles.label}>Lleno: </Text>
+                            <CheckBox
+                                checked={checkedLleno}
+                                onPress={handleCheckBoxChangeLleno}
                                 iconType="material-community"
                                 checkedIcon="checkbox-outline"
                                 uncheckedIcon={'checkbox-blank-outline'}

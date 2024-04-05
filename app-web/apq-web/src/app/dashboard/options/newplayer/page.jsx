@@ -134,6 +134,7 @@ function NewPlayerPage() {
                   <option value="PT">PT</option>
                   <option value="PA">PA</option>
                   <option value="BN">BN</option>
+                  <option value="CIE">CIE</option>
                 </select>
               </div>
             </div>

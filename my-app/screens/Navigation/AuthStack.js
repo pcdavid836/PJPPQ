@@ -7,6 +7,7 @@ import UserSignIn from '../UserSignInScreen';
 import MessageValidationScreen from '../MessageValidationScreen';
 import ForgotPasswordScreen from '../ForgotPasswordScreen';
 import NewPasswordScreen from '../NewPasswordScreen';
+import VerificationCodeScreen from '../VerificationCodeScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -20,6 +21,7 @@ function AuthStack() {
         <Stack.Screen name="UserRegister" component={UserRegister} />
         <Stack.Screen name="NewPasswordScreen" component={NewPasswordScreen} />
         <Stack.Screen name="ForgotPasswordScreen" component={ForgotPasswordScreen} />
+        <Stack.Screen name="VerificationCodeScreen" component={VerificationCodeScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   )

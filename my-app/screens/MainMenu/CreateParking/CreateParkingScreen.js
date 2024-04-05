@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react'
-import { StyleSheet, View, Text, Image, TouchableOpacity, FlatList, Modal } from 'react-native';
+import { StyleSheet, View, Text, Image, TouchableOpacity, FlatList, Modal, TextInput, Button } from 'react-native';
 import { getUserPark } from '../../../api';
 import { AuthContext } from '../../../context/AuthContext';
 import Ionicons from 'react-native-vector-icons/Ionicons'
@@ -13,6 +13,7 @@ const CreateParking = () => {
   const show = () => setVisible(true);
   const hide = () => setVisible(false);
   const [mypark, setMyPark] = useState([]);
+  const [inputValue, setInputValue] = useState('');
 
   const loadMyPark = async () => {
     const data = await getUserPark(userInfo.idUsuario);
@@ -27,6 +28,17 @@ const CreateParking = () => {
     // Manejar la notificación de modificación completada aquí
     // Esto podría incluir la recarga de la lista de vehículos u otras acciones necesarias.
     loadMyPark();
+  };
+
+  const handleInputChange = (text) => {
+    // Limita la entrada a 6 caracteres y evita que las letras sean mayúsculas al inicio
+    const formattedText = text.length <= 6 ? text.toLowerCase() : text.slice(0, 6);
+    setInputValue(formattedText);
+  };
+
+  const handleSubmit = () => {
+    // Aquí puedes manejar lo que sucede cuando se presiona el botón "Enviar"
+    console.log('Input Value:', inputValue);
   };
 
   const CreatePostulation = () => {
@@ -58,6 +70,20 @@ const CreateParking = () => {
         <Modal visible={visible} animationType='slide' onRequestClose={hide}>
           <AddPostulation closeModal={hide} onComplete={loadMyPark} />
         </Modal>
+        <View style={styles.centeredTextContainer}>
+          <Text style={styles.largeCenteredText}>Unirse a alguna Locacion?</Text>
+          <Text style={styles.smallCenteredText}>Ingresa un codigo de 6 caracteres compartido por algun usuario que sea dueño de una locacion.</Text>
+          <TextInput
+            style={styles.input}
+            onChangeText={handleInputChange}
+            value={inputValue}
+            maxLength={6}
+            autoCapitalize='none'
+          />
+          <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+            <Text style={styles.buttonText}>Enviar</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
@@ -86,18 +112,18 @@ const styles = StyleSheet.create({
     marginBottom: 160,
   },
   btnAdd: {
-    backgroundColor: '#008ffc', // Cambia el color del botón según tus necesidades
+    backgroundColor: '#008ffc',
     padding: 10,
     borderRadius: 5,
     marginRight: 10,
   },
   buttonText: {
-    color: 'white', // Cambia el color del texto del botón según tus necesidades
+    color: 'white',
     fontWeight: 'bold',
   },
   buttonContent: {
-    flexDirection: 'row', // Alinea los elementos en fila
-    alignItems: 'center', // Alinea los elementos verticalmente
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   shareButton: {
     marginTop: 10,
@@ -115,6 +141,42 @@ const styles = StyleSheet.create({
   },
   disabledButton: {
     backgroundColor: 'gray', // Cambia el color del botón cuando esté deshabilitado
+  },
+  centeredTextContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 10,
+    paddingTop: 10, // Agrega un pequeño padding top
+  },
+  largeCenteredText: {
+    fontSize: 20, // Reduce el tamaño de las letras
+    color: 'gray',
+    textAlign: 'center',
+  },
+  smallCenteredText: {
+    fontSize: 16, // Reduce el tamaño de las letras
+    color: 'gray',
+    textAlign: 'center',
+  },
+  input: {
+    height: 50, // Aumenta el tamaño del TextInput
+    width: '30%', // Aumenta el ancho del TextInput
+    margin: 12,
+    borderWidth: 1,
+    padding: 10,
+  },
+  button: {
+    height: 50, // Aumenta el tamaño del botón
+    width: '50%', // Aumenta el ancho del botón
+    backgroundColor: 'gold',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 5,
+    marginTop: 10,
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 18, // Aumenta el tamaño de las letras del botón
   },
 });
 export default CreateParking;

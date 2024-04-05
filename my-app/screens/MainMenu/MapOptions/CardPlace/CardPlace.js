@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, StyleSheet, Image, Modal, ScrollView, TouchableOpacity, FlatList } from 'react-native'
-import { getParksTime, getBookByUserTrue, getParkFilterVehicle, getParkOwnerByIdPark } from '../../../../api';
+import { View, Text, StyleSheet, Image, Modal, ScrollView, TouchableOpacity, FlatList, TextInput, Alert } from 'react-native'
+import { getParksTime, getBookByUserTrue, getParkFilterVehicle, getParkOwnerByIdPark, createReportUserPark } from '../../../../api';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import ReserveSpace from '../ReserveSpace';
 import { AuthContext } from '../../../../context/AuthContext';
@@ -11,11 +11,45 @@ import camion from '../../../../assets/images/kindOfCar/camion.png';
 import mini from '../../../../assets/images/kindOfCar/minibus.png';
 import otro from '../../../../assets/images/kindOfCar/mistery.png';
 import moto from '../../../../assets/images/kindOfCar/moto.png';
+import { SelectCountry } from 'react-native-element-dropdown';
 
 
 
 const CardPlace = ({ park, closeModal }) => {
+
+  const local_data = [
+    {
+      value: 'Informacion incorrecta',
+      lable: 'Informacion incorrecta',
+      image: {
+        uri: 'https://www.vigcenter.com/public/all/images/default-image.jpg',
+      },
+    },
+    {
+      value: 'Nunca acepta solicitudes',
+      lable: 'Nunca acepta solicitudes',
+      image: {
+        uri: 'https://www.vigcenter.com/public/all/images/default-image.jpg',
+      },
+    },
+    {
+      value: 'Incumplimiento de horario',
+      lable: 'Incumplimiento de horario',
+      image: {
+        uri: 'https://www.vigcenter.com/public/all/images/default-image.jpg',
+      },
+    },
+    {
+      value: 'Otro',
+      lable: 'Otro',
+      image: {
+        uri: 'https://www.vigcenter.com/public/all/images/default-image.jpg',
+      },
+    },
+  ];
+
   let parkImage = "defaultPark";
+  const [report, setReport] = useState();
   const { userInfo } = useContext(AuthContext);
   const [parktime, setParkTime] = useState([]);
   const [parkVehicleType, setParkVehicles] = useState([]);
@@ -23,12 +57,22 @@ const CardPlace = ({ park, closeModal }) => {
   const [isTimeVisible, setTimeVisible] = useState(false);
   const [iconName, setIconName] = useState("chevron-down-outline");
   const [isModalVisible, setModalVisible] = useState(false);
+  const [secondModalVisible, setSecondModalVisible] = useState(false);
   const [activeBooking, setActiveBooking] = useState(null);
   const hide = () => setModalVisible(false);
 
   const [actualUser, setActualUser] = useState({
     idUsuario: userInfo.idUsuario,
   });
+
+  const [reporInfo, setReportInfo] = useState({
+    Motivo: '',
+    Descripcion: '',
+    usuario_idUsuario: 0,
+    parqueo_idParqueo: 0,
+  });
+
+  const handleChange = (name, value) => setReportInfo({ ...reporInfo, [name]: value });
 
   const loadOwners = async () => {
     const data = await getParkOwnerByIdPark(park.idParqueo);
@@ -160,8 +204,11 @@ const CardPlace = ({ park, closeModal }) => {
   };
 
   async function btnBook() {
-    // Si ya tengo una reserva con Estado 1 obtendre una alerta que indique que debo primero finalizar la actual
-    setModalVisible(true);
+    if (park.Lleno === 1) {
+      Alert.alert('Error', 'El parqueo está lleno. Por favor, consulta al propietario o intenta hacer una reserva en otro momento.');
+    } else {
+      setModalVisible(true);
+    }
   }
 
   if (park.Url_imagen === "defaultPark") {
@@ -169,6 +216,24 @@ const CardPlace = ({ park, closeModal }) => {
   } else {
     parkImage = park.Url_imagen;
   }
+
+  const handleSubmit = () => {
+    // Comprueba si algún valor de reporInfo es nulo o vacío
+    const isReportInfoComplete = Object.values(reporInfo).every(value => value !== '' && value != null);
+
+    if (isReportInfoComplete) {
+      // Llama a la función createReportParkUser con reporInfo como argumento
+      createReportUserPark(reporInfo);
+      console.log('Enviando reporte:', reporInfo);
+      setSecondModalVisible(false); // Ocultar modal después de enviar
+
+      // Muestra una alerta de éxito
+      Alert.alert('Éxito', 'Reporte exitoso');
+    } else {
+      // Si algún campo está vacío, muestra una alerta
+      Alert.alert('Error', 'Por favor, completa todos los campos del reporte.');
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -185,6 +250,11 @@ const CardPlace = ({ park, closeModal }) => {
         />
         <View style={styles.header}>
           <Text style={styles.name}>{park.Titulo}</Text>
+          {park.Lleno === 1 && (
+            <View style={styles.headerContent}>
+              <Text style={{ ...styles.disp, color: 'red', textAlign: 'center' }}>El parqueo actualmente se encuentra Lleno</Text>
+            </View>
+          )}
           <Text style={styles.description}>
             {park.Descripcion}
           </Text>
@@ -228,6 +298,14 @@ const CardPlace = ({ park, closeModal }) => {
         >
           <Text style={styles.shareButtonText}>Solicitar Reserva</Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          style={parktime.length > 0 ? styles.shareButton2 : styles.disabledButton}
+          onPress={() => setSecondModalVisible(true)}
+          disabled={isUserOwner}
+        >
+          <Ionicons name="alert-circle-outline" size={30} color="white" />
+          <Text style={styles.shareButtonText}>Reportar Lugar</Text>
+        </TouchableOpacity>
         <Modal
           animationType="fade"
           transparent={true}
@@ -241,6 +319,64 @@ const CardPlace = ({ park, closeModal }) => {
             {/* Asegúrate de que el contenido del modal esté centrado */}
             <View style={{ margin: 20, backgroundColor: "white", borderRadius: 20, padding: 35, shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 4, elevation: 5 }}>
               <ReserveSpace parkId={park.idParqueo} parktimer={parktime} closeModal={hide} onBookingComplete={closeCard} />
+            </View>
+          </View>
+        </Modal>
+        {/* Segundo Modal */}
+        <Modal
+          animationType="none"
+          transparent={true}
+          visible={secondModalVisible}
+          onRequestClose={() => {
+            setSecondModalVisible(!secondModalVisible);
+          }}
+        >
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+              <Text style={styles.modalTitle}>Reportar Usuario</Text>
+              <SelectCountry
+                style={styles.dropdown}
+                selectedTextStyle={styles.selectedTextStyle}
+                placeholderStyle={styles.placeholderStyle}
+                imageStyle={styles.imageStyle}
+                iconStyle={styles.iconStyle}
+                maxHeight={200}
+                value={report}
+                data={local_data}
+                valueField="value"
+                labelField="lable"
+                imageField="image"
+                placeholder="Motivo..."
+                searchPlaceholder="Buscar..."
+                onChange={e => {
+                  setReport(e.value);
+                  handleChange('Motivo', e.value);
+                }}
+              />
+              <TextInput
+                multiline={true}
+                numberOfLines={6}
+                textAlignVertical="top"
+                maxLength={150}
+                style={styles.modalTextInput}
+                placeholder="Escribe aquí tu reporte..."
+                onChangeText={(text) => handleChange('Descripcion', text)}
+              // ... más propiedades si necesitas ...
+              />
+              <View style={styles.modalButtonContainer}>
+                <TouchableOpacity
+                  style={styles.modalButton}
+                  onPress={() => setSecondModalVisible(false)}
+                >
+                  <Text style={styles.textStyle}>Cerrar</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.modalButton}
+                  onPress={handleSubmit}
+                >
+                  <Text style={styles.textStyle}>Enviar</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
         </Modal>
@@ -288,6 +424,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 30,
     backgroundColor: '#00BFFF',
+  },
+  shareButton2: {
+    marginTop: 10,
+    height: 45,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 30,
+    backgroundColor: '#de8900',
   },
   shareButtonText: {
     color: '#FFFFFF',
@@ -344,6 +489,79 @@ const styles = StyleSheet.create({
     width: 25,
     height: 25,
     margin: 2, // Añade un pequeño espacio entre las imágenes
+  },
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16
+  },
+  dropdown: {
+    margin: 16,
+    height: 50,
+    width: 200,
+    backgroundColor: '#EEEEEE',
+    borderRadius: 22,
+    paddingHorizontal: 8,
+  },
+  imageStyle: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+  },
+  placeholderStyle: {
+    fontSize: 16,
+  },
+  selectedTextStyle: {
+    fontSize: 16,
+    marginLeft: 8,
+  },
+  iconStyle: {
+    width: 20,
+    height: 20,
+  },
+  modalTitle: {
+    fontWeight: 'bold',
+    fontSize: 20,
+    marginBottom: 15,
+  },
+  modalTextInput: {
+    width: 200,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    marginBottom: 15,
+    height: 120,
+  },
+  modalButtonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  modalButton: {
+    backgroundColor: '#2196F3',
+    padding: 10,
+    borderRadius: 5,
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 22,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 35,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
 
 })

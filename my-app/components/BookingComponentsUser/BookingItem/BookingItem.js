@@ -25,6 +25,7 @@ const BookingItem = ({ book, onDeleteComplete, onModifyComplete }) => {
       // Realiza las acciones necesarias con la URI de la imagen capturada
       setImage(imageUri);
       // Aquí puedes hacer la lógica para subir la imagen a Firebase u otras acciones
+      setToSend({ ...tosend, Url_imagen_ingreso: imageUri });
     }
   };
 
@@ -117,6 +118,8 @@ const BookingItem = ({ book, onDeleteComplete, onModifyComplete }) => {
       })
       if (!result.canceled) {
         setImage(result.assets[0].uri);
+        setToSend({ ...tosend, Url_imagen_ingreso: result.assets[0].uri });
+
         //Funcion que sube la imagen:
         //await uploadImage(result.assets[0].uri, "image");
       }
@@ -127,7 +130,9 @@ const BookingItem = ({ book, onDeleteComplete, onModifyComplete }) => {
 
   async function dropImage() {
     setImage(sendImage);
+    setToSend({ ...tosend, Url_imagen_ingreso: sendImage });
   }
+
 
   async function takePic() {
     setImage(sendImage);
@@ -155,6 +160,10 @@ const BookingItem = ({ book, onDeleteComplete, onModifyComplete }) => {
         getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
           // Imagen almacenada en base de datos y nube
           setImage(downloadURL);
+          tosend.Url_imagen_ingreso = downloadURL;
+          const updatedBook = await parkVehicleEnter(book.idReserva, tosend);
+          onModifyComplete(updatedBook);
+          setConfirmModalVisible(false);
           // Asigna la URL de la imagen a la variable actualImage
           // Luego, puedes realizar otras acciones con la URL de la imagen, si es necesario.
         }).catch((error) => {

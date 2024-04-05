@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createBook, getBookByUser, getBookByPark, cancelBook, denyBook, getBookByUserTrue } from '../controllers/booking'
+import { createBook, getBookByUser, getBookByPark, cancelBook, denyBook, getBookByUserTrue, getFilteredParkBooks } from '../controllers/booking'
 
 const router = Router();
 
@@ -46,6 +46,15 @@ router.get('/bookusertrue/:id', getBookByUserTrue)
  *    tags: [Booking]
  */
 router.get('/bookpark/:id', getBookByPark)
+
+/**
+ * @swagger
+ * /bookfilterpark:
+ *  post:
+ *    summary: Obtiene reservas por el id de un parqueo y dependiendo una fecha y estados obtendra solicitudes.
+ *    tags: [Booking]
+ */
+router.post('/bookfilterpark', getFilteredParkBooks)
 
 /**
  * @swagger

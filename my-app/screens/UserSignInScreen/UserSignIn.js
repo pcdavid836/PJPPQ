@@ -1,5 +1,5 @@
 import { React, useState, useContext, useEffect } from 'react';
-import { View, Text, Image, StyleSheet, useWindowDimensions, ScrollView, ToastAndroid } from 'react-native';
+import { View, Text, Image, StyleSheet, useWindowDimensions, ScrollView, ToastAndroid, TextInput } from 'react-native';
 import Logo from '../../assets/images/logoEX.png';
 import CustomInput from '../../components/CustomInput';
 import CustomButton from '../../components/CustomButton';
@@ -26,15 +26,15 @@ const UserSignIn = () => {
         console.log(data);
     };
     */
-/*
-    useEffect(() => {
-        configureGoogleSignIn();
-    });
-
-    const signIn = () => {
-        console.log('pressed')
-    };
-*/
+    /*
+        useEffect(() => {
+            configureGoogleSignIn();
+        });
+    
+        const signIn = () => {
+            console.log('pressed')
+        };
+    */
     const [logser, setLogser] = useState({
         Correo: '',
         Contrasena: '',
@@ -92,7 +92,7 @@ const UserSignIn = () => {
     };
 
     const onForgotPasswordPressed = () => {
-        console.warn('OnForgotPasswordPressed');
+        navigation.navigate('ForgotPasswordScreen');
     };
 
     const onSignInGoogle = () => {
@@ -100,8 +100,7 @@ const UserSignIn = () => {
     };
 
     const onSignInFacebook = () => {
-        console.warn('onSignInFacebook');
-        console.log(login);
+        navigation.navigate('VerificationCodeScreen');
     };
 
     const onSignUpPress = () => {
@@ -111,22 +110,32 @@ const UserSignIn = () => {
     return (
         <ScrollView showsHorizontalScrollIndicator={false}>
             <View style={styles.root}>
+                <Text style={styles.title}>Bienvenido!</Text>
                 <Image
                     source={Logo}
                     style={[styles.logo, { height: height * 0.3 }]}
                     resizeMode='contain'
                 />
-                <CustomInput
-                    placeholder="Correo Electronico"
-                    setValue={(text) => handleChange('Correo', text)}
-                    maxLength={45}
-                />
-                <CustomInput
-                    placeholder="Contraseña"
-                    setValue={(text) => handleChange('Contrasena', text)}
-                    secureTextEntry
-                    maxLength={16}
-                />
+                <View style={styles.container}>
+                    <TextInput
+                        value={logser.Correo}
+                        onChangeText={(text) => handleChange('Correo', text)}
+                        placeholder="Correo Electrónico"
+                        keyboardType="email-address"
+                        style={styles.input}
+                        maxLength={45}
+                        autoCapitalize="none"
+                    />
+                    <TextInput
+                        value={logser.Contrasena}
+                        onChangeText={(text) => handleChange('Contrasena', text)}
+                        placeholder="Contraseña"
+                        style={styles.input}
+                        secureTextEntry
+                        maxLength={45}
+                        autoCapitalize="none"
+                    />
+                </View>
                 <CustomButton
                     text="¿Olvidaste tu Contraseña?"
                     onPress={onForgotPasswordPressed}
@@ -136,14 +145,6 @@ const UserSignIn = () => {
                     text="Iniciar Sesión"
                     onPress={onSignInPressed}
                 />
-               
-                <CustomButton
-                    text="Iniciar sesión con Facebook"
-                    onPress={onSignInFacebook}
-                    bgColor="#FAE9EA"
-                    fgColor="#DD4D44"
-                />
-
                 <CustomButton
                     text="¿No tienes una cuenta? Registrate"
                     onPress={onSignUpPress}
@@ -164,6 +165,27 @@ const styles = StyleSheet.create({
         maxWidth: 300,
         height: 100,
         padding: 40,
+    },
+    title: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: '#051C60',
+        margin: 10,
+    },
+    container: {
+        width: '100%',
+        marginVertical: 10,
+    },
+    input: {
+        backgroundColor: 'white',
+        borderColor: '#e8e8e8',
+        borderWidth: 1,
+        borderRadius: 5,
+        paddingHorizontal: 10,
+        marginBottom: 10,
+    },
+    textInput: {
+        height: 50, // Ajusta la altura de los TextInput
     },
 });
 

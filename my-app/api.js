@@ -1,30 +1,41 @@
-const APIUser = "http://192.168.1.9:3000/user";
-const APIUsermail = "http://192.168.1.9:3000/usermail";
-const APIUserImage = "http://192.168.1.9:3000/userimage";
-const APIVehicle = "http://192.168.1.9:3000/vehicle";
-const APIVehicleInfo = "http://192.168.1.9:3000/vehicleInfo";
-const APIVehicleDelete = "http://192.168.1.9:3000/deletevehicle";
-const APIPark = "http://192.168.1.9:3000/park";
-const APIParkTime = "http://192.168.1.9:3000/parktime";
-const APIParkFilterVehicle = "http://192.168.1.9:3000/parkvehiclefilter";
-const APIParkFilterVehicleEdit = "http://192.168.1.9:3000/parkvehiclefilteredit";
-const APIMyPark = "http://192.168.1.9:3000/mypark";
-const APIMyPost = "http://192.168.1.9:3000/mypost";
-const APIDeletePark = "http://192.168.1.9:3000/deletepark";
-const APISelectAllMyParks = "http://192.168.1.9:3000/myparkaprobed";
-const APISelectParkToEdit = "http://192.168.1.9:3000/parktimetoedit";
-const APIBooking = "http://192.168.1.9:3000/book";
-const APIBookingUser = "http://192.168.1.9:3000/bookuser";
-const APIBookingUserTrue = "http://192.168.1.9:3000/bookusertrue";
-const APIBookingPark = "http://192.168.1.9:3000/bookpark";
-const APIBookingCancel = "http://192.168.1.9:3000/bookcancel";
-const APIBookingDeny = "http://192.168.1.9:3000/bookdeny";
-const APIParkVehicleEnter = "http://192.168.1.9:3000/parkvehicleenter";
-const APIParkVehicle = "http://192.168.1.9:3000/parkvehicle";
-const APIParkVehicleDeny = "http://192.168.1.9:3000/parkvehicledeny";
-const APIParkVehicleFinish = "http://192.168.1.9:3000/parkvehiclefinish";
-const APIParkOwner = "http://192.168.1.9:3000/parkuser";
-const APISearchFilterParks = "http://192.168.1.9:3000/searchfilterparks";
+const API_BASE = "http://192.168.1.9:3000";
+
+const APIUser = `${API_BASE}/user`;
+const APIVerify = `${API_BASE}/verify`;
+const APIUsermail = `${API_BASE}/usermail`;
+const APIUsermailExistence = `${API_BASE}/usermailexist`;
+const APIUserImage = `${API_BASE}/userimage`;
+const APIVehicle = `${API_BASE}/vehicle`;
+const APIVehicleInfo = `${API_BASE}/vehicleInfo`;
+const APIVehicleDelete = `${API_BASE}/deletevehicle`;
+const APIPark = `${API_BASE}/park`;
+const APIParkTime = `${API_BASE}/parktime`;
+const APIParkFilterVehicle = `${API_BASE}/parkvehiclefilter`;
+const APIParkFilterVehicleEdit = `${API_BASE}/parkvehiclefilteredit`;
+const APIMyPark = `${API_BASE}/mypark`;
+const APIMyPost = `${API_BASE}/mypost`;
+const APIDeletePark = `${API_BASE}/deletepark`;
+const APISelectAllMyParks = `${API_BASE}/myparkaprobed`;
+const APISelectParkToEdit = `${API_BASE}/parktimetoedit`;
+const APIBooking = `${API_BASE}/book`;
+const APIBookingUser = `${API_BASE}/bookuser`;
+const APIBookingUserTrue = `${API_BASE}/bookusertrue`;
+const APIBookingPark = `${API_BASE}/bookpark`;
+const APIBookingCancel = `${API_BASE}/bookcancel`;
+const APIBookingDeny = `${API_BASE}/bookdeny`;
+const APIParkVehicleEnter = `${API_BASE}/parkvehicleenter`;
+const APIParkVehicle = `${API_BASE}/parkvehicle`;
+const APIParkVehicleDeny = `${API_BASE}/parkvehicledeny`;
+const APIParkVehicleFinish = `${API_BASE}/parkvehiclefinish`;
+const APIParkOwner = `${API_BASE}/parkuser`;
+const APISearchFilterParks = `${API_BASE}/searchfilterparks`;
+const APISearchRecover = `${API_BASE}/passwordsearchrecover`;
+const APIUpdatePassword = `${API_BASE}/updatepassword`;
+const APIBookingParkFilter = `${API_BASE}/bookfilterpark`;
+const APIParkVehicleFilter = `${API_BASE}/parkvehiclefilter`;
+const APIParkReportUser = `${API_BASE}/reporttouser`;
+const APIUserReportPark = `${API_BASE}/reporttopark`;
+
 
 
 
@@ -381,16 +392,19 @@ export const parkVehicleFinish = async (idBook) => {
   return res;
 };
 
-export const parkVehicleDeny = async (idBook) => {
-  const res = await fetch(`${APIParkVehicleDeny}/${idBook}`, {
+export const parkVehicleDeny = async (idParqueo_Vehiculo, idBook ) => {
+  //console.log(idBook, idParqueo_Vehiculo)
+  const res = await fetch(`${APIParkVehicleDeny}`, {
     method: "PUT",
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json",
     },
+    body: JSON.stringify({ idParqueo_Vehiculo, idBook })
   });
   return res;
 };
+
 
 export const getParkOwnerByIdPark = async (idPark) => {
   const res = await fetch(`${APIParkOwner}/${idPark}`, {
@@ -409,3 +423,87 @@ export const getParksByFilter = async (searchData) => {
   });
   return await res.json();
 };
+
+export const getUserExistenceByEmail = async (searchData) => {
+  const res = await fetch(APIUsermailExistence, {
+    method: "POST",
+    headers: { Accept: "application/json", "Content-Type": "application/json" },
+    body: JSON.stringify(searchData)
+  });
+  return await res.json();
+};
+
+export const sendVerificationSMS = async (getPhone) => {
+  //console.log(JSON.stringify(getPhone));
+  const res = await fetch(APIVerify, {
+    method: "POST",
+    headers: { Accept: "application/json", "Content-Type": "application/json" },
+    body: JSON.stringify(getPhone)
+  });
+  return await res.json();
+};
+
+
+export const emailSearchPasswordRecover = async (getMail) => {
+  //console.log(JSON.stringify(getMail));
+  const res = await fetch(APISearchRecover, {
+    method: "POST",
+    headers: { Accept: "application/json", "Content-Type": "application/json" },
+    body: JSON.stringify(getMail)
+  });
+  return await res.json();
+};
+
+export const updateUserPassword = async (newData) => {
+  const res = await fetch(APIUpdatePassword, {
+    method: "PUT",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(newData),
+  });
+  return res;
+};
+
+export const getBooksByFilter = async (getPetition) => {
+  //console.log(JSON.stringify(getPhone));
+  const res = await fetch(APIBookingParkFilter, {
+    method: "POST",
+    headers: { Accept: "application/json", "Content-Type": "application/json" },
+    body: JSON.stringify(getPetition)
+  });
+  return await res.json();
+};
+
+export const getParkedVehicleByFilter = async (getPetition) => {
+  //console.log(JSON.stringify(getPetition));
+  const res = await fetch(APIParkVehicleFilter, {
+    method: "POST",
+    headers: { Accept: "application/json", "Content-Type": "application/json" },
+    body: JSON.stringify(getPetition)
+  });
+  return await res.json();
+};
+
+export const createReportParkUser = async (getPetition) => {
+  //console.log(JSON.stringify(getPetition));
+  const res = await fetch(APIParkReportUser, {
+    method: "POST",
+    headers: { Accept: "application/json", "Content-Type": "application/json" },
+    body: JSON.stringify(getPetition)
+  });
+  return await res.json();
+};
+
+export const createReportUserPark = async (getPetition) => {
+  //console.log(JSON.stringify(getPetition));
+  const res = await fetch(APIUserReportPark, {
+    method: "POST",
+    headers: { Accept: "application/json", "Content-Type": "application/json" },
+    body: JSON.stringify(getPetition)
+  });
+  return await res.json();
+};
+
+

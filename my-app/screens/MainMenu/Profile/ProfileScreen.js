@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react'
-import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, ToastAndroid, Modal, Button } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, ToastAndroid, Modal, Button, Alert } from 'react-native'
 import {
   Menu,
   MenuOptions,
@@ -8,19 +8,22 @@ import {
   renderers,
 } from 'react-native-popup-menu';
 import { AuthContext } from '../../../context/AuthContext';
-import { updateUser, updateImageUser } from '../../../api';
+import { updateUser, updateImageUser, emailSearchPasswordRecover } from '../../../api';
 import * as ImagePicker from "expo-image-picker";
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage'
 import { storage } from "../../../firebaseConfig";
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import StackNavigationGroup from '../../Navigation/StackNavigationGroup';
 import CameraProfileScreen from '../TakePhoto/CameraProfile/CameraProfileScreen';
+import UpdatePasswordScreen from '../UpdatePassword/UpdatePasswordScreen';
 
 
 
 const ProfileScreen = () => {
   const { userInfo, userImage, updateUserImage } = useContext(AuthContext);
   const [visible, setVisible] = useState(false);
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [userData, setUserData] = useState(null);
   const show = () => setVisible(true);
   const hide = () => setVisible(false);
 
@@ -131,6 +134,36 @@ const ProfileScreen = () => {
     ToastAndroid.show('Cambios realizados con éxito!', ToastAndroid.SHORT);
   };
 
+  const onModifyPassword = async () => {
+    Alert.alert(
+      "Confirmación",
+      "¿Estás seguro de que quieres modificar tu contraseña?",
+      [
+        {
+          text: "No",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel"
+        },
+        {
+          text: "Sí", onPress: async () => {
+            try {
+              const response = await emailSearchPasswordRecover({ Correo: userInfo.Correo });
+              //console.log(response);
+              if (response.mensaje === "Correo de verificación enviado") {
+                setUserData(response);
+                setModalVisible(true);
+              } else {
+                Alert.alert("Error", response.mensaje);
+              }
+            } catch (error) {
+              console.error(error);
+              Alert.alert("Error", "Ocurrió un error al recuperar la contraseña.");
+            }
+          }
+        }
+      ]
+    );
+  };
 
   return (
     <View>
@@ -205,32 +238,36 @@ const ProfileScreen = () => {
           />
           <Text style={styles.label}>Carnet de Identidad</Text>
           <TextInput
-            style={styles.input}
+            style={[styles.input, { color: '#6a0dad' }]} // Cambia el color del texto a un azul oscuro tirando a lila
             placeholder="CI"
             defaultValue={userInfo.CI}
             placeholderTextColor="#999"
             onChangeText={(text) => handleChange('CI', text.toUpperCase())}
             maxLength={10}
+            editable={false}
           />
           <Text style={styles.label}>Celular</Text>
           <TextInput
-            style={styles.input}
+            style={[styles.input, { color: '#6a0dad' }]} // Cambia el color del texto a un azul oscuro tirando a lila
             defaultValue={userInfo.Celular}
             placeholder="Celular"
             placeholderTextColor="#999"
             onChangeText={(text) => handleChange('Celular', text)}
             keyboardType="numeric"
             maxLength={15}
+            editable={false}
           />
           <View style={styles.btnContainer}>
-            <TouchableOpacity style={[styles.button, styles.pass]}>
+            <TouchableOpacity style={[styles.button, styles.pass]} onPress={onModifyPassword}>
               <Text style={styles.buttonText}>Modificar Contraseña</Text>
             </TouchableOpacity>
             <TouchableOpacity style={[styles.button, styles.save]} onPress={onSaveUpdate}>
               <Text style={styles.buttonText} >Guardar</Text>
             </TouchableOpacity>
           </View>
-
+          <Modal visible={isModalVisible} animationType='slide'>
+            <UpdatePasswordScreen user={userData} closeModal={() => setModalVisible(false)} />
+          </Modal>
 
           {/*<TouchableOpacity style={styles.buttonContainer}>
             <Text>Opcion 2</Text>
@@ -357,13 +394,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#DB4437'
   },
   btnImage: {
-    width: 40, // Cambia el ancho según tus preferencias
-    height: 40, // Cambia la altura según tus preferencias
-    borderRadius: 25, // La mitad del ancho o altura para hacerlo circular
+    width: 40,
+    height: 40,
+    borderRadius: 25,
     backgroundColor: '#D3D3D3',
     position: 'absolute',
-    alignSelf: 'flex-end', // Alineado a la derecha
-    marginTop: 'auto', // Empuja hacia abajo desde la parte superior
+    alignSelf: 'flex-end',
+    marginTop: 'auto',
     bottom: -20, // Distancia desde la parte inferior de la pantalla
     right: 130, // Distancia desde el lado derecho de la pantalla
   },
