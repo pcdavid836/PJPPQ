@@ -1,23 +1,30 @@
 import { React, useState, useContext, useEffect } from 'react';
-import { View, Text, Image, StyleSheet, useWindowDimensions, ScrollView, ToastAndroid, TextInput } from 'react-native';
+import { View, Text, Image, StyleSheet, useWindowDimensions, ScrollView, ToastAndroid, TextInput, Button } from 'react-native';
 import Logo from '../../assets/images/logoEX.png';
 import CustomInput from '../../components/CustomInput';
 import CustomButton from '../../components/CustomButton';
 import { useNavigation } from '@react-navigation/native';
 import { getUserMail } from '../../api';
 import { AuthContext } from '../../context/AuthContext';
-//import { GoogleSignIn, GoogleSignInButton, statusCodes } from '@react-native-google-signin/google-signin'
+//import { GoogleSignin, GoogleSigninButton } from '@react-native-google-signin/google-signin'
 import CryptoES from 'crypto-es';
 
 const UserSignIn = () => {
     const { login, updateUserImage } = useContext(AuthContext);
+    const [error, setError] = useState();
+    const [userInfo, setUsrInfo] = useState();
+
+    /*
     const configureGoogleSignIn = () => {
+        
+
         GoogleSignIn.configure({
             webClientId: "121681989018-befic7f8r6cd1ahrjq2oilngsi3n6uu4.apps.googleusercontent.com",
             androidClientId: "121681989018-befic7f8r6cd1ahrjq2oilngsi3n6uu4.apps.googleusercontent.com",
             iosClientId: "",
         });
     };
+    */
     //Llamado de usuarios (prueba)
     /*
     const loadUsers = async () => {
@@ -26,15 +33,32 @@ const UserSignIn = () => {
         console.log(data);
     };
     */
-    /*
-        useEffect(() => {
-            configureGoogleSignIn();
-        });
-    
-        const signIn = () => {
-            console.log('pressed')
-        };
-    */
+
+    useEffect(() => {
+      /*  GoogleSignin.configure({
+            webClientId:
+                "121681989018-1jam5ikei19nur9knshk2n599pehkmh5.apps.googleusercontent.com",
+        });*/
+    }, []);
+/*
+    const signin = async () => {
+        try {
+            await GoogleSignin.hasPlayServices();
+            const user = await GoogleSignin.signIn();
+            setUsrInfo(user);
+            setError();
+        } catch (e) {
+            setError(e);
+        }
+    };
+
+    const logout = () => {
+        setUserInfo();
+        GoogleSignin.revokeAccess();
+        GoogleSignin.signOut();
+    }
+
+*/
     const [logser, setLogser] = useState({
         Correo: '',
         Contrasena: '',
@@ -150,6 +174,21 @@ const UserSignIn = () => {
                     onPress={onSignUpPress}
                     type="TERTIARY"
                 />
+                {/*
+                    <View style={styles.container}>
+                        <Text>{JSON.stringify(error)}</Text>
+                        {userInfo && <Text>{JSON.stringify(userInfo.user)}</Text>}
+                        {userInfo ? (
+                            <Button title="Logout" onPress={logout} />
+                        ) : (
+                            <GoogleSigninButton
+                                size={GoogleSigninButton.Size.Standard}
+                                color={GoogleSigninButton.Color.Dark}
+                                onPress={signin}
+                            />
+                        )}
+                    </View>*/
+                }
             </View>
         </ScrollView>
     );
