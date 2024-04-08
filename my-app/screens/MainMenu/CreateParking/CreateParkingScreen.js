@@ -166,8 +166,8 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   button: {
-    height: 50, // Aumenta el tamaño del botón
-    width: '50%', // Aumenta el ancho del botón
+    height: 50, 
+    width: '50%',
     backgroundColor: 'gold',
     justifyContent: 'center',
     alignItems: 'center',
@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: 'white',
-    fontSize: 18, // Aumenta el tamaño de las letras del botón
+    fontSize: 18,
   },
 });
 export default CreateParking;

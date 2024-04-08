@@ -34,8 +34,8 @@ const UserSignIn = () => {
     };
     */
 
-    useEffect(() => {
-      /*  GoogleSignin.configure({
+    useEffect(() => {/*
+        GoogleSignin.configure({
             webClientId:
                 "121681989018-1jam5ikei19nur9knshk2n599pehkmh5.apps.googleusercontent.com",
         });*/
@@ -57,8 +57,8 @@ const UserSignIn = () => {
         GoogleSignin.revokeAccess();
         GoogleSignin.signOut();
     }
-
 */
+
     const [logser, setLogser] = useState({
         Correo: '',
         Contrasena: '',
@@ -187,8 +187,8 @@ const UserSignIn = () => {
                                 onPress={signin}
                             />
                         )}
-                    </View>*/
-                }
+                    </View>
+                */}
             </View>
         </ScrollView>
     );
