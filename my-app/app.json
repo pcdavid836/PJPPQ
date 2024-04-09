@@ -20,7 +20,22 @@
           "isAccessMediaLocationEnabled": "true"
         }
       ],
-      "expo-build-properties",
+      [
+        "@react-native-google-signin/google-signin"
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "compileSdkVersion": 34,
+            "targetSdkVersion": 34,
+            "buildToolsVersion": "34.0.0"
+          },
+          "ios": {
+            "deploymentTarget": "13.0"
+          }
+        }
+      ],
       "@react-native-google-signin/google-signin"
     ],
     "assetBundlePatterns": [
@@ -32,7 +47,8 @@
       "infoPlist": {
         "NSPhotoLibraryUsageDescription": "Allow $(PRODUCT_NAME) to access your photos.",
         "NSPhotoLibraryAddUsageDescription": "Allow $(PRODUCT_NAME) to save photos."
-      }
+      },
+      "googleServicesFile": "./GoogleService-Info.plist"
     },
     "android": {
       "adaptiveIcon": {
@@ -44,6 +60,7 @@
         "android.permission.WRITE_EXTERNAL_STORAGE",
         "android.permission.ACCESS_MEDIA_LOCATION"
       ],
+      "googleServicesFile": "./google-services.json",
       "package": "com.pc_useh.pjapq"
     },
     "web": {

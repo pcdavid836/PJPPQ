@@ -1,12 +1,13 @@
 import { React, useState, useContext, useEffect } from 'react';
-import { View, Text, Image, StyleSheet, useWindowDimensions, ScrollView, ToastAndroid, TextInput, Button } from 'react-native';
+import { View, Text, Image, StyleSheet, useWindowDimensions, ScrollView, ToastAndroid, TextInput, Button, Alert } from 'react-native';
 import Logo from '../../assets/images/logoEX.png';
 import CustomInput from '../../components/CustomInput';
 import CustomButton from '../../components/CustomButton';
 import { useNavigation } from '@react-navigation/native';
 import { getUserMail } from '../../api';
 import { AuthContext } from '../../context/AuthContext';
-//import { GoogleSignin, GoogleSigninButton } from '@react-native-google-signin/google-signin'
+import auth from '@react-native-firebase/auth';
+import { GoogleSignin, GoogleSigninButton } from '@react-native-google-signin/google-signin'
 import CryptoES from 'crypto-es';
 
 const UserSignIn = () => {
@@ -14,17 +15,7 @@ const UserSignIn = () => {
     const [error, setError] = useState();
     const [userInfo, setUsrInfo] = useState();
 
-    /*
-    const configureGoogleSignIn = () => {
-        
 
-        GoogleSignIn.configure({
-            webClientId: "121681989018-befic7f8r6cd1ahrjq2oilngsi3n6uu4.apps.googleusercontent.com",
-            androidClientId: "121681989018-befic7f8r6cd1ahrjq2oilngsi3n6uu4.apps.googleusercontent.com",
-            iosClientId: "",
-        });
-    };
-    */
     //Llamado de usuarios (prueba)
     /*
     const loadUsers = async () => {
@@ -34,30 +25,46 @@ const UserSignIn = () => {
     };
     */
 
-    useEffect(() => {/*
+    useEffect(() => {
         GoogleSignin.configure({
             webClientId:
-                "121681989018-1jam5ikei19nur9knshk2n599pehkmh5.apps.googleusercontent.com",
-        });*/
+                "121681989018-4gtrk5pnmmokcrlnkkdglhd839c5mil8.apps.googleusercontent.com",
+        });
     }, []);
-/*
-    const signin = async () => {
-        try {
-            await GoogleSignin.hasPlayServices();
-            const user = await GoogleSignin.signIn();
-            setUsrInfo(user);
-            setError();
-        } catch (e) {
-            setError(e);
-        }
-    };
 
-    const logout = () => {
-        setUserInfo();
-        GoogleSignin.revokeAccess();
-        GoogleSignin.signOut();
+    async function onGoogleButtonPress() {
+        // Check if your device supports Google Play
+        await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+        // Get the users ID token
+        const { idToken } = await GoogleSignin.signIn();
+
+        console.log(idToken);
+        Alert.alert('Success test');
+
+        // Create a Google credential with the token
+        const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+
+        // Sign-in the user with the credential
+        return auth().signInWithCredential(googleCredential);
     }
-*/
+    /*
+        const signin = async () => {
+            try {
+                await GoogleSignin.hasPlayServices();
+                const user = await GoogleSignin.signIn();
+                setUsrInfo(user);
+                setError();
+            } catch (e) {
+                setError(e);
+            }
+        };
+    
+        const logout = () => {
+            setUserInfo();
+            GoogleSignin.revokeAccess();
+            GoogleSignin.signOut();
+        }
+    */
 
     const [logser, setLogser] = useState({
         Correo: '',
@@ -71,7 +78,7 @@ const UserSignIn = () => {
     const navigation = useNavigation();
 
     const onSignInPressed = async () => {
-
+    console.log("actual");
         if (logser.Correo === '' || logser.Contrasena === '') {
             ToastAndroid.show('Debes llenar los datos requeridos!', ToastAndroid.SHORT);
             return;
@@ -106,6 +113,7 @@ const UserSignIn = () => {
             login(user);
             updateUserImage(user.Url_imagen);
             navigation.navigate('HomeScreen');
+            console.log(mainpassword);
 
 
         } else {
@@ -173,6 +181,10 @@ const UserSignIn = () => {
                     text="¿No tienes una cuenta? Registrate"
                     onPress={onSignUpPress}
                     type="TERTIARY"
+                />
+                <Button
+                    title="Google Sign-In"
+                    onPress={() => onGoogleButtonPress().then(() => console.log('Signed in with Google!'))}
                 />
                 {/*
                     <View style={styles.container}>
