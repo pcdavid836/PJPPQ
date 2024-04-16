@@ -113,8 +113,8 @@ const AddVehicle = ({ closeModal, onComplete }) => {
                 // Espera a que la imagen se suba antes de guardar el vehículo
                 await uploadImage(image, "image");
                 saveVehicle(vehicle);
-                onComplete(vehicle);
                 closeModal();
+                onComplete();
             } catch (error) {
                 console.error("Error al subir la imagen:", error);
             }
@@ -122,6 +122,7 @@ const AddVehicle = ({ closeModal, onComplete }) => {
             ToastAndroid.show('Completa los campos restantes!', ToastAndroid.SHORT);
         }
         setIsSubmitting(false);
+        onComplete();
     }
 
     async function takePic() {

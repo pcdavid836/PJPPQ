@@ -1,10 +1,5 @@
 import { connect } from "../database"
 
-//COMO DATO CURIOSO PUEDES HACER QUE EN CASO DE QUE EXISTA UNA RESERVA ANTIGUA PUEDES COMPROBAR EN LA CONSULTA DE ELEGIR HORARIO
-//MOSTRAR UNA ALERTA QUE INDIQUE QYE YA EXISTE UNA RESERVA ANTERIOR ASI EVITAS QUE ALGUIEN INTENTE CREAR UNA RESERVA DOBLE
-
-//EN POSTULACIONES AñADE EL BUSCAR CODIGO DE ESTABLECIMIENTO Y CREA A CADA PARQUEO 2 COLUMNAS UNA PARA ACTIVAR O DESACTIVAR CODIGOS Y OTRA PARA ALMACENAR EL CODIGO SECRETO
-
 export const getPark = async (req, res) => {
     const db = await connect();
     const [rows] = await db.query('SELECT * FROM parqueo WHERE Estado = 1 AND Aprobacion = 1 AND Disponibilidad = 1;')
@@ -32,7 +27,7 @@ export const createPark = async (req, res) => {
         const connection = await connect();
 
         // Insertar un nuevo registro en la tabla parqueo
-        const [results] = await connection.execute("INSERT INTO parqueo (Ubicacion, Tamaño, Descripcion, Disponibilidad, Estado, Tipo_Parqueo_idTipo_Parqueo, Titulo, Url_imagen, Url_validacion, Aprobacion, Fecha_Creacion, Latitud, Longitud, Lleno) VALUES (?, ?, ?, 0, 1, ?, ?, ?, ?, 0, CURRENT_TIMESTAMP, ?, ?, 0);", [
+        const [results] = await connection.execute("INSERT INTO parqueo (Ubicacion, Tamaño, Descripcion, Disponibilidad, Estado, Tipo_Parqueo_idTipo_Parqueo, Titulo, Url_imagen, Url_validacion, Aprobacion, Fecha_Creacion, Latitud, Longitud, Lleno, Codigo, Compartir) VALUES (?, ?, ?, 0, 1, ?, ?, ?, ?, 0, CURRENT_TIMESTAMP, ?, ?, 0, DEFAULT, DEFAULT);", [
             req.body.Ubicacion,
             req.body.Tamaño,
             req.body.Descripcion,
@@ -62,6 +57,7 @@ export const createPark = async (req, res) => {
         console.error(error);
     }
 };
+
 
 export const updatePostPark = async (req, res) => {
     const connection = await connect();
@@ -117,6 +113,8 @@ export const getPostPark = async (req, res) => {
                 Longitud: park.Longitud,
                 Disponibilidad: park.Disponibilidad,
                 Lleno: park.Lleno,
+                Codigo: park.Codigo, // Nueva columna
+                Compartir: park.Compartir, // Nueva columna
             };
 
             res.json(parkinfo);
@@ -129,7 +127,7 @@ export const getPostPark = async (req, res) => {
     }
 };
 
-//ESTO NO SE USA PARA NADA, SOLO FUE AGREGADO CON FINES DE APRENDISAJE
+
 export const deletePark = async (req, res) => {
     const connection = await connect();
     await connection.query('UPDATE Parqueo SET Estado = 0 WHERE idParqueo = ?', [
@@ -137,7 +135,6 @@ export const deletePark = async (req, res) => {
     ]);
     res.sendStatus(204);
 };
-//
 
 
 export const getMyAprobedPark = async (req, res) => {
@@ -191,5 +188,44 @@ export const getParkFilters = async (req, res) => {
     } catch (error) {
         console.error(error);
         return res.status(500).json({ mensaje: "Error en el servidor" });
+    }
+};
+
+// Función para actualizar los valores de 'Codigo' y 'Compartir'
+export const updateParkShareCode = async (req, res) => {
+    try {
+        const connection = await connect();
+        await connection.query('UPDATE parqueo SET Codigo = ?, Compartir = ? WHERE idParqueo = ?', [
+            req.body.Codigo,
+            req.body.Compartir,
+            req.params.id
+        ]);
+        res.json({
+            Codigo: req.body.Codigo,
+            Compartir: req.body.Compartir
+        });
+    } catch (error) {
+        console.error('Error updating park share code:', error);
+        res.status(500).json({ error: 'An error occurred while updating the park share code.' });
+    }
+};
+
+
+// Función para actualizar solo el valor de 'Codigo'
+export const updateParkCode = async (req, res) => {
+    try {
+        const connection = await connect();
+        await connection.query('UPDATE parqueo SET Codigo = ? WHERE idParqueo = ?', [
+            req.body.Codigo,
+            req.params.id
+        ]);
+
+        // Devuelve los nuevos valores de 'Codigo'
+        res.json({
+            Codigo: req.body.Codigo
+        });
+    } catch (error) {
+        console.error('Error updating park code:', error);
+        res.status(500).json({ error: 'An error occurred while updating the park code.' });
     }
 };

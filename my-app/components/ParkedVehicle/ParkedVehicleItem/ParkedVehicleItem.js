@@ -1,12 +1,12 @@
 import React, { useState, useContext } from 'react';
 import { View, Text, StyleSheet, Image, Modal, Alert, TouchableOpacity, Button, TextInput } from 'react-native'
-import { parkVehicleDeny, parkVehicleFinish, createReportParkUser } from '../../../api'
+import { parkVehicleDeny, parkVehicleFinish, createReportParkUser, muteParkToUser } from '../../../api'
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { SelectCountry } from 'react-native-element-dropdown';
 
 
 const ParkedVehicleItem = ({ vehicles, onDeleteComplete }) => {
-
+    //console.log(vehicles)
     const local_data = [
         {
             value: 'Informacion incorrecta',
@@ -173,6 +173,53 @@ const ParkedVehicleItem = ({ vehicles, onDeleteComplete }) => {
         }
     };
 
+    const onMuteUserClic = () => {
+        Alert.alert(
+            "Eliminar usuario",
+            "¿Estás seguro de que silenciar este usuario?",
+            [
+                {
+                    text: "No",
+                    style: "cancel"
+                },
+                {
+                    text: "Sí",
+                    onPress: () => {
+                        handleMute().then(() => {
+                            onDeleteComplete();
+                        });
+                    }
+                }
+            ]
+        );
+    };
+
+    const handleMute = async () => {
+        try {
+            const idData = {
+                usuario_idUsuario: vehicles.idUsuario,
+                parqueo_idParqueo: vehicles.Parqueo_idParqueo
+            };
+            console.log(idData);
+            const response = await muteParkToUser(idData);
+            //console.log(response);
+            if (response.mensaje === 'El usuario ha sido silenciado exitosamente.') {
+                Alert.alert('Éxito', 'El usuario ha sido silenciado exitosamente.');
+            } else if (response.mensaje === 'El usuario ha sido silenciado y se ha creado un nuevo registro.') {
+                Alert.alert('Éxito', 'El usuario ha sido silenciado y se ha creado un nuevo registro.');
+            } else if (response.mensaje === 'El usuario ya fue silenciado anteriormente.') {
+                Alert.alert('Error', 'El usuario ya fue silenciado anteriormente.');
+            } else if (response.mensaje === 'No se encontró un parqueo con el código proporcionado o el parqueo no está compartido.') {
+                Alert.alert('Error', 'No se encontró el parqueo con el código proporcionado.');
+            } else {
+                throw new Error('La respuesta de la API no fue exitosa.');
+            }
+        } catch (error) {
+            console.error(error);
+            Alert.alert('Error', 'Ocurrió un error al intentar silenciar al usuario.');
+        }
+    };
+
 
     const renderAdditionalText = () => {
         const numericValue = parseInt(vehicles.idTipo_Vehiculo);
@@ -180,9 +227,6 @@ const ParkedVehicleItem = ({ vehicles, onDeleteComplete }) => {
             case 1:
                 return (
                     <View style={{ padding: 10, marginBottom: 10 }}>
-                        <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
-                            <Ionicons name="close-circle-outline" size={30} color="gray" />
-                        </TouchableOpacity>
                         <Text style={{ fontWeight: 'bold', textAlign: 'center', paddingBottom: 10, fontSize: 20 }}>{veh}</Text>
                         <Text style={{ fontWeight: 'bold' }} >Placa: {vehicles.Placa}</Text>
                         <Text style={{ fontWeight: 'bold' }} >Color: {vehicles.Color}</Text>
@@ -315,6 +359,12 @@ const ParkedVehicleItem = ({ vehicles, onDeleteComplete }) => {
                     >
                         <View style={styles.centeredView}>
                             <View style={styles.modalView}>
+                                <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
+                                    <Ionicons name="close-circle-outline" size={30} color="gray" />
+                                </TouchableOpacity>
+                                <TouchableOpacity style={styles.muteButton} onPress={() => onMuteUserClic()}>
+                                    <Ionicons name="sad-outline" size={30} color="gray" />
+                                </TouchableOpacity>
 
                                 {renderAdditionalText()}
 
@@ -551,8 +601,14 @@ const styles = StyleSheet.create({
     },
     closeButton: {
         position: 'absolute',
-        top: -10,
-        left: 250,
+        top: 20,
+        left: 280,
+        zIndex: 1,
+    },
+    muteButton: {
+        position: 'absolute',
+        top: 20,
+        right: 280,
         zIndex: 1,
     },
     dropdown: {

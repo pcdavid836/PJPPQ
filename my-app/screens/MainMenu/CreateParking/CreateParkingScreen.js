@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react'
-import { StyleSheet, View, Text, Image, TouchableOpacity, FlatList, Modal, TextInput, Button } from 'react-native';
-import { getUserPark } from '../../../api';
+import { StyleSheet, View, Text, Image, TouchableOpacity, FlatList, Modal, TextInput, Button, Alert } from 'react-native';
+import { getUserPark, searchShareCode } from '../../../api';
 import { AuthContext } from '../../../context/AuthContext';
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import MyParkList from '../../../components/MyParkList';
@@ -14,6 +14,10 @@ const CreateParking = () => {
   const hide = () => setVisible(false);
   const [mypark, setMyPark] = useState([]);
   const [inputValue, setInputValue] = useState('');
+  const [searchData, setSearchData] = useState({
+    Codigo: "",
+    usuario_idUsuario: userInfo.idUsuario
+  });
 
   const loadMyPark = async () => {
     const data = await getUserPark(userInfo.idUsuario);
@@ -30,16 +34,45 @@ const CreateParking = () => {
     loadMyPark();
   };
 
-  const handleInputChange = (text) => {
-    // Limita la entrada a 6 caracteres y evita que las letras sean mayúsculas al inicio
-    const formattedText = text.length <= 6 ? text.toLowerCase() : text.slice(0, 6);
-    setInputValue(formattedText);
+
+  const handleInputChange = (value) => {
+    // Actualiza 'Codigo' en 'searchData' y también 'inputValue'
+    setInputValue(value);
+    setSearchData(prevState => ({ ...prevState, Codigo: value }));
   };
 
-  const handleSubmit = () => {
-    // Aquí puedes manejar lo que sucede cuando se presiona el botón "Enviar"
-    console.log('Input Value:', inputValue);
+  const handleSubmit = async () => {
+    // Verifica si 'Codigo' está vacío
+    if (!searchData.Codigo) {
+      // Muestra una alerta si 'Codigo' está vacío
+      Alert.alert('Error', 'Debes ingresar un código.');
+      return;
+    }
+
+    // Llama a la función de la API con 'searchData'
+    try {
+      const response = await searchShareCode(searchData);
+      // Verifica si la respuesta es exitosa
+      console.log(response);
+      if (response.mensaje === 'Registro Actualizado' || response.mensaje === 'Nuevo Registro Creado') {
+        Alert.alert('Éxito', 'El ingreso del código funcionó correctamente. Para hacer uso de las funciones de cuidador, vuelve a iniciar sesión.');
+      } else if (response.mensaje === 'Registro Existente' || response.mensaje === 'El usuario ya se unió a esta ubicación.') {
+        // Muestra una alerta si el usuario ya se registró con ese código
+        Alert.alert('Error', 'Ya te registraste con este codigo.');
+      } else if (response.mensaje === 'Parqueo No Encontrado') {
+        // Muestra una alerta si no se encontró el parqueo
+        Alert.alert('Error', 'No se encontró el parqueo con el código proporcionado.');
+      } else {
+        // Muestra una alerta genérica si ocurre otro error
+        Alert.alert('Error', 'Ocurrió un error al ingresar el código.');
+      }
+    } catch (error) {
+      console.error(error);
+      // Muestra una alerta si ocurre un error en la ejecución del código
+      Alert.alert('Error', 'Ocurrió un error al ingresar el código.');
+    }
   };
+
 
   const CreatePostulation = () => {
     if (mypark.length > 0) {
@@ -166,9 +199,9 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   button: {
-    height: 50, 
+    height: 50,
     width: '50%',
-    backgroundColor: 'gold',
+    backgroundColor: 'brown',
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 5,

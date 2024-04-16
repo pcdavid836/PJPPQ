@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { View, Text, StyleSheet, Image, Modal, Alert, TouchableOpacity, Button, TextInput } from 'react-native'
-import { denyBook, createReportParkUser } from '../../../api'
+import { denyBook, createReportParkUser, muteParkToUser } from '../../../api'
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { SelectCountry } from 'react-native-element-dropdown';
 
@@ -8,6 +8,9 @@ import { SelectCountry } from 'react-native-element-dropdown';
 const BookingItem = ({ book, onDeleteComplete }) => {
   //console.log(book);
   const [image, setImage] = useState(book.Url_imagen_Vehiculo);
+  if (image === 'defaiult') {
+    setImage("https://firebasestorage.googleapis.com/v0/b/pkpq-74307.appspot.com/o/VehicleImages%2Fvehicle_default.jpg?alt=media&token=a9055e84-5ca2-49cc-a4ee-9dab61d076fe");
+  }
   const [modalVisible, setModalVisible] = useState(false);
   const [secondModalVisible, setSecondModalVisible] = useState(false);
 
@@ -108,6 +111,55 @@ const BookingItem = ({ book, onDeleteComplete }) => {
     );
   };
 
+  const onMuteUserClic = () => {
+    Alert.alert(
+      "Eliminar usuario",
+      "¿Estás seguro de que silenciar este usuario?",
+      [
+        {
+          text: "No",
+          style: "cancel"
+        },
+        {
+          text: "Sí",
+          onPress: () => {
+            handleMute().then(() => {
+              onDeleteComplete();
+            });
+          }
+        }
+      ]
+    );
+  };
+
+  const handleMute = async () => {
+    try {
+      const idData = {
+        usuario_idUsuario: book.Usuario_idUsuario,
+        parqueo_idParqueo: book.Parqueo_idParqueo
+      };
+      //console.log(idData);
+      const response = await muteParkToUser(idData);
+      //console.log(response);
+      if (response.mensaje === 'El usuario ha sido silenciado exitosamente.') {
+        Alert.alert('Éxito', 'El usuario ha sido silenciado exitosamente.');
+      } else if (response.mensaje === 'El usuario ha sido silenciado y se ha creado un nuevo registro.') {
+        Alert.alert('Éxito', 'El usuario ha sido silenciado y se ha creado un nuevo registro.');
+      } else if (response.mensaje === 'El usuario ya fue silenciado anteriormente.') {
+        Alert.alert('Error', 'El usuario ya fue silenciado anteriormente.');
+      } else if (response.mensaje === 'No se encontró un parqueo con el código proporcionado o el parqueo no está compartido.') {
+        Alert.alert('Error', 'No se encontró el parqueo con el código proporcionado.');
+      } else {
+        throw new Error('La respuesta de la API no fue exitosa.');
+      }
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Error', 'Ocurrió un error al intentar silenciar al usuario.');
+    }
+  };
+
+
+
   switch (book.Tipo_Vehiculo_id) {
     case 1:
       title = "Automóvil";
@@ -161,6 +213,9 @@ const BookingItem = ({ book, onDeleteComplete }) => {
                 <View style={{ padding: 10, marginBottom: 10 }}>
                   <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
                     <Ionicons name="close-circle-outline" size={30} color="gray" />
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.muteButton} onPress={() => onMuteUserClic()}>
+                    <Ionicons name="sad-outline" size={30} color="gray" />
                   </TouchableOpacity>
                   <Text style={{ fontWeight: 'bold', textAlign: 'center', paddingBottom: 10, fontSize: 20 }}>Automóvil</Text>
                   <Text style={{ fontWeight: 'bold' }} >Placa: {book.Placa}</Text>
@@ -299,6 +354,9 @@ const BookingItem = ({ book, onDeleteComplete }) => {
                   <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
                     <Ionicons name="close-circle-outline" size={30} color="gray" />
                   </TouchableOpacity>
+                  <TouchableOpacity style={styles.muteButton} onPress={() => onMuteUserClic()}>
+                    <Ionicons name="sad-outline" size={30} color="gray" />
+                  </TouchableOpacity>
                   <Text style={{ fontWeight: 'bold', textAlign: 'center', paddingBottom: 10, fontSize: 20 }}>Automóvil</Text>
                   <Text style={{ fontWeight: 'bold' }} >Placa: {book.Placa}</Text>
                   <Text style={{ fontWeight: 'bold' }} >Color: {book.Color}</Text>
@@ -434,6 +492,9 @@ const BookingItem = ({ book, onDeleteComplete }) => {
                 <View style={{ padding: 10, marginBottom: 10 }}>
                   <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
                     <Ionicons name="close-circle-outline" size={30} color="gray" />
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.muteButton} onPress={() => onMuteUserClic()}>
+                    <Ionicons name="sad-outline" size={30} color="gray" />
                   </TouchableOpacity>
                   <Text style={{ fontWeight: 'bold', textAlign: 'center', paddingBottom: 10, fontSize: 20 }}>Automóvil</Text>
                   <Text style={{ fontWeight: 'bold' }} >Placa: {book.Placa}</Text>
@@ -572,6 +633,9 @@ const BookingItem = ({ book, onDeleteComplete }) => {
                   <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
                     <Ionicons name="close-circle-outline" size={30} color="gray" />
                   </TouchableOpacity>
+                  <TouchableOpacity style={styles.muteButton} onPress={() => onMuteUserClic()}>
+                    <Ionicons name="sad-outline" size={30} color="gray" />
+                  </TouchableOpacity>
                   <Text style={{ fontWeight: 'bold', textAlign: 'center', paddingBottom: 10, fontSize: 20 }}>Automóvil</Text>
                   <Text style={{ fontWeight: 'bold' }} >Placa: {book.Placa}</Text>
                   <Text style={{ fontWeight: 'bold' }} >Color: {book.Color}</Text>
@@ -708,6 +772,9 @@ const BookingItem = ({ book, onDeleteComplete }) => {
                 <View style={{ padding: 10, marginBottom: 10 }}>
                   <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
                     <Ionicons name="close-circle-outline" size={30} color="gray" />
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.muteButton} onPress={() => onMuteUserClic()}>
+                    <Ionicons name="sad-outline" size={30} color="gray" />
                   </TouchableOpacity>
                   <Text style={{ fontWeight: 'bold', textAlign: 'center', paddingBottom: 10, fontSize: 20 }}>Automóvil</Text>
                   <Text style={{ fontWeight: 'bold' }} >Placa: {book.Placa}</Text>
@@ -846,6 +913,9 @@ const BookingItem = ({ book, onDeleteComplete }) => {
                   <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
                     <Ionicons name="close-circle-outline" size={30} color="gray" />
                   </TouchableOpacity>
+                  <TouchableOpacity style={styles.muteButton} onPress={() => onMuteUserClic()}>
+                    <Ionicons name="sad-outline" size={30} color="gray" />
+                  </TouchableOpacity>
                   <Text style={{ fontWeight: 'bold', textAlign: 'center', paddingBottom: 10, fontSize: 20 }}>Automóvil</Text>
                   <Text style={{ fontWeight: 'bold' }} >Placa: {book.Placa}</Text>
                   <Text style={{ fontWeight: 'bold' }} >Color: {book.Color}</Text>
@@ -980,6 +1050,9 @@ const BookingItem = ({ book, onDeleteComplete }) => {
                 <View style={{ padding: 10, marginBottom: 10 }}>
                   <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
                     <Ionicons name="close-circle-outline" size={30} color="gray" />
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.muteButton} onPress={() => onMuteUserClic()}>
+                    <Ionicons name="sad-outline" size={30} color="gray" />
                   </TouchableOpacity>
                   <Text style={{ fontWeight: 'bold', textAlign: 'center', paddingBottom: 10, fontSize: 20 }}>Automóvil</Text>
                   <Text style={{ fontWeight: 'bold' }} >Placa: {book.Placa}</Text>
@@ -1275,6 +1348,12 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -10,
     left: 250,
+    zIndex: 1,
+  },
+  muteButton: {
+    position: 'absolute',
+    top: -10,
+    right: 250,
     zIndex: 1,
   },
   dropdown: {

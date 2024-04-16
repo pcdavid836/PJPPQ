@@ -4,7 +4,7 @@ import Logo from '../../assets/images/logoEX.png';
 import CustomInput from '../../components/CustomInput';
 import CustomButton from '../../components/CustomButton';
 import { useNavigation } from '@react-navigation/native';
-import { getUserMail } from '../../api';
+import { getUserMail, getExternalMail, updateExternalReturn } from '../../api';
 import { AuthContext } from '../../context/AuthContext';
 import auth from '@react-native-firebase/auth';
 import { GoogleSignin, GoogleSigninButton } from '@react-native-google-signin/google-signin'
@@ -13,7 +13,19 @@ import CryptoES from 'crypto-es';
 const UserSignIn = () => {
     const { login, updateUserImage } = useContext(AuthContext);
     const [error, setError] = useState();
-    const [userInfo, setUsrInfo] = useState();
+    const [userInfo, setUserInfo] = useState();
+    const [logser, setLogser] = useState({
+        Correo: '',
+        Contrasena: '',
+    });
+
+    const handleChange = (name, value) => setLogser({ ...logser, [name]: value });
+
+    const [logserExt, setLogserExt] = useState({
+        Correo: '',
+    });
+
+    const handleChangeExt = (name, value) => setLogserExt({ ...logserExt, [name]: value });
 
 
     //Llamado de usuarios (prueba)
@@ -32,53 +44,86 @@ const UserSignIn = () => {
         });
     }, []);
 
+    /* EJEMPLO PARA COMPROBAR SI EL PROYECTO ESTA CONECTADO A FIREBASE DE GOOGLE Y QUE DATOS PUEDEN MANIPULARSE
     async function onGoogleButtonPress() {
-        // Check if your device supports Google Play
-        await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
-        // Get the users ID token
-        const { idToken } = await GoogleSignin.signIn();
+        try {
+            // Check if your device supports Google Play
+            await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+            // Get the users ID token
+            const { idToken, user } = await GoogleSignin.signIn();
 
-        console.log(idToken);
-        Alert.alert('Success test');
+            console.log('Nombre: ' + user.givenName);
+            console.log('Apellidos: ' + user.familyName);
+            console.log('Email: ' + user.email);
+            //console.log('Número de teléfono: ' + user.phoneNumber); GOOGLE YA NO DA NUMEROS DE CELULAR
+            Alert.alert('Success test');
 
-        // Create a Google credential with the token
-        const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+            // Create a Google credential with the token
+            const googleCredential = auth.GoogleAuthProvider.credential(idToken);
 
-        // Sign-in the user with the credential
-        return auth().signInWithCredential(googleCredential);
-    }
-    /*
-        const signin = async () => {
-            try {
-                await GoogleSignin.hasPlayServices();
-                const user = await GoogleSignin.signIn();
-                setUsrInfo(user);
-                setError();
-            } catch (e) {
-                setError(e);
-            }
-        };
-    
-        const logout = () => {
-            setUserInfo();
-            GoogleSignin.revokeAccess();
-            GoogleSignin.signOut();
+            // Sign-in the user with the credential
+            return auth().signInWithCredential(googleCredential);
+        } catch (error) {
+            Alert.alert('Inicio de Sesion, Hubo algun problema al iniciar sesion.');
+            console.log(error)
         }
+
+    }
     */
+    const signin = async () => {
+        try {
+            await GoogleSignin.hasPlayServices();
+            const dataown = await GoogleSignin.signIn();
+            setUserInfo(dataown);
 
-    const [logser, setLogser] = useState({
-        Correo: '',
-        Contrasena: '',
-    });
+            logserExt.Correo = dataown.user.email;
 
-    const handleChange = (name, value) => setLogser({ ...logser, [name]: value });
+            const dataAnswer = await getExternalMail(logserExt);
+            console.log(dataAnswer);
+
+            // Verifica si dataAnswer es nulo, un objeto vacío, o contiene el mensaje "Credenciales incorrectas"
+            if (!dataAnswer || Object.keys(dataAnswer).length === 0 || dataAnswer.mensaje === "No se encontró ningún usuario con ese correo electrónico") {
+                navigation.navigate('UserRegisterExternalScreen', { userLogged: dataown.user });
+                logout();
+            }
+            else {
+                if (dataAnswer.Ban === 0) {
+                    if (dataAnswer.Estado === 0) {
+                        updateExternalReturn(dataAnswer.idUsuario);
+                        Alert.alert('Se recupero tu cuenta con exito! intenta iniciar denuevo la sesion.');
+                        logout();
+                    } else {
+                        login(dataAnswer);
+                        updateUserImage(dataAnswer.Url_imagen);
+                        navigation.navigate('HomeScreen');
+                    }
+                }
+                else {
+                    Alert.alert('Error, Su cuenta ha sido baneada permanentemente del servicio!');
+                    return;
+                }
+            }
+
+            setError();
+        } catch (e) {
+            setError(e);
+            Alert.alert('Inicio de Sesion, Hubo algun problema al iniciar sesion.');
+        }
+    };
+
+
+    const logout = () => {
+        setUserInfo();
+        GoogleSignin.revokeAccess();
+        GoogleSignin.signOut();
+    }
 
     const { height } = useWindowDimensions();
 
     const navigation = useNavigation();
 
     const onSignInPressed = async () => {
-    console.log("actual");
+        //console.log("actual");
         if (logser.Correo === '' || logser.Contrasena === '') {
             ToastAndroid.show('Debes llenar los datos requeridos!', ToastAndroid.SHORT);
             return;
@@ -96,6 +141,11 @@ const UserSignIn = () => {
         //Realzar busqueda API y obtener correo electronico y Contrasena.
         const user = await getUserMail(logser);
 
+        if (user.Correo_Externo === 1) {
+            ToastAndroid.show('Esa cuenta ya esta registrada desde un correo electronico!', ToastAndroid.SHORT);
+            return;
+        }
+
         //console.log(user);
         const email = user.Correo;
         const mainpassword = user.Contrasena;
@@ -108,6 +158,8 @@ const UserSignIn = () => {
 
         //console.log(mainpassword); ver Contrasena despues del proceso
 
+
+        //SE OBTIENE MEDIANTE getUserMail LOS DATOS DE UN USUARIO Y SE COMPRUEBA SI EL PASSWORD Y EL CORREO CONCUERDAN PARA LUEGO CREAR UN TOKEN
         if (email === correo && mainpassword === hashString) {
             // Navigate to the HomeScreen
             login(user);
@@ -182,25 +234,26 @@ const UserSignIn = () => {
                     onPress={onSignUpPress}
                     type="TERTIARY"
                 />
+                {/*<Button title="Logout" onPress={logout} />*/}
+
+                {/*
                 <Button
                     title="Google Sign-In"
                     onPress={() => onGoogleButtonPress().then(() => console.log('Signed in with Google!'))}
                 />
-                {/*
+                */
+                }
+                {
                     <View style={styles.container}>
-                        <Text>{JSON.stringify(error)}</Text>
-                        {userInfo && <Text>{JSON.stringify(userInfo.user)}</Text>}
-                        {userInfo ? (
-                            <Button title="Logout" onPress={logout} />
-                        ) : (
-                            <GoogleSigninButton
-                                size={GoogleSigninButton.Size.Standard}
-                                color={GoogleSigninButton.Color.Dark}
-                                onPress={signin}
-                            />
-                        )}
+                        <GoogleSigninButton
+                            size={GoogleSigninButton.Size.Wide}
+                            color={GoogleSigninButton.Color.Dark}
+                            onPress={signin}
+                            style={{ width: '100%', height: 50 }} // Ajusta el tamaño aquí
+                        />
                     </View>
-                */}
+
+                }
             </View>
         </ScrollView>
     );

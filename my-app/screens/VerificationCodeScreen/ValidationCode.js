@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
-import { saveUser } from '../../api';
+import { saveUser, sendVerificationSMS } from '../../api';
 import { useNavigation } from '@react-navigation/native';
 
 const ValidationCode = ({ route }) => {
 
     const navigation = useNavigation();
     const { user } = route.params;
-    const { verificationCode } = route.params;
+    const [verificationCode, setVerificationCode] = useState(route.params.verificationCode);
+    const [userPhone, setUserPhone] = useState({
+        phoneNumber: '',
+    });
 
     //console.log(user);
     console.log(verificationCode);
@@ -25,6 +28,14 @@ const ValidationCode = ({ route }) => {
         alert('¡Registro exitoso!');
     };
 
+    const resendSMS = async () => {
+        userPhone.phoneNumber = user.Celular;
+        const verificationCode2 = await sendVerificationSMS(userPhone);
+        setVerificationCode(verificationCode2);
+        console.log(verificationCode2);
+    };
+
+
 
     return (
         <View style={styles.container}>
@@ -39,6 +50,13 @@ const ValidationCode = ({ route }) => {
                 onPress={handleSubmit}
             >
                 <Text style={styles.buttonText}>Enviar</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+                onPress={() => {
+                    resendSMS();
+                }}
+            >
+                <Text style={styles.resendText}>Re-enviar código</Text>
             </TouchableOpacity>
         </View>
     );
@@ -73,6 +91,13 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 16,
         fontWeight: 'bold',
+    },
+    resendText: {
+        color: 'darkgray',
+        fontSize: 18,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        marginTop: 20,
     },
 });
 

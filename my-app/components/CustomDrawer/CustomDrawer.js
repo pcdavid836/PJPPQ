@@ -3,13 +3,20 @@ import { View, Text, ImageBackground, Image, TouchableOpacity } from 'react-nati
 import { DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer'
 import { AuthContext } from '../../context/AuthContext';
 import Ionicons from 'react-native-vector-icons/Ionicons'
+import auth from '@react-native-firebase/auth';
+import { GoogleSignin } from '@react-native-google-signin/google-signin'
 
 
 const CustomDrawer = (props) => {
     const { logout, userInfo, userImage, updateUserImage } = useContext(AuthContext);
     //console.log('primero:', userInfo)
 
-    
+    const logoutGoogle = () => {
+        GoogleSignin.revokeAccess();
+        GoogleSignin.signOut();
+    }
+
+
     const [actualCustomImage, setActualCustomImage] = useState({
         Url_imagen: userInfo.Url_imagen,
     });
@@ -18,17 +25,17 @@ const CustomDrawer = (props) => {
     //console.log("Imagen actual " + actualCustomImage.Url_imagen);
     //console.log("Imagen actual userImage " + userImage);
 
-    useEffect(() => { 
+    useEffect(() => {
         if (actualCustomImage.Url_imagen === "default") {
             actualCustomImage.Url_imagen = 'https://firebasestorage.googleapis.com/v0/b/pkpq-74307.appspot.com/o/ProfileImages%2Fuser_default.png?alt=media&token=d6b24730-d87d-4be5-9275-df4a44f5c323';
             updateUserImage(actualCustomImage.Url_imagen); // Llama a la función para actualizar userImage en el contexto
         }
-        
+
         // Actualiza la imagen cuando cambie userImage
         setActualCustomImage({ Url_imagen: userImage });
     }, [userImage]);
 
-    
+
 
     const nombre = userInfo.Nombres.split(" ")[0];
 
@@ -90,7 +97,13 @@ const CustomDrawer = (props) => {
             </DrawerContentScrollView>
 
             <View style={{ padding: 20, borderTopWidth: 1, borderTopColor: '#ccc' }}>
-                <TouchableOpacity onPress={() => { logout() }} style={{ paddingVertical: 15 }}>
+                <TouchableOpacity
+                    onPress={() => {
+                        logout();
+                        logoutGoogle();
+                    }}
+                    style={{ paddingVertical: 15 }}
+                >
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <Ionicons name="exit-outline" size={22} />
                         <Text style={{
@@ -100,7 +113,6 @@ const CustomDrawer = (props) => {
                             Cerrar Sesión
                         </Text>
                     </View>
-
                 </TouchableOpacity>
             </View>
         </View>

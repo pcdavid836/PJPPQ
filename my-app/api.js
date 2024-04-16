@@ -35,11 +35,19 @@ const APIBookingParkFilter = `${API_BASE}/bookfilterpark`;
 const APIParkVehicleFilter = `${API_BASE}/parkvehiclefilter`;
 const APIParkReportUser = `${API_BASE}/reporttouser`;
 const APIUserReportPark = `${API_BASE}/reporttopark`;
+const APIMailExt = `${API_BASE}/usermailext`;
+const APIMailExtReturn = `${API_BASE}/userextreturn`;
+const APIParkSaveCode = `${API_BASE}/parkmodcode`;
+const APIParkUpdateCode = `${API_BASE}/parkrefreshcode`;
+const APISidekick = `${API_BASE}/sidekick`;
+const APISidekickRemove = `${API_BASE}/removesidekick`;
+const APIMute = `${API_BASE}/mute`;
+const APIUnMute = `${API_BASE}/undomute`;
 
 
 
-
-//Nota la ip local siempre varia en todas las redes ver la ipconfig en cmd.
+//Nota la ip local siempre varia en todas las redes. Se recomienda ver la ipconfig en cmd.
+//Nota 2 separar las api en varios archivos a futuro...
 
 export const saveUser = async (newUser) => {
   const res = await fetch(APIUser, {
@@ -392,7 +400,7 @@ export const parkVehicleFinish = async (idBook) => {
   return res;
 };
 
-export const parkVehicleDeny = async (idParqueo_Vehiculo, idBook ) => {
+export const parkVehicleDeny = async (idParqueo_Vehiculo, idBook) => {
   //console.log(idBook, idParqueo_Vehiculo)
   const res = await fetch(`${APIParkVehicleDeny}`, {
     method: "PUT",
@@ -506,4 +514,106 @@ export const createReportUserPark = async (getPetition) => {
   return await res.json();
 };
 
+export const getExternalMail = async (extEmail) => {
+  //console.log(JSON.stringify(extEmail));
+  const res = await fetch(APIMailExt, {
+    method: "POST",
+    headers: { Accept: "application/json", "Content-Type": "application/json" },
+    body: JSON.stringify(extEmail)
+  });
+  return await res.json();
+};
 
+export const updateExternalReturn = async (idUser) => {
+  const res = await fetch(`${APIMailExtReturn}/${idUser}`, {
+    method: "PUT",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+  });
+  return res;
+};
+
+
+export const saveShareCode = async (idPark, newData) => {
+  //console.log(idPark, newData)
+  const res = await fetch(`${APIParkSaveCode}/${idPark}`, {
+    method: "PUT",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(newData),
+  });
+  return res;
+};
+
+export const generateNewCode = async (idPark, newData) => {
+  //console.log(idPark, newData)
+  const res = await fetch(`${APIParkUpdateCode}/${idPark}`, {
+    method: "PUT",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(newData),
+  });
+  return res;
+};
+
+export const getSideKickByPark = async (idPark) => {
+  const res = await fetch(`${APISidekick}/${idPark}`, {
+    method: "GET",
+  });
+
+  return await res.json();
+};
+
+export const searchShareCode = async (searchData) => {
+  //console.log(JSON.stringify(searchData));
+  const res = await fetch(APISidekick, {
+    method: "POST",
+    headers: { Accept: "application/json", "Content-Type": "application/json" },
+    body: JSON.stringify(searchData)
+  });
+  return await res.json();
+};
+
+
+export const deleteSidekick = async (idData) => {
+  const res = await fetch(APISidekickRemove, {
+    method: "POST",
+    headers: { Accept: "application/json", "Content-Type": "application/json" },
+    body: JSON.stringify(idData)
+  });
+  return await res.json();
+};
+
+export const muteParkToUser = async (connectedIds) => {
+  //console.log(JSON.stringify(connectedIds));
+  const res = await fetch(APIMute, {
+    method: "POST",
+    headers: { Accept: "application/json", "Content-Type": "application/json" },
+    body: JSON.stringify(connectedIds)
+  });
+  return await res.json();
+};
+
+export const getMutedByPark = async (idPark) => {
+  const res = await fetch(`${APIMute}/${idPark}`, {
+    method: "GET",
+  });
+
+  return await res.json();
+};
+
+export const unMuteUser = async (connectedIds) => {
+  //console.log(JSON.stringify(connectedIds));
+  const res = await fetch(APIUnMute, {
+    method: "POST",
+    headers: { Accept: "application/json", "Content-Type": "application/json" },
+    body: JSON.stringify(connectedIds)
+  });
+  return await res.json();
+};

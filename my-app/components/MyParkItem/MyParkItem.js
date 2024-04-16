@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Image, Modal, Alert } from 'react-native'
-import MapView, { Marker } from 'react-native-maps'
+import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
 import ModifyPostulation from '../../screens/MainMenu/MyPostulationForms/ModifyPostulation';
-import  {deletePark}  from '../../api';
+import { deletePark } from '../../api';
 
 const MyParkItem = ({ mypark, onModifyComplete, onDeleteComplete }) => {
   const [visible, setVisible] = useState(false);
@@ -48,6 +48,7 @@ const MyParkItem = ({ mypark, onModifyComplete, onDeleteComplete }) => {
     <View style={styles.container}>
       <View style={styles.vehicleCard}>
         <MapView
+          provider={PROVIDER_GOOGLE}
           style={styles.vehicleImage}
           initialRegion={{
             latitude: origin.latitude,
@@ -79,8 +80,8 @@ const MyParkItem = ({ mypark, onModifyComplete, onDeleteComplete }) => {
       </View>
       <Modal visible={visible} animationType='slide' onRequestClose={hide}>
         <ModifyPostulation closeModal={hide} myparkId={mypark.idParqueo} onComplete={(modifiedPost) => {
-                  onModifyComplete(modifiedPost);
-                }}/>
+          onModifyComplete(modifiedPost);
+        }} />
       </Modal>
     </View>
   )

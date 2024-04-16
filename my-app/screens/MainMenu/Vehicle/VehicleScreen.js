@@ -13,9 +13,6 @@ const VehicleScreen = () => {
   const [visible, setVisible] = useState(false);
   const show = () => setVisible(true);
   const hide = () => setVisible(false);
-  const reload = () => loadCars();
-
-
 
   const loadCars = async () => {
     const data = await getCars(userInfo.idUsuario);
@@ -58,7 +55,7 @@ const VehicleScreen = () => {
         </Modal>
       </View>
       <View style={styles.cardList}>
-        <CarsList cars={cars} onModifyComplete={handleModifyComplete} onDeleteComplete={loadCars} />
+        <CarsList cars={cars} idUser={userInfo.idUsuario} onModifyComplete={handleModifyComplete} onDeleteComplete={loadCars} />
       </View>
     </View>
   );

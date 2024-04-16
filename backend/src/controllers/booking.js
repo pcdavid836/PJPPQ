@@ -4,9 +4,28 @@ export const createBook = async (req, res) => {
     try {
         const connection = await connect();
 
+        // Comprobar si existe un registro en 'silenciado' con Estado = 1
+        const [silenciado] = await connection.execute("SELECT * FROM silenciado WHERE Parqueo_idParqueo = ? AND Usuario_idUsuario = ? AND Estado = 1", [
+            req.body.Parqueo_idParqueo,
+            req.body.Usuario_idUsuario
+        ]);
+
+        if (silenciado.length > 0) {
+            return res.status(400).json({ error: "No se puede realizar la reserva debido a restricciones." });
+        }
+
+        // Comprobar si existe una reserva activa en el mismo parqueo
+        const [reserva] = await connection.execute("SELECT * FROM reserva WHERE Parqueo_idParqueo = ? AND Estado = 1", [
+            req.body.Parqueo_idParqueo
+        ]);
+
+        if (reserva.length > 0) {
+            return res.status(400).json({ error: "No se puede realizar la reserva porque ya existe una reserva activa en este parqueo." });
+        }
+
+        // Si no hay restricciones, proceder con la inserción de la reserva
         const insertReservaQuery = "INSERT INTO reserva (Parqueo_idParqueo, Usuario_idUsuario, Estado, Fecha_Creacion, Fecha_Reserva, Hora_Reserva_Inicio, Hora_Reserva_Fin, Rechazado, Cancelado, vehiculo_idVehiculo, Realizado) VALUES (?, ?, 1, CURRENT_TIMESTAMP, ?, ?, ?, 0, 0, ?, 0)";
 
-        // Insertar el registro en la tabla 'reserva'
         const [resultsReserva] = await connection.execute(insertReservaQuery, [
             req.body.Parqueo_idParqueo,
             req.body.Usuario_idUsuario,
@@ -16,17 +35,14 @@ export const createBook = async (req, res) => {
             req.body.vehiculo_idVehiculo
         ]);
 
-        const newReservaId = resultsReserva.insertId; // Obtener la nueva ID de 'reserva'
-
-        // Continuar con la inserción en la tabla 'parqueo_vehiculo'
+        const newReservaId = resultsReserva.insertId;
 
         const insertParqueoVehiculoQuery = "INSERT INTO parqueo_vehiculo (Parqueo_idParqueo, ConfirmacionEntrada, Estado, Fecha_Creacion, Hora_Ingreso, Hora_Salida, Url_imagen_ingreso, vehiculo_idVehiculo, ConfirmacionSalida, Cancelado, reserva_idReserva) VALUES (?, 0, 1, CURRENT_TIMESTAMP, NULL, NULL, 'defaultVehicle', ?, 0, 0, ?)";
 
-        // Insertar el registro en la tabla 'parqueo_vehiculo'
         const [resultsParqueoVehiculo] = await connection.execute(insertParqueoVehiculoQuery, [
             req.body.Parqueo_idParqueo,
             req.body.vehiculo_idVehiculo,
-            newReservaId // Utiliza la nueva ID de 'reserva' como reserva_idReserva
+            newReservaId
         ]);
 
         const newReserva = {

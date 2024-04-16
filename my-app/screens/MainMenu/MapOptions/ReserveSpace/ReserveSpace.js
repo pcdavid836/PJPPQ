@@ -201,16 +201,27 @@ const ReserveSpace = ({ parkId, parktimer, closeModal, onBookingComplete }) => {
         booking.vehiculo_idVehiculo = value;
 
         // Verifica que ninguno de los valores en 'booking' sea nulo
-        if (Object.values(booking).every(value => value !== null)) {
-            createBooking(booking);
-            closeModal();
-            onBookingComplete();
-            Alert.alert('Éxito', 'La reserva fue realizada con éxito. Puedes comprobarlo en la vista de reservas.');
-        } else {
-            // Muestra una alerta al usuario con un título personalizado, mostrar alertas faltantes en caso de seleccionar tiempos excedidos y demas
+        if (!Object.values(booking).every(value => value !== null)) {
             Alert.alert('Error', 'Por favor, selecciona un vehículo.');
+            return;
+        }
+
+        try {
+            const response = await createBooking(booking);
+            if (response.error) {
+                // Muestra un mensaje de error personalizado basado en el error devuelto por la API
+                Alert.alert('Error', response.error);
+            } else {
+                closeModal();
+                onBookingComplete();
+                Alert.alert('Éxito', 'La reserva fue realizada con éxito. Puedes comprobarlo en la vista de reservas.');
+            }
+        } catch (error) {
+            // Muestra un mensaje de error genérico si ocurre un error inesperado
+            Alert.alert('Error', 'Ocurrió un error al realizar la reserva. Por favor, inténtalo de nuevo.');
         }
     }
+
 
     return (
         <View>

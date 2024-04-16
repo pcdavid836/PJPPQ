@@ -8,11 +8,11 @@ textflow.useKey("LBwi4AkaJN4GbT1Bc7wHD9mlTPmHNrwSf0wxISgIOcIg22AETl7vxJAXPvtY9V0
 const nodemailer = require('nodemailer');
 
 let transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: 'crisisxd9@gmail.com',
-    pass: 'wern djlb gyte hcxq'
-  }
+    service: 'gmail',
+    auth: {
+        user: 'crisisxd9@gmail.com',
+        pass: 'wern djlb gyte hcxq'
+    }
 });
 
 
@@ -33,7 +33,7 @@ export const getUserid = async (req, res) => {
 export const getUserMail = async (req, res) => {
     try {
         const connection = await connect();
-        const [rows] = await connection.execute("SELECT * FROM Usuario WHERE Correo = ? AND Contrasena = ? AND Estado = 1;", [
+        const [rows] = await connection.execute("SELECT * FROM Usuario WHERE Correo = ? AND Contrasena = ? AND Estado = 1 AND Ban = 0;", [
             req.body.Correo,
             req.body.Contrasena
         ]);
@@ -51,6 +51,7 @@ export const getUserMail = async (req, res) => {
                 Celular: user.Celular,
                 Url_imagen: user.Url_imagen,
                 idRol: user.Tipo_Usuario_idTipo_Usuario,
+                Correo_Externo: user.Correo_Externo, // Añade la nueva columna aquí
             };
 
             res.json(userInfo);
@@ -62,6 +63,7 @@ export const getUserMail = async (req, res) => {
         res.status(500).json({ mensaje: "Error en el servidor" });
     }
 };
+
 
 export const getUserMailExistence = async (req, res) => {
     try {
@@ -98,14 +100,16 @@ export const sendVerificationSMS = async (req, res) => {
 export const createUser = async (req, res) => {
     try {
         const connection = await connect();
-        const [results] = await connection.execute("INSERT INTO Usuario (Correo, Nombres, Primer_Apellido, Segundo_Apellido, Celular, CI, Contrasena, Estado, FechaCreacion, Tipo_Usuario_idTipo_Usuario, Codigo) VALUES (?, ?, ?, ?, ?, ?, ?, 1, CURRENT_TIMESTAMP, 1, 281201)", [
+        const [results] = await connection.execute("INSERT INTO Usuario (Correo, Nombres, Primer_Apellido, Segundo_Apellido, Celular, CI, Contrasena, Estado, FechaCreacion, Tipo_Usuario_idTipo_Usuario, Codigo, Correo_Externo, Url_Imagen) VALUES (?, ?, ?, ?, ?, ?, ?, 1, CURRENT_TIMESTAMP, 1, 281201, ?, ?)", [
             req.body.Correo,
             req.body.Nombres,
             req.body.Primer_Apellido,
             req.body.Segundo_Apellido,
             req.body.Celular,
             req.body.CI,
-            req.body.Contrasena
+            req.body.Contrasena,
+            req.body.Correo_Externo, // Añade el valor de Correo_Externo aquí
+            req.body.Url_imagen,
         ]);
 
         const newUser = {
@@ -117,6 +121,7 @@ export const createUser = async (req, res) => {
         console.error(error);
     }
 };
+
 
 export const deleteUser = async (req, res) => {
     const connection = await connect();
@@ -151,10 +156,10 @@ export const updateImageUser = async (req, res) => {
 export const sendVerificationEmail = async (req, res) => {
     try {
         const connection = await connect();
-        const [rows] = await connection.execute("SELECT * FROM Usuario WHERE Correo = ? AND Estado = 1 AND Ban = 0;", [
+        const [rows] = await connection.execute("SELECT * FROM Usuario WHERE Correo = ? AND Estado = 0 AND Ban = 0 AND Correo_Externo = 0;", [
             req.body.Correo
         ]);
-        
+
         if (rows.length > 0) {
             const user = rows[0];
             const verificationCode = crypto.randomBytes(3).toString('hex'); // Genera un código de 6 dígitos
@@ -173,7 +178,7 @@ export const sendVerificationEmail = async (req, res) => {
                 text: `Tu código de verificación es: ${verificationCode}`
             };
 
-            transporter.sendMail(mailOptions, function(error, info){
+            transporter.sendMail(mailOptions, function (error, info) {
                 if (error) {
                     console.log(error);
                     res.status(500).json({ mensaje: "Error al enviar el correo de verificación" });
@@ -224,4 +229,45 @@ export const updatePassword = async (req, res) => {
         console.error(error);
         res.status(500).json({ mensaje: "Error en el servidor" });
     }
+};
+
+export const getExternalMail = async (req, res) => {
+    try {
+        const connection = await connect();
+        const [rows] = await connection.execute("SELECT * FROM Usuario WHERE Correo = ?;", [
+            req.body.Correo
+        ]);
+        if (rows.length === 1) {
+            const user = rows[0];
+            const userInfo = {
+                idUsuario: user.idUsuario,
+                Correo: user.Correo,
+                Contrasena: user.Contrasena,
+                Nombres: user.Nombres,
+                Primer_Apellido: user.Primer_Apellido,
+                Segundo_Apellido: user.Segundo_Apellido,
+                CI: user.CI,
+                Celular: user.Celular,
+                Url_imagen: user.Url_imagen,
+                idRol: user.Tipo_Usuario_idTipo_Usuario,
+                Correo_Externo: user.Correo_Externo,
+                Estado: user.Estado,
+                Ban: user.Ban,
+            };
+            res.json(userInfo);
+        } else {
+            res.status(404).json({ mensaje: "No se encontró ningún usuario con ese correo electrónico" });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ mensaje: "Error en el servidor" });
+    }
+};
+
+export const updateEstate4Back = async (req, res) => {
+    const connection = await connect();
+    await connection.query('UPDATE Usuario SET Estado = 1, FechaActualizacion = CURRENT_TIMESTAMP, Correo_Externo = 1 WHERE idUsuario = ?', [
+        req.params.id
+    ]);
+    res.sendStatus(204);
 };

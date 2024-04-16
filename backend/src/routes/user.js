@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createUser, getUser, updateUser, deleteUser, getUserid, getUserMail, updateImageUser, getUserMailExistence, sendVerificationSMS, sendVerificationEmail, updatePassword } from '../controllers/user'
+import { createUser, getUser, updateUser, deleteUser, getUserid, getUserMail, updateImageUser, getUserMailExistence, sendVerificationSMS, sendVerificationEmail, updatePassword, getExternalMail, updateEstate4Back } from '../controllers/user'
 
 //Se recomienda ver siempre el archivo de notas
 
@@ -111,5 +111,23 @@ router.post('/passwordsearchrecover', sendVerificationEmail)
  *    tags: [User]
  */
 router.put('/updatepassword', updatePassword)
+
+/**
+ * @swagger
+ * /usermailext:
+ *  post:
+ *    summary: Obtiene a un usuario por su correo para ver la existencia de este en dominios externos como google o facebook
+ *    tags: [User]
+ */
+router.post('/usermailext', getExternalMail)
+
+/**
+ * @swagger
+ * /userexternal/{id}:
+ *  put:
+ *    summary: Recupera la cuenta de un usuario en caso de que esta haya sido borrada (Caso especifico de cuentas externas).
+ *    tags: [User]
+ */
+router.put('/userextreturn/:id', updateEstate4Back)
 
 export default router;

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getPark, getMyPark, createPark, getParkid, updatePostPark, getPostPark, deletePark, getMyAprobedPark, updatePark, getParkFilters } from '../controllers/park'
+import { getPark, getMyPark, createPark, getParkid, updatePostPark, getPostPark, deletePark, getMyAprobedPark, updatePark, getParkFilters, updateParkShareCode, updateParkCode} from '../controllers/park'
 
 const router = Router();
 
@@ -49,7 +49,7 @@ router.get('/park/:id', getParkid)
 
 /**
  * @swagger
- * /mypost:
+ * /mypost/:id:
  *  put:
  *    summary: Modifica a un parqueo por su id pero solo a los que estan en la opcion de postulaciones.
  *    tags: [Parking]
@@ -58,7 +58,7 @@ router.put('/mypost/:id', updatePostPark)
 
 /**
  * @swagger
- * /mypost:
+ * /park/:id:
  *  put:
  *    summary: Modifica a los valores basicos de un parqueo aprobado mediante su id.
  *    tags: [Parking]
@@ -77,7 +77,7 @@ router.post('/mypost', getPostPark)
 
 /**
  * @swagger
- * /user:
+ * /deletepark/:id:
  *  put:
  *    summary: Elimina a un parqueo por su id
  *    tags: [Parking]
@@ -101,6 +101,24 @@ router.get('/myparkaprobed/:id', getMyAprobedPark)
  *    tags: [Parking]
  */
 router.post('/searchfilterparks', getParkFilters)
+
+/**
+ * @swagger
+ * parkmodcode/:id:
+ *  put:
+ *    summary: Permite modificar los valores de Codigo y Compartir de un parqueo.
+ *    tags: [Parking]
+ */
+router.put('/parkmodcode/:id', updateParkShareCode)
+
+/**
+ * @swagger
+ * /parkrefreshcode/:id:
+ *  put:
+ *    summary: Permite modificar el Codigo de compartir de un usuario.
+ *    tags: [Parking]
+ */
+router.put('/parkrefreshcode/:id', updateParkCode)
 
 
 

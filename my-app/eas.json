@@ -10,7 +10,16 @@
     "preview": {
       "distribution": "internal"
     },
-    "production": {}
+    "production": {
+      "env": {
+        "GOOGLE_MAPS_KEY": "AIzaSyC1r-xowRz8F3Ow1PEN36V8ESFaLpYhQtE"
+      }
+    },
+    "test": {
+      "env": {
+        "GOOGLE_MAPS_KEY": "AIzaSyC1r-xowRz8F3Ow1PEN36V8ESFaLpYhQtE"
+      }
+    }
   },
   "submit": {
     "production": {}

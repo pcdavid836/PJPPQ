@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useState } from 'react';
 import * as Location from 'expo-location';
-import MapView from 'react-native-maps'
+import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, Alert } from 'react-native'
 import { SearchBar } from 'react-native-elements';
 import { getParks, getParksByFilter } from '../../../api';
@@ -239,6 +239,7 @@ const MapScreen = ({ navigation }) => {
         value={search}
       />
       <MapView
+        provider={PROVIDER_GOOGLE}
         ref={mapViewRef}
         style={styles.map}
         initialRegion={{

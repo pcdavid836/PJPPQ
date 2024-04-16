@@ -1,20 +1,23 @@
 import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
-import { View, Text, StyleSheet, ScrollView, ToastAndroid, TextInput, Alert } from 'react-native';
-import CustomButton from '../../components/CustomButton';
-import { sendVerificationSMS, getUserExistenceByEmail } from '../../api';
-import CryptoES from 'crypto-es';
+import { View, Text, StyleSheet, ScrollView, ToastAndroid, TextInput, Alert, TouchableOpacity } from 'react-native';
 import { SelectCountry } from 'react-native-element-dropdown';
 import PhoneInput from "react-native-phone-number-input";
+import CryptoES from 'crypto-es';
+import { sendVerificationSMS, getUserExistenceByEmail } from '../../api';
+
+const UserRegisterExternal = ({ route }) => {
+
+    const { userLogged } = route.params;
+    const hash = CryptoES.SHA256(userLogged.email); //TENER EN CUENTA QUE LA CONTRASEñA NO SE USA EN ESTE CASO
 
 
-const UserRegister = () => {
+    console.log(userLogged);
 
     const [country, setCountry] = useState('');
     const phoneInput = React.useRef(null);
     const [countryCode, setCountryCode] = useState('');
-    const [phoneNumber, setPhoneNumber] = useState('');
-    const [originalCI, setOriginalCI] = useState('');
+
 
     const local_data = [
         {
@@ -91,26 +94,22 @@ const UserRegister = () => {
 
     const navigation = useNavigation();
     const [user, setUser] = useState({
-        Correo: '',
-        Nombres: '',
-        Primer_Apellido: '',
+        Correo: userLogged.email,
+        Nombres: userLogged.name,
+        Primer_Apellido: userLogged.familyName,
         Segundo_Apellido: '',
         Celular: '',
         CI: '',
-        Contrasena: '',
-        Url_imagen: 'default',
-        Correo_Externo: 0,
+        Contrasena: hash.toString(), //INGRESAR ALGUN DATO ENCRIPTADO
+        Url_imagen: userLogged.photo,
+        Correo_Externo: 1,
     });
 
-    //CONTROLES DE VALIDACION
-    let phoneNumbeh = user.Celular;
-
-
-    //ALMACENAR Y ENVIAR SMS
+    const [phoneNumber, setPhoneNumber] = useState('');
+    const [originalCI, setOriginalCI] = useState('');
     const [userPhone, setUserPhone] = useState({
         phoneNumber: '',
     });
-
 
     const handleChange = (name, value) => {
         setUser({ ...user, [name]: value });
@@ -119,23 +118,10 @@ const UserRegister = () => {
         }
     };
 
-
     const onTermsOfUsePressed = () => {
         console.log('DOCUMENTO');
         console.log(user.Celular);
     };
-
-
-    const validateEmail = (email) => {
-        const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        return re.test(String(email).toLowerCase());
-    }
-
-    const validatePassword = (password) => {
-        // Debe tener al menos 6 caracteres
-        return password.length >= 6;
-    }
-
 
     const onHandleSubmit = async () => {
         const callingCode = phoneInput.current.getCallingCode();
@@ -161,20 +147,9 @@ const UserRegister = () => {
         user.CI = originalCI + country;  // Ahora añade country
 
         //console.log(user.CI);
-
         const { Correo, Nombres, Primer_Apellido, Segundo_Apellido, Celular, CI, Contrasena } = user;
         if (!Correo || !Nombres || !Primer_Apellido || !Segundo_Apellido || !Celular || !CI || !Contrasena) {
             Alert.alert('Por favor', 'Llena todos los datos');
-            return;
-        }
-
-        if (!validateEmail(Correo)) {
-            Alert.alert('Error', 'Por favor, introduce un correo electrónico válido');
-            return;
-        }
-
-        if (!validatePassword(Contrasena)) {
-            Alert.alert('Error', 'La contraseña debe tener al menos 6 caracteres, incluyendo al menos una letra mayúscula, un número o símbolo');
             return;
         }
 
@@ -184,9 +159,10 @@ const UserRegister = () => {
             return;
         }
 
+
         // Comprobar la existencia del correo electrónico
         const emailExistence = await getUserExistenceByEmail({
-            Correo: Correo.toLowerCase(),
+            Correo: userLogged.email,
             Celular: user.Celular
         });
 
@@ -195,23 +171,12 @@ const UserRegister = () => {
             return;
         }
 
-        const password = user.Contrasena;
-        const password2 = user.Contrasena2;
-        if (password !== password2) {
-            ToastAndroid.show('Las Contraseñas no coinciden!', ToastAndroid.SHORT);
-            return;
-        }
         else {
             //console.log(user);
-            const hash = CryptoES.SHA256(password);
-
-            user.Contrasena = hash.toString();
-
-            user.Celular = completePhoneNumber;
 
             //console.log(hash.toString());
 
-            //saveUser(user)
+            //saveUser(user)/*
             userPhone.phoneNumber = completePhoneNumber; // Usa la nueva variable aquí
             const verificationCode = await sendVerificationSMS(userPhone);
             navigation.navigate('VerificationCodeScreen', { user: user, verificationCode: verificationCode });
@@ -220,19 +185,23 @@ const UserRegister = () => {
 
 
 
+
+
     return (
         <ScrollView showsHorizontalScrollIndicator={false}>
             <View style={styles.root}>
-                <Text style={styles.title}>Crear una Cuenta</Text>
+                <Text style={styles.title}>Datos Adicionales</Text>
                 <TextInput
                     placeholder="Nombre o Nombres"
                     onChangeText={(text) => handleChange('Nombres', text)}
+                    defaultValue={userLogged.name}
                     style={styles.container}
                     maxLength={45}
                 />
                 <TextInput
                     placeholder="Apellido"
                     onChangeText={(text) => handleChange('Primer_Apellido', text)}
+                    defaultValue={userLogged.familyName}
                     style={styles.container}
                     maxLength={45}
                 />
@@ -246,7 +215,7 @@ const UserRegister = () => {
                     placeholder="Correo Electronico"
                     keyboardType="email-address"
                     autoCapitalize="none"
-                    onChangeText={(text) => handleChange('Correo', text)}
+                    value={userLogged.email}
                     style={styles.container}
                     maxLength={45}
                 />
@@ -290,27 +259,13 @@ const UserRegister = () => {
                         }}
                     />
                 </View>
-                <TextInput
-                    placeholder="Contraseña"
-                    secureTextEntry
-                    onChangeText={(text) => handleChange('Contrasena', text)}
-                    style={styles.container}
-                    maxLength={45}
-                    autoCapitalize="none"
-                />
-                <TextInput
-                    placeholder="Repite la Contraseña"
-                    secureTextEntry
-                    onChangeText={(text) => handleChange('Contrasena2', text)}
-                    style={styles.container}
-                    maxLength={45}
-                    autoCapitalize="none"
-                />
                 <View style={{ paddingTop: 20, width: '100%' }}>
-                    <CustomButton
-                        text="Registrarse"
+                    <TouchableOpacity
+                        style={styles.button}
                         onPress={onHandleSubmit}
-                    />
+                    >
+                        <Text style={styles.buttonText}>Terminar registro</Text>
+                    </TouchableOpacity>
                 </View>
                 <Text style={styles.text}>
                     Al momento de registrarte estas confirmando aceptar los
@@ -320,8 +275,9 @@ const UserRegister = () => {
 
             </View>
         </ScrollView>
-    );
-};
+    )
+}
+
 
 const styles = StyleSheet.create({
     root: {
@@ -397,6 +353,18 @@ const styles = StyleSheet.create({
     input20: {
         width: '40%',
     },
+    button: {
+        backgroundColor: '#007bff',
+        width: '100%',
+        paddingVertical: 12,
+        alignItems: 'center',
+        borderRadius: 5,
+    },
+    buttonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
 });
 
-export default UserRegister;
+export default UserRegisterExternal

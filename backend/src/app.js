@@ -16,6 +16,8 @@ import parkVehicleRoutes from "./routes/parkVehicle";
 import parkFilterVehiclesRoutes from "./routes/parkFilterVehicles";
 import parkUserRoutes from "./routes/parkUser";
 import reportsRoutes from "./routes/reports";
+import sidekickRoutes from "./routes/sidekick";
+import muteRoutes from "./routes/mute";
 
 
 const app = express();
@@ -33,6 +35,8 @@ app.use(parkVehicleRoutes);
 app.use(parkFilterVehiclesRoutes);
 app.use(parkUserRoutes);
 app.use(reportsRoutes);
+app.use(sidekickRoutes);
+app.use(muteRoutes);
 
 app.use("/docs", swaggerUI.serve, swaggerUI.setup(specs));
 
