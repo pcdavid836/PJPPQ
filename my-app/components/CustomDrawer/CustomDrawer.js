@@ -16,6 +16,7 @@ const CustomDrawer = (props) => {
         GoogleSignin.signOut();
     }
 
+    const defaultImage = require('../../assets/images/unknown.png');
 
     const [actualCustomImage, setActualCustomImage] = useState({
         Url_imagen: userInfo.Url_imagen,
@@ -67,7 +68,7 @@ const CustomDrawer = (props) => {
                     source={require('../../assets/menu-bg.jpeg')}
                     style={{ padding: 20 }}>
                     <Image
-                        source={{ uri: actualCustomImage.Url_imagen }}
+                        source={actualCustomImage.Url_imagen && actualCustomImage.Url_imagen !== 'default' ? { uri: actualCustomImage.Url_imagen } : defaultImage}
                         style={{ height: 80, width: 80, borderRadius: 40, marginBottom: 10 }}
                     />
                     <Text

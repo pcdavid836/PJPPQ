@@ -35,6 +35,10 @@ const ProfileScreen = () => {
     CI: userInfo.CI,
   });
 
+
+  //USARLA PARA QUITAR BUG DE CONSOLE WARN Y HACER LO MISMO EN TOCAS LAS VISTAS QUE LO NESESITEN
+  const defaultImage = require('../../../assets/images/unknown.png');
+
   const handleChangeImage = (uri) => {
     setActualImage({
       Url_imagen: uri,
