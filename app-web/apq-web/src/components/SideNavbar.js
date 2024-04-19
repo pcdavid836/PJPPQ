@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import Link from 'next/link'
 import React from "react";
 import { GiHamburgerMenu } from "react-icons/gi";
@@ -16,7 +16,7 @@ import {
 import { CgProfile } from "react-icons/cg";
 import { signOut } from 'next-auth/react'
 
-async function SideNavbar() {
+export function SideNavbar() {
     return (
         <div>
             <Disclosure as="nav">

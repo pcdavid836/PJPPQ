@@ -1,6 +1,5 @@
 function DashboardPage() {
     return (
-
         <div>
             <div className="bg-gray-100" style={{ minHeight: '100vh' }}>
                 <main className="col-md-10 ms-sm-auto col-lg-10 px-md-5">

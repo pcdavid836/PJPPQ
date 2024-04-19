@@ -1,7 +1,8 @@
 "use client";
 import React from 'react'
+import { useSession } from "next-auth/react"
 
-function MyInfoPage() {
+async function MyInfoPage() {
 
   return (
     <div className="bg-gray-100" style={{ minHeight: '100vh' }}>
