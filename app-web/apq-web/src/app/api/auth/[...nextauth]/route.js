@@ -7,7 +7,7 @@ import bcrypt from 'bcrypt'
 HASH256
 */
 
-const authOptions = {
+export const authOptions = {
     providers: [
         CredentialsProvider({
             name: "Credentials",

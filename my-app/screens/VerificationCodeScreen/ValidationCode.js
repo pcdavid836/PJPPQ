@@ -12,7 +12,7 @@ const ValidationCode = ({ route }) => {
         phoneNumber: '',
     });
 
-    //console.log(user);
+    console.log(user);
     console.log(verificationCode);
 
     const [codeSMS, setCodeSMS] = useState('');

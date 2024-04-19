@@ -168,10 +168,11 @@ const AddPostulation = ({ closeModal, onComplete }) => {
 
                 postulate(myparkValues);
                 closeModal();
-                onComplete(myparkValues);
+                onComplete();
             } catch (error) {
                 console.error("Error al subir la imagen o el documento:", error);
             }
+            onComplete();
         } else {
             // Muestra un mensaje de error si no se ha subido una imagen o un documento
             if (myparkValues.Url_imagen === definedImage) {

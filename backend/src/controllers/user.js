@@ -100,7 +100,7 @@ export const sendVerificationSMS = async (req, res) => {
 export const createUser = async (req, res) => {
     try {
         const connection = await connect();
-        const [results] = await connection.execute("INSERT INTO Usuario (Correo, Nombres, Primer_Apellido, Segundo_Apellido, Celular, CI, Contrasena, Estado, FechaCreacion, Tipo_Usuario_idTipo_Usuario, Codigo, Correo_Externo, Url_Imagen) VALUES (?, ?, ?, ?, ?, ?, ?, 1, CURRENT_TIMESTAMP, 1, 281201, ?, ?)", [
+        const [results] = await connection.execute("INSERT INTO Usuario (Correo, Nombres, Primer_Apellido, Segundo_Apellido, Celular, CI, Contrasena, Estado, FechaCreacion, Tipo_Usuario_idTipo_Usuario, Codigo, Correo_Externo, Url_Imagen, FechaActualizacion, Ban) VALUES (?, ?, ?, ?, ?, ?, ?, 1, CURRENT_TIMESTAMP, 1, 281201, ?, ?, CURRENT_TIMESTAMP, 0)", [
             req.body.Correo,
             req.body.Nombres,
             req.body.Primer_Apellido,

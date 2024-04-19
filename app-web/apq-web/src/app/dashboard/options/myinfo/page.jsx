@@ -1,8 +1,13 @@
-"use client";
 import React from 'react'
-import { useSession } from "next-auth/react"
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "next-auth/next";
+
 
 async function MyInfoPage() {
+
+const session = await getServerSession(authOptions);
+console.log(session)
+//console.log(session.user.name)
 
   return (
     <div className="bg-gray-100" style={{ minHeight: '100vh' }}>
@@ -12,6 +17,7 @@ async function MyInfoPage() {
           <div className="btn-toolbar mb-2 mb-md-0">
           </div>
         </div>
+        <h2>{session.user.email}</h2>
       </main>
     </div>
   )
