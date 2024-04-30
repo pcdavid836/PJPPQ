@@ -4,24 +4,42 @@ import { useForm } from 'react-hook-form'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import axios from 'axios';
+
+async function fetchUserData(email) {
+  if (email) {
+    const { data } = await axios.post(`/api/owninfo`, { Correo: email });
+    return data;
+  }
+  console.log('Email is undefined');
+  return null;
+}
 
 function LoginPage() {
   const { register, handleSubmit, formState: { errors } } = useForm();
   const router = useRouter();
   const [error, setError] = useState(null);
 
+
   const onSubmit = handleSubmit(async (data) => {
-    console.log(data);
+    //console.log(data);
 
     const res = await signIn('credentials', {
       Correo: data.Correo,
       Contrasena: data.Contrasena,
       redirect: false
     });
+    const mainUser = await fetchUserData(data.Correo);
     if (res.error) {
       setError(res.error)
     } else {
-      router.push('/dashboard')
+      // Asegúrate de que 'data' está definido y tiene la propiedad 'Estado'
+      localStorage.setItem('userData', JSON.stringify(mainUser));
+      if (mainUser.Estado === 1 || mainUser.Estado === true) {
+        router.push('/dashboard')
+      } else {
+        router.push('/accountValidation')
+      }
     }
   })
 

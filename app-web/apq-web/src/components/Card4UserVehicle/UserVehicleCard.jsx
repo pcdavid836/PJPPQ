@@ -61,7 +61,7 @@ function UserVehicleCard({ car }) {
     let mainImage = car.Url_imagen;
     let role = ""
 
-    switch (car.tipo_vehiculo) {
+    switch (car.Tipo_Vehiculo_idTipo_Vehiculo) {
         case 1:
             role = "Automóvil";
             break;

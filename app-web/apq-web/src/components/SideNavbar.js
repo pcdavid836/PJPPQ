@@ -16,7 +16,10 @@ import {
 import { CgProfile } from "react-icons/cg";
 import { signOut } from 'next-auth/react'
 
-export function SideNavbar() {
+export function SideNavbar({ ownData }) {
+    //console.log(ownData);
+
+
     return (
         <div>
             <Disclosure as="nav">
@@ -78,12 +81,14 @@ export function SideNavbar() {
                                 </h3>
                             </Link>
                             {/* agregar un if si soy usuario tipo 4 */}
-                            <Link className="flex mb-2 justify-start items-center gap-4 pl-5 hover:bg-gray-900 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto" href="/dashboard/options/newplayer" style={{ textDecoration: 'none' }}>
-                                <MdPersonAddAlt className="text-2xl text-gray-600 group-hover:text-white " />
-                                <h3 className="text-base text-gray-800 group-hover:text-white font-semibold ">
-                                    Agregar usuario
-                                </h3>
-                            </Link>
+                            {ownData.Tipo_Usuario_idTipo_Usuario === 4 && (
+                                <Link className="flex mb-2 justify-start items-center gap-4 pl-5 hover:bg-gray-900 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto" href="/dashboard/options/newplayer" style={{ textDecoration: 'none' }}>
+                                    <MdPersonAddAlt className="text-2xl text-gray-600 group-hover:text-white " />
+                                    <h3 className="text-base text-gray-800 group-hover:text-white font-semibold ">
+                                        Agregar usuario
+                                    </h3>
+                                </Link>
+                            )}
                         </div>
                         {/* logout */}
                         <div className=" my-4">

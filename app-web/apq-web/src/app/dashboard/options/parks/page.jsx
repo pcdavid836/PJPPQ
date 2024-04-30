@@ -99,7 +99,7 @@ function ParkPage() {
                   </div>
                   <p>{selectedPark.Descripcion}</p>
                   <p><strong>Tamaño:</strong> {selectedPark.Tamaño}m2</p>
-                  <p><strong>Dueño:</strong> {userDetails && `${userDetails.Nombres} ${userDetails.Primer_Apellido} ${userDetails.Segundo_Apellido}`}</p>
+                  <p><strong>Dueño:</strong><Link href={`/dashboard/options/users/${selectedPark.usuario_idUsuario}`} > {userDetails && `${userDetails.Nombres} ${userDetails.Primer_Apellido} ${userDetails.Segundo_Apellido}`}</Link></p>
                   <p><strong>Documento:</strong><a href={selectedPark.Url_validacion} target="_blank"> Ver archivo</a></p>
                   <table className="table">
                     <thead>
@@ -166,20 +166,28 @@ function ParkPage() {
                       </Button>
                     </ModalFooter>
                   </Modal>
-                  <div className="d-flex pt-2 pb-2">
-
-                    <Link href={`/dashboard/options/parks/${selectedPark.idParqueo}`} className="w-50 pe-2">
-                      <button className="btn btn-warning w-100" type="button">
-                        Modificar
-                      </button>
-                    </Link>
-                    <Button className="btn w-50" color="danger" onClick={toggle}>
-                      Mover al Baul
-                    </Button>
+                  <Link href={`/dashboard/options/parks/parkControl/${selectedPark.idParqueo}`}>
+                    <button className="btn btn-primary btn-block w-100 mt-2" type="button">
+                      Registro del Establecimiento
+                    </button>
+                  </Link>
+                  <div className="d-flex mt-2 mb-2">
+                    <div className="flex-fill mr-1">
+                      <Link href={`/dashboard/options/parks/${selectedPark.idParqueo}`}>
+                        <button className="btn btn-warning btn-block w-100" type="button">
+                          Modificar
+                        </button>
+                      </Link>
+                    </div>
+                    <div className="flex-fill ml-1">
+                      <Button className="btn btn-danger btn-block w-100" color="danger" onClick={toggle}>
+                        Mover al Baul
+                      </Button>
+                    </div>
                     <Modal isOpen={modal} toggle={toggle}>
                       <ModalHeader toggle={toggle}>Mover al baul</ModalHeader>
                       <ModalBody>
-                        Estas seguro?
+                        ¿Estás seguro?
                       </ModalBody>
                       <ModalFooter>
                         <Button color="danger" onClick={moveToVault}>
@@ -190,6 +198,23 @@ function ParkPage() {
                         </Button>
                       </ModalFooter>
                     </Modal>
+                  </div>
+
+                  <div className="row  mt-1 mb-1">
+                    <div className="col">
+                      <Link href={`/dashboard/options/parks/sidekicks/${selectedPark.idParqueo}`}>
+                        <button className="btn btn-primary btn-block w-100" type="button">
+                          Lista de Ayudantes
+                        </button>
+                      </Link>
+                    </div>
+                    <div className="col">
+                      <Link href={`/dashboard/options/parks/stunnedUsers/${selectedPark.idParqueo}`}>
+                        <button className="btn btn-secondary btn-block w-100" type="button">
+                          Silenciados
+                        </button>
+                      </Link>
+                    </div>
                   </div>
 
                 </div>

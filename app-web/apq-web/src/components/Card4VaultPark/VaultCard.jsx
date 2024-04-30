@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 
 
 function VaultCard({ place }) {
-    console.log(place)
+    //console.log(place)
     const [reqName, setReqName] = useState({
         Nombres: "",
         Primer_Apellido: "",
@@ -26,7 +26,7 @@ function VaultCard({ place }) {
                     Primer_Apellido: res.data.Primer_Apellido,
                     Segundo_Apellido: res.data.Segundo_Apellido
                 })
-                console.log("Name:" + res.data.Nombres);
+                //console.log("Name:" + res.data.Nombres);
             })
         // Obtén los horarios de atención
         axios.get('/api/schedules/' + place.idParqueo)
@@ -84,7 +84,7 @@ function VaultCard({ place }) {
             // Send the POST request
             const res = await axios.post('/api/requests', data);
 
-            console.log(res.data);
+            //console.log(res.data);
         }
     }
 
@@ -92,7 +92,7 @@ function VaultCard({ place }) {
     const aprobeVault = async () => {
         setToRestore({ Estado: 1 }); // Use setToAprobe to update the state
         const res = await axios.put("/api/parks/" + place.idParqueo, toRestore);
-        console.log(res);
+        //console.log(res);
         toggle(); // This will close all modals immediately
         router.refresh();
     }
@@ -139,7 +139,7 @@ function VaultCard({ place }) {
                                 <img src={place.Url_imagen} className="img-fluid pb-3" alt="..."></img>
                                 <p><strong>Id:</strong> {place.idParqueo}</p>
                                 <p><strong>Tipo de parqueo:</strong> {role}</p>
-                                <p><strong>Dueño:</strong> {reqName.Nombres} {reqName.Primer_Apellido} {reqName.Segundo_Apellido}</p>
+                                <p><strong>Dueño:</strong><Link href={`/dashboard/options/users/${place.usuario_idUsuario}`} > {reqName.Nombres} {reqName.Primer_Apellido} {reqName.Segundo_Apellido}</Link> </p>
                                 <p><strong>Ubicacion:</strong> {place.Ubicacion}</p>
                                 <p><strong>Descripcion:</strong> {place.Descripcion}</p>
                                 <p><strong>Tamaño:</strong> {place.Tamaño} m2</p>
@@ -221,6 +221,21 @@ function VaultCard({ place }) {
                                     </Button>
                                 </ModalFooter>
                             </Modal>
+                            <Link href={`/dashboard/options/parks/sidekicks/${place.idParqueo}`} >
+                                <Button color="primary" onClick={toggle}>
+                                    Lista de Ayudantes
+                                </Button>
+                            </Link>
+                            <Link href={`/dashboard/options/parks/stunnedUsers/${place.idParqueo}`} >
+                                <Button color="secondary" onClick={toggle}>
+                                    Usuarios Silenciados
+                                </Button>
+                            </Link>
+                            <Link href={`/dashboard/options/parks/parkControl/${place.idParqueo}`} >
+                                <Button color="secondary" onClick={toggle}>
+                                    Registro del Establecimiento
+                                </Button>
+                            </Link>
                         </ModalFooter>
 
                     </Modal>

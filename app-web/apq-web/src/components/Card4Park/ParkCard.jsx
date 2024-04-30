@@ -89,14 +89,14 @@ function ParkCard({ place }) {
             // Send the POST request
             const res = await axios.post('/api/requests', data);
 
-            console.log(res.data);
+            //console.log(res.data);
         }
     }
 
     const deleteImage = async () => {
         setImage({ Url_imagen: 'defaultPark' });
         const res = await axios.put("/api/parks/" + place.idParqueo, toImage);
-        console.log(res);
+        //console.log(res);
         toggle2();
         router.refresh();
     }
@@ -104,7 +104,7 @@ function ParkCard({ place }) {
     const moveToVault = async () => {
         setToDeny({ Estado: 0 }); // Use setToAprobe to update the state
         const res = await axios.put("/api/parks/" + place.idParqueo, toDeny);
-        console.log(res);
+        //console.log(res);
         toggle(); // This will close all modals immediately
         router.refresh();
     }
@@ -156,7 +156,7 @@ function ParkCard({ place }) {
                                 />
                                 <p><strong>Id:</strong> {place.idParqueo}</p>
                                 <p><strong>Tipo de parqueo:</strong> {role}</p>
-                                <p><strong>Dueño:</strong> {reqName.Nombres} {reqName.Primer_Apellido} {reqName.Segundo_Apellido}</p>
+                                <p><strong>Dueño:</strong> <Link href={`/dashboard/options/users/${place.usuario_idUsuario}`} >{reqName.Nombres} {reqName.Primer_Apellido} {reqName.Segundo_Apellido}</Link></p>
                                 <p><strong>Ubicacion:</strong> {place.Ubicacion}</p>
                                 <p><strong>Descripcion:</strong> {place.Descripcion}</p>
                                 <p><strong>Tamaño:</strong> {place.Tamaño} m2</p>
@@ -255,6 +255,21 @@ function ParkCard({ place }) {
                                     </Button>
                                 </ModalFooter>
                             </Modal>
+                            <Link href={`/dashboard/options/parks/sidekicks/${place.idParqueo}`} >
+                                <Button color="primary" onClick={toggle}>
+                                    Lista de Ayudantes
+                                </Button>
+                            </Link>
+                            <Link href={`/dashboard/options/parks/stunnedUsers/${place.idParqueo}`} >
+                                <Button color="secondary" onClick={toggle}>
+                                    Usuarios Silenciados
+                                </Button>
+                            </Link>
+                            <Link href={`/dashboard/options/parks/parkControl/${place.idParqueo}`} >
+                                <Button color="secondary" onClick={toggle}>
+                                    Registro de Establecimiento
+                                </Button>
+                            </Link>
                         </ModalFooter>
 
                     </Modal>

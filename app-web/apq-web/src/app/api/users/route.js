@@ -2,6 +2,10 @@ import { NextResponse } from "next/server";
 import { conn } from "@/libs/mysql"
 import bcrypt from 'bcrypt';
 
+/* EN CASO DE QUE EN UN FUTURO SE QUIERA UTILIZAR EL ROL ADMINISTRADOR EN AMBAS APLICACIONES CAMBIAR bcrypt A CryptoES Y SE EMPEZARA A ENCRIPTAR CONTRASEñAS CON
+HASH256
+*/
+
 export async function GET() {
     try {
         const results = await conn.query("SELECT * FROM usuario WHERE Estado = 1 AND Ban = 0 AND Tipo_Usuario_idTipo_Usuario = 1 OR Tipo_Usuario_idTipo_Usuario = 2 ORDER BY idUsuario ASC");

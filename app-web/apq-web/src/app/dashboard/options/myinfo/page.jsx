@@ -1,13 +1,14 @@
-import React from 'react'
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "next-auth/next";
-
+import NextAuth, { authOptions } from 'next-auth'
+import FormOwnInfo from '@/components/EditOwnInfo/FormOwnInfo'
 
 async function MyInfoPage() {
+  const session = await getServerSession(authOptions);
 
-const session = await getServerSession(authOptions);
-console.log(session)
-//console.log(session.user.name)
+  if (!session) {
+    // Redirigir al usuario a la página de inicio de sesión si no hay una sesión
+    window.location.href = "/auth/signin"
+  }
 
   return (
     <div className="bg-gray-100" style={{ minHeight: '100vh' }}>
@@ -17,7 +18,7 @@ console.log(session)
           <div className="btn-toolbar mb-2 mb-md-0">
           </div>
         </div>
-        <h2>{session.user.email}</h2>
+        {session && <FormOwnInfo email={session.user.email} />}
       </main>
     </div>
   )

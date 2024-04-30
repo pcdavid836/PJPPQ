@@ -74,7 +74,8 @@ function NewPlayerPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ codigo: passport }),
+        //AñADIR LINEA PARA SELECCIONAR A QUIEN SE ESTA ENVIANDO EL CORREO
+        body: JSON.stringify({ usuario: user.Correo, codigo: passport }),
       });
 
       form.current.reset();
@@ -89,7 +90,7 @@ function NewPlayerPage() {
         Contrasena: "default",
         Estado: 0,
         Url_Imagen: "default",
-        Tipo_Usuario_idTipo_Usuario: 3
+        Tipo_Usuario_idTipo_Usuario: 3,
       });
       completeCi = "";
       setExpeditionPlace("");

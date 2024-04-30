@@ -16,7 +16,7 @@ export const authOptions = {
                 Contrasena: { label: "Password", type: "password", placeholder: "**********" },
             },
             async authorize(credentials, req) {
-                console.log(credentials)
+                //console.log(credentials)
 
                 const userFound = await db.usuario.findUnique({
                     where: {
@@ -28,17 +28,19 @@ export const authOptions = {
 
                 if (userFound.Ban == 1) throw new Error('Credenciales no admitidas!')
 
-                console.log(userFound)
+                //console.log(userFound)
 
                 const matchPassword = await bcrypt.compare(credentials.Contrasena, userFound.Contrasena)
 
                 if (!matchPassword) throw new Error('Contraseña Incorrecta!')
 
                 return {
-                    id: userFound.idUsuario,
                     name: userFound.Nombres,
-                    email: userFound.Correo,
+                    email: userFound.Correo, 
+                    image: userFound.Url_Imagen,
+                    id: userFound.idUsuario,
                 };
+
             },
         }),
     ],

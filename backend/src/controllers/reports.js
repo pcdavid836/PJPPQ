@@ -3,7 +3,7 @@ import { connect } from "../database"
 export const reportParkToUser = async (req, res) => {
     try {
         const connection = await connect();
-        const [results] = await connection.execute("INSERT INTO reporte_parqueo_usuario (Motivo, Descripcion, usuario_idUsuario, parqueo_idParqueo, Valido) VALUES (?, ?, ?, ?, 0);", [
+        const [results] = await connection.execute("INSERT INTO reporte_parqueo_usuario (Motivo, Descripcion, usuario_idUsuario, parqueo_idParqueo, Valido, Estado, FechaCreacion) VALUES (?, ?, ?, ?, 0, 1, CURRENT_TIMESTAMP);", [
             req.body.Motivo,
             req.body.Descripcion,
             req.body.usuario_idUsuario,
@@ -23,7 +23,7 @@ export const reportParkToUser = async (req, res) => {
 export const reportUserToPark = async (req, res) => {
     try {
         const connection = await connect();
-        const [results] = await connection.execute("INSERT INTO reporte_usuario_parqueo (Motivo, Descripcion, usuario_idUsuario, parqueo_idParqueo, Valido) VALUES (?, ?, ?, ?, 0);", [
+        const [results] = await connection.execute("INSERT INTO reporte_usuario_parqueo (Motivo, Descripcion, usuario_idUsuario, parqueo_idParqueo, Valido, Estado, FechaCreacion) VALUES (?, ?, ?, ?, 0, 1, CURRENT_TIMESTAMP);", [
             req.body.Motivo,
             req.body.Descripcion,
             req.body.usuario_idUsuario,

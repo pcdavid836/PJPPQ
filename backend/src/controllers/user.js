@@ -49,7 +49,7 @@ export const getUserMail = async (req, res) => {
                 Segundo_Apellido: user.Segundo_Apellido,
                 CI: user.CI,
                 Celular: user.Celular,
-                Url_imagen: user.Url_imagen,
+                Url_Imagen: user.Url_Imagen,
                 idRol: user.Tipo_Usuario_idTipo_Usuario,
                 Correo_Externo: user.Correo_Externo, // Añade la nueva columna aquí
             };
@@ -109,7 +109,7 @@ export const createUser = async (req, res) => {
             req.body.CI,
             req.body.Contrasena,
             req.body.Correo_Externo, // Añade el valor de Correo_Externo aquí
-            req.body.Url_imagen,
+            req.body.Url_Imagen,
         ]);
 
         const newUser = {
@@ -146,8 +146,8 @@ export const updateUser = async (req, res) => {
 
 export const updateImageUser = async (req, res) => {
     const connection = await connect();
-    await connection.query('UPDATE Usuario SET Url_imagen = ?, FechaActualizacion = CURRENT_TIMESTAMP WHERE idUsuario = ?', [
-        req.body.Url_imagen,
+    await connection.query('UPDATE Usuario SET Url_Imagen = ?, FechaActualizacion = CURRENT_TIMESTAMP WHERE idUsuario = ?', [
+        req.body.Url_Imagen,
         req.params.id
     ]);
     res.sendStatus(204);
@@ -156,7 +156,7 @@ export const updateImageUser = async (req, res) => {
 export const sendVerificationEmail = async (req, res) => {
     try {
         const connection = await connect();
-        const [rows] = await connection.execute("SELECT * FROM Usuario WHERE Correo = ? AND Estado = 0 AND Ban = 0 AND Correo_Externo = 0;", [
+        const [rows] = await connection.execute("SELECT * FROM Usuario WHERE Correo = ? AND Estado = 1 AND Ban = 0 AND Correo_Externo = 0;", [
             req.body.Correo
         ]);
 
@@ -248,7 +248,7 @@ export const getExternalMail = async (req, res) => {
                 Segundo_Apellido: user.Segundo_Apellido,
                 CI: user.CI,
                 Celular: user.Celular,
-                Url_imagen: user.Url_imagen,
+                Url_Imagen: user.Url_Imagen,
                 idRol: user.Tipo_Usuario_idTipo_Usuario,
                 Correo_Externo: user.Correo_Externo,
                 Estado: user.Estado,

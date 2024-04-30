@@ -17,7 +17,7 @@ function UserCard({ user }) {
     });
 
     const [toDefault, setToDefault] = useState({
-        Url_imagen: 'default',
+        Url_Imagen: 'default',
     });
 
     const [closeAll, setCloseAll] = useState(false);
@@ -34,7 +34,8 @@ function UserCard({ user }) {
 
     const toggle = () => setModal(!modal);
 
-    let mainImage = user.Url_imagen;
+    let mainImage = user.Url_Imagen;
+    //console.log(user);
     let role = ""
 
     switch (user.Tipo_Usuario_idTipo_Usuario) {
@@ -49,7 +50,7 @@ function UserCard({ user }) {
             break;
     }
 
-    //console.log(mainImage);
+    console.log(mainImage);
 
     if (mainImage === 'default') {
         mainImage = "https://firebasestorage.googleapis.com/v0/b/pkpq-74307.appspot.com/o/ProfileImages%2Fuser_default.png?alt=media&token=d6b24730-d87d-4be5-9275-df4a44f5c323";
@@ -64,7 +65,7 @@ function UserCard({ user }) {
     }
 
     const imageBack = async () => {
-        setToDefault({ Url_imagen: 'default' });
+        setToDefault({ Url_Imagen: 'default' });
         const res = await axios.put("/api/users/" + user.idUsuario, toDefault);
         console.log(res);
         toggle();
@@ -86,7 +87,7 @@ function UserCard({ user }) {
                 <div className="card-body text-center">
                     <h6 className="card-title">{user.Correo}</h6>
                     <p className="card-text">
-                        {user.Nombres} {user.Primer_Apellido} {user.Segundo_Apellido}
+                    <Link href={`/dashboard/options/users/${user.idUsuario}`}> {user.Nombres} {user.Primer_Apellido} {user.Segundo_Apellido}</Link>
                     </p>
                 </div>
                 <div className="card-footer text-center">
@@ -104,7 +105,7 @@ function UserCard({ user }) {
                                     style={{ width: '200px', height: '200px' }}
                                 />
                                 <p><strong>Id:</strong> {user.idUsuario}</p>
-                                <p><strong>Nombre completo:</strong> {user.Nombres} {user.Primer_Apellido} {user.Segundo_Apellido}</p>
+                                <p><strong>Nombre completo:</strong> <Link href={`/dashboard/options/users/${user.idUsuario}`}>{user.Nombres} {user.Primer_Apellido} {user.Segundo_Apellido}</Link></p>
                                 <p><strong>Correo:</strong> {user.Correo}</p>
                                 <p><strong>Celular:</strong> {user.Celular}</p>
                                 <p><strong>CI:</strong> {user.CI}</p>

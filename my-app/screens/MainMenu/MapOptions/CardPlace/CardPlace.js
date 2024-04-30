@@ -68,8 +68,8 @@ const CardPlace = ({ park, closeModal }) => {
   const [reporInfo, setReportInfo] = useState({
     Motivo: '',
     Descripcion: '',
-    usuario_idUsuario: 0,
-    parqueo_idParqueo: 0,
+    usuario_idUsuario: userInfo.idUsuario,
+    parqueo_idParqueo: park.idParqueo,
   });
 
   const handleChange = (name, value) => setReportInfo({ ...reporInfo, [name]: value });
