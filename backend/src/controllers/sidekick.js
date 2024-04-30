@@ -42,12 +42,20 @@ export const createSideKick = async (req, res) => {
                         parqueo.idParqueo
                     ]);
 
-                    // Actualiza 'Tipo_Usuario_idTipo_Usuario' en la tabla 'usuario'
-                    await connection.query('UPDATE usuario SET Tipo_Usuario_idTipo_Usuario = 2 WHERE idUsuario = ?;', [
+                    // Obtiene el tipo de usuario
+                    const [usuarios] = await connection.query('SELECT * FROM usuario WHERE idUsuario = ?;', [
                         req.body.usuario_idUsuario
                     ]);
+                    const usuario = usuarios[0];
 
-                    res.sendStatus(200); // Devuelve un código de estado 200 para indicar que la actualización fue exitosa
+                    // Si el tipo de usuario es 1, lo actualiza a 2
+                    if (usuario.Tipo_Usuario_idTipo_Usuario === 1) {
+                        await connection.query('UPDATE usuario SET Tipo_Usuario_idTipo_Usuario = 2 WHERE idUsuario = ?;', [
+                            req.body.usuario_idUsuario
+                        ]);
+                    }
+
+                    res.status(200).json({ mensaje: "Usuario retorno a establecimiento" }); // Devuelve un código de estado 200 para indicar que la actualización fue exitosa
                 } else {
                     res.status(400).json({ mensaje: "El usuario ya se unió a esta ubicación." });
                 }
@@ -73,6 +81,7 @@ export const createSideKick = async (req, res) => {
         res.status(500).json({ mensaje: "Error en el servidor" });
     }
 };
+
 
 
 export const removeSidekick = async (req, res) => {

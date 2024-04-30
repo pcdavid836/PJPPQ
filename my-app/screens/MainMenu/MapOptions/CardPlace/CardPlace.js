@@ -16,7 +16,7 @@ import { SelectCountry } from 'react-native-element-dropdown';
 
 
 const CardPlace = ({ park, closeModal }) => {
-
+  //console.log(park);
   const local_data = [
     {
       value: 'Informacion incorrecta',

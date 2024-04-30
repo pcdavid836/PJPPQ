@@ -213,7 +213,7 @@ const ReserveSpace = ({ parkId, parktimer, closeModal, onBookingComplete }) => {
                 Alert.alert('Error', response.error);
             } else {
                 closeModal();
-                onBookingComplete();
+                //onBookingComplete();
                 Alert.alert('Éxito', 'La reserva fue realizada con éxito. Puedes comprobarlo en la vista de reservas.');
             }
         } catch (error) {

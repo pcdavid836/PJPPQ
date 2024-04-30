@@ -23,12 +23,12 @@ export const createRecord = async (req, res) => {
 export const postEnter = async (req, res) => {
     const connection = await connect();
     // Primera consulta para actualizar Url_imagen_ingreso y ConfirmacionEntrada
-    await connection.query('UPDATE parqueo_vehiculo SET Url_imagen_ingreso = ?, Hora_Ingreso = CURRENT_TIMESTAMP, ConfirmacionEntrada = 1 WHERE reserva_idReserva = ?;', [
+    await connection.query('UPDATE parqueo_vehiculo SET Url_imagen_ingreso = ?, Hora_Ingreso = CURRENT_TIMESTAMP, Fecha_Actualizacion = CURRENT_TIMESTAMP, ConfirmacionEntrada = 1 WHERE reserva_idReserva = ?;', [
         req.body.Url_imagen_ingreso,
         req.params.id
     ]);
     // Segunda consulta para actualizar Realizado a 1 si Estado es 0
-    await connection.query('UPDATE reserva SET Realizado = 1, Estado = 0 WHERE idReserva = ?;', [
+    await connection.query('UPDATE reserva SET Realizado = 1, Estado = 0, Fecha_Actualizacion = CURRENT_TIMESTAMP WHERE idReserva = ?;', [
         req.params.id
     ]);
 
@@ -109,8 +109,8 @@ export const denyAparkment = async (req, res) => {
 
     await connection.query('START TRANSACTION');
     try {
-        await connection.query('UPDATE parqueo_vehiculo SET Cancelado = 1, Estado = 0 WHERE idParqueo_Vehiculo = ?;', [idParqueo_Vehiculo]);
-        await connection.query('UPDATE reserva SET Realizado = 0, Rechazado = 1 WHERE idReserva = ?;', [idReserva]);
+        await connection.query('UPDATE parqueo_vehiculo SET Cancelado = 1, Estado = 0, Fecha_Actualizacion = CURRENT_TIMESTAMP WHERE idParqueo_Vehiculo = ?;', [idParqueo_Vehiculo]);
+        await connection.query('UPDATE reserva SET Realizado = 0, Rechazado = 1, Fecha_Actualizacion = CURRENT_TIMESTAMP WHERE idReserva = ?;', [idReserva]);
         await connection.query('COMMIT');
     } catch (error) {
         await connection.query('ROLLBACK');
@@ -123,7 +123,7 @@ export const denyAparkment = async (req, res) => {
 
 export const aprobeAparkment = async (req, res) => {
     const connection = await connect();
-    await connection.query('UPDATE parqueo_vehiculo SET Hora_Salida = CURRENT_TIMESTAMP, Estado = 0, ConfirmacionSalida = 1 WHERE idParqueo_Vehiculo = ?;', [
+    await connection.query('UPDATE parqueo_vehiculo SET Hora_Salida = CURRENT_TIMESTAMP, Estado = 0, ConfirmacionSalida = 1, Fecha_Actualizacion = CURRENT_TIMESTAMP WHERE idParqueo_Vehiculo = ?;', [
         req.params.id
     ]);
     res.sendStatus(204);

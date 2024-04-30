@@ -54,17 +54,29 @@ const CreateParking = () => {
       const response = await searchShareCode(searchData);
       // Verifica si la respuesta es exitosa
       console.log(response);
-      if (response.mensaje === 'Registro Actualizado' || response.mensaje === 'Nuevo Registro Creado') {
-        Alert.alert('Éxito', 'El ingreso del código funcionó correctamente. Para hacer uso de las funciones de cuidador, vuelve a iniciar sesión.');
-      } else if (response.mensaje === 'Registro Existente' || response.mensaje === 'El usuario ya se unió a esta ubicación.') {
-        // Muestra una alerta si el usuario ya se registró con ese código
-        Alert.alert('Error', 'Ya te registraste con este codigo.');
-      } else if (response.mensaje === 'Parqueo No Encontrado') {
-        // Muestra una alerta si no se encontró el parqueo
-        Alert.alert('Error', 'No se encontró el parqueo con el código proporcionado.');
+      // Verifica si la respuesta es un objeto (es decir, JSON)
+      if (typeof response === 'object') {
+        if (response.mensaje === 'Usuario retorno a establecimiento') {
+          // Muestra una alerta de éxito si el usuario retorna al establecimiento
+          Alert.alert('Éxito', 'El ingreso del código funcionó correctamente. Para hacer uso de las funciones de cuidador, vuelve a iniciar sesión.');
+        } else if (response.mensaje === 'Registro Actualizado' || response.mensaje === 'Nuevo Registro Creado') {
+          Alert.alert('Éxito', 'El ingreso del código funcionó correctamente. Para hacer uso de las funciones de cuidador, vuelve a iniciar sesión.');
+        } else if (response.mensaje === 'Registro Existente' || response.mensaje === 'El usuario ya se unió a esta ubicación.') {
+          // Muestra una alerta si el usuario ya se registró con ese código
+          Alert.alert('Error', 'Ya te registraste con este codigo.');
+        } else if (response.mensaje === 'Parqueo No Encontrado') {
+          // Muestra una alerta si no se encontró el parqueo
+          Alert.alert('Error', 'No se encontró el parqueo con el código proporcionado.');
+        } else if (response.mensaje === 'OK') {
+          Alert.alert('Éxito', 'El ingreso del código funcionó correctamente. Para hacer uso de las funciones de cuidador, vuelve a iniciar sesión.');
+        } else {
+          // Muestra una alerta genérica si ocurre otro error
+          Alert.alert('Error', 'Ocurrió un error al ingresar el código.');
+        }
       } else {
-        // Muestra una alerta genérica si ocurre otro error
-        Alert.alert('Error', 'Ocurrió un error al ingresar el código.');
+        // Ignora las respuestas que no están en formato JSON
+        console.log('La respuesta no está en formato JSON, se ignorará.');
+        Alert.alert('Cambio', 'Cambio realizado, vuelve a iniciar sesión.');
       }
     } catch (error) {
       console.error(error);
@@ -72,6 +84,7 @@ const CreateParking = () => {
       Alert.alert('Error', 'Ocurrió un error al ingresar el código.');
     }
   };
+
 
 
   const CreatePostulation = () => {

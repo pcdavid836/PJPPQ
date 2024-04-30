@@ -14,6 +14,7 @@ import { CheckBox } from 'react-native-elements';
 import CryptoES from 'crypto-es';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { AuthContext } from '../../../../context/AuthContext';
+import { parkPlaceholder } from '../../../../assets/park.jpg';
 
 
 export default function MyCardPlace({ myparkto, onModifyComplete }) {
@@ -516,7 +517,13 @@ export default function MyCardPlace({ myparkto, onModifyComplete }) {
                     <View style={{ alignItems: 'center', marginHorizontal: 30 }}>
                         <Image
                             style={styles.productImg}
-                            source={{ uri: mypark ? mypark.Url_imagen : 'placeholder_image_url' }}
+                            source={
+                                mypark && mypark.Url_imagen
+                                    ? mypark.Url_imagen === "defaultPark"
+                                        ? { uri: "https://firebasestorage.googleapis.com/v0/b/pkpq-74307.appspot.com/o/GarageImages%2FdefaulttPark.jpg?alt=media&token=829c6cfc-bfda-45ef-a172-7f6086d260c7" }
+                                        : { uri: mypark.Url_imagen }
+                                    : parkPlaceholder
+                            }
                         />
                     </View>
                     <Text style={styles.name}>{mypark ? mypark.Ubicacion : ''}</Text>

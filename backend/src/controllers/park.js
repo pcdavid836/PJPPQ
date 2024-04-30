@@ -139,7 +139,7 @@ export const deletePark = async (req, res) => {
 
 export const getMyAprobedPark = async (req, res) => {
     const connection = await connect()
-    const [rows] = await connection.query("SELECT parqueo.* FROM parqueo INNER JOIN usuario_has_parqueo ON parqueo.idParqueo = usuario_has_parqueo.parqueo_idParqueo WHERE usuario_has_parqueo.usuario_idUsuario = ? AND parqueo.Aprobacion = 1 AND parqueo.Estado = 1;", [
+    const [rows] = await connection.query("SELECT parqueo.* FROM parqueo INNER JOIN usuario_has_parqueo ON parqueo.idParqueo = usuario_has_parqueo.parqueo_idParqueo WHERE usuario_has_parqueo.usuario_idUsuario = ? AND parqueo.Aprobacion = 1 AND parqueo.Estado = 1 AND usuario_has_parqueo.Estado = 1 ;", [
         req.params.id,
     ]);
     res.json(rows)

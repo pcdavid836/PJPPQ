@@ -16,6 +16,8 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 import StackNavigationGroup from '../../Navigation/StackNavigationGroup';
 import CameraProfileScreen from '../TakePhoto/CameraProfile/CameraProfileScreen';
 import UpdatePasswordScreen from '../UpdatePassword/UpdatePasswordScreen';
+import defaultAvatar from '../../../assets/user.png'; // Asegúrate de que la ruta sea correcta
+
 
 
 
@@ -175,7 +177,7 @@ const ProfileScreen = () => {
       <View style={styles.header}>
         <Image
           style={styles.avatar}
-          source={{ uri: actualImage.Url_imagen }}
+          source={actualImage && actualImage.Url_imagen ? { uri: actualImage.Url_imagen } : defaultAvatar}
         />
       </View>
 
