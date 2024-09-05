@@ -1,4 +1,4 @@
-const API_BASE = "http://192.168.1.9:3000";
+const API_BASE = "http://192.168.1.7:3000";
 
 const APIUser = `${API_BASE}/user`;
 const APIVerify = `${API_BASE}/verify`;
@@ -43,6 +43,11 @@ const APISidekick = `${API_BASE}/sidekick`;
 const APISidekickRemove = `${API_BASE}/removesidekick`;
 const APIMute = `${API_BASE}/mute`;
 const APIUnMute = `${API_BASE}/undomute`;
+const APIQRSource = `${API_BASE}/qrsource`;
+const APIQROptions = `${API_BASE}/qroptions`;
+const APIQROptions2 = `${API_BASE}/qroptionsrepeat`;
+const APIQRUser = `${API_BASE}/qroptionsuser`;
+const APIQRPark = `${API_BASE}/qroptionspark`;
 
 
 
@@ -379,6 +384,32 @@ export const parkVehicleEnter = async (idBook, newData) => {
   return res;
 };
 
+export const parkVehicleQRPay = async (idBook, newData) => {
+  //console.log(idBook, newData)
+  const res = await fetch(`${APIQRUser}/${idBook}`, {
+    method: "PUT",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(newData),
+  });
+  return res;
+};
+
+export const parkVehicleQRPayUpdateByPark = async (idBook, newData) => {
+  //console.log(idBook, newData)
+  const res = await fetch(`${APIQRPark}/${idBook}`, {
+    method: "PUT",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(newData),
+  });
+  return res;
+};
+
 export const getParkVehicleByPark = async (idPark) => {
   const res = await fetch(`${APIParkVehicle}/${idPark}`, {
     method: "GET",
@@ -616,4 +647,46 @@ export const unMuteUser = async (connectedIds) => {
     body: JSON.stringify(connectedIds)
   });
   return await res.json();
+};
+
+export const getQRSource = async () => {
+  const res = await fetch(APIQRSource, {
+    method: "GET",
+  });
+
+  return await res.json();
+};
+
+export const addQRPayment = async (idData) => {
+  const res = await fetch(APIQROptions, {
+    method: "POST",
+    headers: { Accept: "application/json", "Content-Type": "application/json" },
+    body: JSON.stringify(idData)
+  });
+  const data = await res.json();
+  return data;
+};
+
+export const denyQRPayment = async (idData) => {
+  const res = await fetch(`${APIQROptions}/${idData}`, {
+    method: "PUT",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+  });
+  const data = await res.json();
+  return data;
+};
+
+export const repeatQRPayment = async (idData) => {
+  const res = await fetch(`${APIQROptions2}/${idData}`, {
+    method: "PUT",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+  });
+  const data = await res.json();
+  return data;
 };

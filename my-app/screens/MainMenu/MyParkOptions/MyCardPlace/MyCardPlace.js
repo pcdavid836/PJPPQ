@@ -3,7 +3,7 @@ import { View, useWindowDimensions, StyleSheet, ScrollView, TouchableOpacity, Te
 import { TabView, SceneMap } from 'react-native-tab-view';
 import PrivateHour from '../../../../components/PrivateHour';
 import MyCardModInfo from '../MyCardModInfo/MyCardModInfo';
-import { getInfoPark, getBookByPark, getParkVehicleByPark, getBooksByFilter, getParkedVehicleByFilter, saveShareCode, generateNewCode, getSideKickByPark, getMutedByPark } from '../../../../api'
+import { getInfoPark, getBookByPark, getParkVehicleByPark, getBooksByFilter, getParkedVehicleByFilter, saveShareCode, generateNewCode, getSideKickByPark, getMutedByPark, getQRSource } from '../../../../api'
 import BookingList from '../../../../components/BookingComponentsPark/BookingList';
 import ParkedVehicleList from '../../../../components/ParkedVehicle/ParkedVehicleList';
 import SidekickList from '../../../../components/SideKicksComponentsPark/SidekickList';
@@ -15,6 +15,11 @@ import CryptoES from 'crypto-es';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { AuthContext } from '../../../../context/AuthContext';
 import { parkPlaceholder } from '../../../../assets/park.jpg';
+import { UnknownImage } from '../../../../assets/images/unknown.png';
+import * as Sharing from 'expo-sharing';
+import * as FileSystem from 'expo-file-system';
+
+
 
 
 export default function MyCardPlace({ myparkto, onModifyComplete }) {
@@ -67,7 +72,7 @@ export default function MyCardPlace({ myparkto, onModifyComplete }) {
         },
     ];
 
-
+    const defaultImage = UnknownImage;
 
     const { userInfo } = React.useContext(AuthContext);
     const [country, setCountry] = React.useState('1');
@@ -87,6 +92,7 @@ export default function MyCardPlace({ myparkto, onModifyComplete }) {
     const [book, setBook] = React.useState([]);
     const [vehicles, setVehicles] = React.useState([]);
     const [stunnedUsers, setStunnedUsers] = React.useState([]);
+    const [mainQrImage, setMainQrImage] = React.useState([]);
     const [sidekicks, setSidekicks] = React.useState([]);
     const [myShareCode, setMyShareCode] = React.useState(null);
     const showInfo = () => setInfoVisible(true);
@@ -99,6 +105,10 @@ export default function MyCardPlace({ myparkto, onModifyComplete }) {
     const hideCodeInfo = () => setInfoCodeVisible(false);
     const showListStunnedUsers = () => setmodalListStunned(true);
     const hideListStunnedUsers = () => setmodalListStunned(false);
+
+    const [visibleQR, setVisibleQR] = React.useState(false);
+    const showQR = () => setVisibleQR(true);
+    const hideQR = () => setVisibleQR(false);
 
     const openNewModal = () => {
         setInfoCodeVisible(false);
@@ -151,6 +161,7 @@ export default function MyCardPlace({ myparkto, onModifyComplete }) {
         loadParkedVehicles();
         loadSidekicks();
         loadMutedUsers();
+        loadQRImage();
         //console.log(mypark);
     }, []);
 
@@ -185,7 +196,7 @@ export default function MyCardPlace({ myparkto, onModifyComplete }) {
         try {
             const response = await getParkVehicleByPark(myparkto);
             setVehicles(response);
-            //console.log(vehicles);
+            //console.log(response);
         } catch (error) {
             console.error('Error fetching park details.', error);
         }
@@ -196,6 +207,16 @@ export default function MyCardPlace({ myparkto, onModifyComplete }) {
             const response = await getMutedByPark(myparkto);
             setStunnedUsers(response);
             //console.log(vehicles);
+        } catch (error) {
+            console.error('Error fetching park details.', error);
+        }
+    };
+
+    const loadQRImage = async () => {
+        try {
+            const response = await getQRSource();
+            setMainQrImage(response);
+            //console.log(response);
         } catch (error) {
             console.error('Error fetching park details.', error);
         }
@@ -270,6 +291,17 @@ export default function MyCardPlace({ myparkto, onModifyComplete }) {
         }
     };
 
+    const shareSubmit = async () => {
+        const uri = mainQrImage[0]?.Url_imagen || defaultImage;
+        const downloadResumable = FileSystem.createDownloadResumable(uri, FileSystem.documentDirectory + 'image.jpg');
+
+        try {
+            const { uri: localUri } = await downloadResumable.downloadAsync();
+            await Sharing.shareAsync(localUri);
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
     const updateShareCode = async () => {
         // Genera algo aleatorio
@@ -513,6 +545,33 @@ export default function MyCardPlace({ myparkto, onModifyComplete }) {
                 <View style={styles.form}>
                     <View style={styles.header}>
                         <Text style={styles.title}>{mypark ? mypark.Titulo : ''}</Text>
+                        <TouchableOpacity style={styles.qrButton} onPress={() => showQR()}>
+                            <Text style={styles.qrButtonText}>Código QR</Text>
+                        </TouchableOpacity>
+                        <Modal
+                            animationType="none"
+                            transparent={true}
+                            visible={visibleQR}
+                            onRequestClose={hideQR}
+                        >
+                            <View style={styles.modalBackground}>
+                                <View style={styles.centeredView}>
+                                    <View style={styles.modalView}>
+                                        <TouchableOpacity style={styles.closeButton} onPress={hideQR}>
+                                            <Ionicons name="close-circle-outline" size={30} color="gray" />
+                                        </TouchableOpacity>
+                                        <Text style={styles.title}>Código</Text>
+                                        <Image
+                                            style={styles.qrImage}
+                                            source={{ uri: mainQrImage[0]?.Url_imagen || defaultImage }}
+                                        />
+                                        <TouchableOpacity style={styles.shareButton2} onPress={shareSubmit}>
+                                            <Text style={styles.shareButtonText2}>Compartir</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                </View>
+                            </View>
+                        </Modal>
                     </View>
                     <View style={{ alignItems: 'center', marginHorizontal: 30 }}>
                         <Image
@@ -932,5 +991,34 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         fontSize: 24,
         marginBottom: 10,
+    },
+    qrButton: {
+        backgroundColor: 'green', // Color de fondo del botón
+        padding: 10,
+        borderRadius: 5,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginLeft: 10, // Añade un margen para separar el botón del texto
+    },
+    qrButtonText: {
+        color: 'white', // Color del texto del botón
+        fontWeight: 'bold',
+    },
+    shareButton2: {
+        backgroundColor: 'lime', // Color de fondo del botón
+        padding: 10,
+        borderRadius: 5,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginTop: 10, // Añade un margen para separar el botón de la imagen
+    },
+    shareButtonText2: {
+        color: 'black', // Color del texto del botón
+        fontWeight: 'bold',
+    },
+    qrImage: {
+        width: 300,
+        height: 300,
+        resizeMode: 'contain',
     },
 });

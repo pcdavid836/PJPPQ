@@ -12,6 +12,8 @@ function AccordionCore({ transactCards }) {
     //console.log(transactCards);
     const [modal, setModal] = useState(false);
     const [modal2, setModal2] = useState(false);
+    const [montoQR, setMontoQR] = useState({}); // Estado para manejar los montos de QR
+    const [qrMod, setQrMod] = useState({});
 
     const toggle = () => setModal(!modal);
 
@@ -22,6 +24,32 @@ function AccordionCore({ transactCards }) {
         updatedVisibility[index] = !updatedVisibility[index];
         setIsVisible(updatedVisibility);
     }
+
+    const handleMontoChange = (id, value) => {
+        const newMontoQR = { ...montoQR, [id]: value };
+        setMontoQR(newMontoQR);
+    };
+    const actualizarMontoQR = async (id) => {
+        // Asegúrate de que el montoQR[id] es un número y no está vacío
+        if (!montoQR[id] || isNaN(montoQR[id])) {
+            console.error('El monto ingresado no es válido.');
+            return;
+        }
+
+        // Actualiza el estado qrMod con el nuevo monto
+        setQrMod({ Monto: montoQR[id] });
+
+        try {
+            // Realiza la solicitud PUT para actualizar el monto en el backend
+            const res = await axios.put(`/api/parks/parksrecord/${id}`, { Monto: montoQR[id] });
+            console.log(`Respuesta del servidor al actualizar el monto para QR ID ${id}:`, res.data);
+            
+
+        } catch (error) {
+            console.error('Error al actualizar el monto de QR:', error);
+        }
+        router.refresh();
+    };
 
     const getAlertType = (transactCard) => {
         if (transactCard.PV_Cancelado === 1) {
@@ -211,9 +239,29 @@ function AccordionCore({ transactCards }) {
                                                 <ModalHeader toggle={toggle2}>Transaccion con QR</ModalHeader>
                                                 <ModalBody>
                                                     <p><strong>ID de QR:</strong> {transactCard.QR_idQR}</p>
-                                                    <p><strong>Monto de QR:</strong> {transactCard.QR_Monto}</p>
-                                                    <p><strong>Comprobante de QR:</strong> {transactCard.QR_Comprobante}</p>
-                                                    <p><strong>ID de Parqueo-Vehículo de QR:</strong> {transactCard.QR_idParqueo_Vehiculo}</p>
+                                                    <div className="d-flex align-items-center">
+                                                        <p className="mb-0 mr-2"><strong>Monto de QR: (En Bolivianos)</strong></p>
+                                                        <input
+                                                            type="text"
+                                                            className="form-control mr-2"
+                                                            style={{ width: 'auto' }}
+                                                            value={montoQR[transactCard.QR_idQR] || transactCard.QR_Monto}
+                                                            onChange={(e) => handleMontoChange(transactCard.QR_idQR, e.target.value)}
+                                                            pattern="^\d{0,5}(\.\d{0,2})?$"
+                                                            title="Ingrese un monto válido en Bolivianos. Ejemplo: 12345.67"
+                                                        />
+                                                        <Button color="success" onClick={() => actualizarMontoQR(transactCard.QR_idQR)}>
+                                                            Actualizar
+                                                        </Button>
+                                                    </div>
+
+                                                    <p><strong>Comprobante de QR:</strong></p>
+                                                    <img
+                                                        src={transactCard.QR_Comprobante === '' ? 'https://firebasestorage.googleapis.com/v0/b/pkpq-74307.appspot.com/o/VehicleImages%2Fvehicle_default.jpg?alt=media&token=a9055e84-5ca2-49cc-a4ee-9dab61d076fe' : transactCard.QR_Comprobante}
+                                                        className="img-fluid"
+                                                        alt="..."
+                                                        style={{ width: '600px', height: '300px', objectFit: 'cover' }}
+                                                    />
                                                     <p><strong>Estado de QR:</strong> {transactCard.QR_Estado}</p>
                                                     <p><strong>Confirmación de QR:</strong> {transactCard.QR_Confirmacion}</p>
                                                 </ModalBody>

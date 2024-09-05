@@ -1,22 +1,26 @@
 import React, { useState, useContext } from 'react';
-import { View, Text, StyleSheet, Image, Modal, Alert, TouchableOpacity, Button } from 'react-native'
+import { View, Text, StyleSheet, Image, Modal, Alert, TouchableOpacity, Button, TextInput } from 'react-native'
 import ModifyReserve from '../../../screens/MainMenu/BookingOptions/ModifyReserve';
 import ComeConfirmed from '../../../screens/MainMenu/BookingOptions/ComeComfirmed';
-import { cancelBook, parkVehicleEnter } from '../../../api'
+import { cancelBook, parkVehicleEnter, parkVehicleQRPay } from '../../../api'
 import * as ImagePicker from "expo-image-picker";
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage'
 import { storage } from "../../../firebaseConfig";
 import { AuthContext } from '../../../context/AuthContext';
 import CameraVehicleConfirmed from '../../../screens/MainMenu/TakePhoto/CameraVehicleConfirmed'
-
+import UnknownImage from '../../../assets/images/unknown.png';
 
 const BookingItem = ({ book, onDeleteComplete, onModifyComplete }) => {
+  //console.log(book);
+
   let veh = "";
   let parkImage = "";
+  let qrImage = "";
   let sendImage = "https://firebasestorage.googleapis.com/v0/b/pkpq-74307.appspot.com/o/VehicleImages%2Fvehicle_default.jpg?alt=media&token=a9055e84-5ca2-49cc-a4ee-9dab61d076fe&_gl=1*1eccxzy*_ga*MTkxMTcyMTI0MC4xNjk0ODIyNzI3*_ga_CW55HF8NVT*MTY5ODIxOTgwOC40OS4xLjE2OTgyMTk4MTQuNTQuMC4w";
   const { userInfo } = useContext(AuthContext);
   const [progress, setProgress] = useState(0);
   const [image, setImage] = useState(sendImage);
+  const [imageQR, setImageQR] = useState(sendImage);
   const [visible, setVisible] = useState(false);
   const show = () => setVisible(true);
   const hide = (imageUri) => {
@@ -33,10 +37,19 @@ const BookingItem = ({ book, onDeleteComplete, onModifyComplete }) => {
     Url_imagen_ingreso: sendImage,
   });
 
+  const [tosendQR, setToSendQR] = useState({
+    Comprobante: sendImage,
+    idParqueo_Vehiculo: book.idParqueo_Vehiculo,
+    Monto: book.Monto
+  });
+
   const handleChange = (name, value) => setToSend({ ...tosend, [name]: value });
+
+  const handleChange2 = (name, value) => setToSendQR({ ...tosendQR, [name]: value });
 
   const [modifyModalVisible, setModifyModalVisible] = useState(false);
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
+  const [qrModalVisible, setQrModalVisible] = useState(false);
 
 
   if (book.Url_imagen_Parqueo === "defaultPark") {
@@ -133,6 +146,31 @@ const BookingItem = ({ book, onDeleteComplete, onModifyComplete }) => {
     setToSend({ ...tosend, Url_imagen_ingreso: sendImage });
   }
 
+  async function editImageChangeQR() {
+    try {
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      })
+      if (!result.canceled) {
+        setImageQR(result.assets[0].uri);
+        setToSendQR({ ...tosendQR, Comprobante: result.assets[0].uri });
+
+        //Funcion que sube la imagen:
+        //await uploadImage(result.assets[0].uri, "image");
+      }
+    } catch (error) {
+      console.error("Error al seleccionar la imagen:", error);
+    }
+  }
+
+  async function dropImageQR() {
+    setImageQR(sendImage);
+    setToSendQR({ ...tosendQR, Comprobante: sendImage });
+  }
+
 
   async function takePic() {
     setImage(sendImage);
@@ -172,6 +210,41 @@ const BookingItem = ({ book, onDeleteComplete, onModifyComplete }) => {
       });
   }
 
+
+  async function uploadImageQR(uri, fileType) {
+    const response = await fetch(uri);
+    const blob = await response.blob();
+
+    const storageRef = ref(storage, "QRControl/" + new Date().getTime() + "u" + userInfo.idUsuario + "qr" + book.idReserva);
+    const uploadTask = uploadBytesResumable(storageRef, blob)
+
+    // Eventos que suceden cuando se sube la imagen:
+    // Cuadro de carga (no es usado aquí pero puede ser usado en otra vista)
+    uploadTask.on("state_changed", (snapshot) => {
+      const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+      setProgress(progress.toFixed());
+    },
+      (error) => {
+        // Handle error
+        console.error("Error al subir la imagen:", error);
+      },
+      () => {
+        getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
+          // Imagen almacenada en base de datos y nube
+          setImage(downloadURL);
+          tosendQR.Comprobante = downloadURL;
+          const updatedBook = await parkVehicleQRPay(book.idReserva, tosendQR);
+          onModifyComplete(updatedBook);
+          setConfirmModalVisible(false);
+          // Asigna la URL de la imagen a la variable actualImage
+          // Luego, puedes realizar otras acciones con la URL de la imagen, si es necesario.
+        }).catch((error) => {
+          console.error("Error al obtener la URL de la imagen:", error);
+        });
+      });
+  }
+
+
   async function onUploadOrder() {
     if (tosend.Url_imagen_ingreso === sendImage) {
       Alert.alert(
@@ -190,6 +263,41 @@ const BookingItem = ({ book, onDeleteComplete, onModifyComplete }) => {
     }
   }
 
+  async function onUploadOrderQR() {
+    // Verificar si el campo Monto está vacío
+    if (!tosendQR.Monto.trim()) {
+      Alert.alert("Error", "Por favor, ingresa el monto.");
+      return;
+    }
+    // Verificar si el valor ingresado es un número válido
+    if (isNaN(tosendQR.Monto) || !/^\d+(\.\d{1,2})?$/.test(tosendQR.Monto)) {
+      Alert.alert("Error", "Por favor, ingresa un valor monetario válido.");
+      return;
+    }
+    // Si el monto es mayor a 10000, mostrar una alerta
+    if (parseFloat(tosendQR.Monto) > 10000.00) {
+      Alert.alert("Error", "El monto no puede ser mayor a 10,000.00 Bs.");
+      return;
+    }
+
+    // Si el comprobante es la imagen por defecto, mostrar una alerta
+    if (tosendQR.Comprobante === sendImage) {
+      Alert.alert(
+        "Imagen requerida",
+        "Por favor, selecciona una imagen diferente a la imagen por defecto.",
+        [{ text: "OK" }]
+      );
+      return;
+    }
+
+    // Continuar con la lógica para subir el comprobante
+    const updateQR = await parkVehicleQRPay(book.idQR, tosendQR);
+    uploadImageQR(imageQR, "image");
+    onModifyComplete(updateQR);
+    setQrModalVisible(false);
+  }
+
+
 
 
   switch (book.Tipo_Parqueo_idTipo_Parqueo) {
@@ -198,6 +306,54 @@ const BookingItem = ({ book, onDeleteComplete, onModifyComplete }) => {
         <View style={{ margin: 10 }}>
           <View style={styles.header}>
             <Text style={styles.productTitle}>{book.Titulo}</Text>
+            {book.PagoQR === 1 && (
+              <TouchableOpacity style={styles.qrButton} onPress={() => setQrModalVisible(true)}>
+                <Text style={styles.qrButtonText}>Pago QR</Text>
+              </TouchableOpacity>
+
+            )}
+            <Modal
+              animationType="fade"
+              transparent={true}
+              visible={qrModalVisible}
+              onRequestClose={() => {
+                setQrModalVisible(!qrModalVisible);
+              }}
+            >
+              <View style={styles.centeredView}>
+                <View style={styles.modalView}>
+                  <Text style={styles.productTitle}>Hacer un Pago mediante QR</Text>
+                  <View style={styles.vehicleCard}>
+                    <Image style={styles.vehicleImage} source={{ uri: imageQR }} />
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Monto en Bs."
+                      keyboardType="numeric"
+                      maxLength={8} // Maximum length of 8 characters (including decimal point)
+                      placeholderTextColor="#888"
+                      onChangeText={(text) => handleChange2('Monto', text)}
+                    />
+                    <View style={styles.cardFooter}>
+                      {book.ConfirmacionSalida === 0 && (
+                        <>
+                          <TouchableOpacity style={styles.btnAdd} onPress={editImageChangeQR}>
+                            <Text style={styles.buttonText2}>Subir imagen</Text>
+                          </TouchableOpacity>
+                          <TouchableOpacity style={styles.btnAdd2} onPress={dropImageQR}>
+                            <Text style={styles.buttonText2}>Quitar imagen</Text>
+                          </TouchableOpacity>
+                        </>
+                      )}
+                    </View>
+                  </View>
+                  {book.ConfirmacionSalida === 0 && (
+                    <TouchableOpacity onPress={onUploadOrderQR} style={[styles.buttonConfirm, { marginTop: 10 }]} >
+                      <Text style={styles.buttonCText}>ENVIAR COMPROBANTE</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+              </View>
+            </Modal>
           </View>
           <View style={styles.productCard}>
             <Image source={{ uri: parkImage }} style={styles.productImage} />
@@ -209,7 +365,7 @@ const BookingItem = ({ book, onDeleteComplete, onModifyComplete }) => {
                 <Text style={styles.productPrice}>Ingreso: <Text style={styles.productPriceText}>{formattedStartTime}</Text></Text>
                 <Text style={styles.productPrice}>Salida: <Text style={styles.productPriceText}>{formattedEndTime}</Text></Text>
               </View>
-              <TouchableOpacity style={[styles.buttonConfirm, book.Estado === 0 ? styles.disabledButton : {}]} disabled={book.Estado === 0} onPress={() => setConfirmModalVisible(true)}>
+              <TouchableOpacity style={[styles.buttonConfirm, book.Estado_Reserva === 0 ? styles.disabledButton : {}]} disabled={book.Estado_Reserva === 0} onPress={() => setConfirmModalVisible(true)}>
                 <Text style={styles.buttonCText}>Confirmar llegada</Text>
               </TouchableOpacity>
             </View>
@@ -292,6 +448,46 @@ const BookingItem = ({ book, onDeleteComplete, onModifyComplete }) => {
         <View style={{ margin: 10 }}>
           <View style={styles.header}>
             <Text style={styles.productTitle}>{book.Titulo}</Text>
+            {book.PagoQR === 1 && (
+              <TouchableOpacity style={styles.qrButton} onPress={() => setQrModalVisible(true)}>
+                <Text style={styles.qrButtonText}>Pago QR</Text>
+              </TouchableOpacity>
+
+            )}
+            <Modal
+              animationType="fade"
+              transparent={true}
+              visible={qrModalVisible}
+              onRequestClose={() => {
+                setQrModalVisible(!qrModalVisible);
+              }}
+            >
+              <View style={styles.centeredView}>
+                <View style={styles.modalView}>
+                  <Text style={styles.productTitle}>Hacer un Pago mediante QR</Text>
+                  <View style={styles.vehicleCard}>
+                    <Image style={styles.vehicleImage} source={{ uri: imageQR }} />
+                    <View style={styles.cardFooter}>
+                      {book.ConfirmacionSalida === 0 && (
+                        <>
+                          <TouchableOpacity style={styles.btnAdd} onPress={editImageChangeQR}>
+                            <Text style={styles.buttonText2}>Subir imagen</Text>
+                          </TouchableOpacity>
+                          <TouchableOpacity style={styles.btnAdd2} onPress={dropImageQR}>
+                            <Text style={styles.buttonText2}>Quitar imagen</Text>
+                          </TouchableOpacity>
+                        </>
+                      )}
+                    </View>
+                  </View>
+                  {book.ConfirmacionSalida === 0 && (
+                    <TouchableOpacity onPress={onUploadOrderQR} style={[styles.buttonConfirm, { marginTop: 10 }]} >
+                      <Text style={styles.buttonCText}>ENVIAR COMPROBANTE</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+              </View>
+            </Modal>
           </View>
           <View style={styles.productCard}>
             <Image source={{ uri: parkImage }} style={styles.productImage} />
@@ -303,7 +499,7 @@ const BookingItem = ({ book, onDeleteComplete, onModifyComplete }) => {
                 <Text style={styles.productPrice}>Ingreso: <Text style={styles.productPriceText}>{formattedStartTime}</Text></Text>
                 <Text style={styles.productPrice}>Salida: <Text style={styles.productPriceText}>{formattedEndTime}</Text></Text>
               </View>
-              <TouchableOpacity style={[styles.buttonConfirm, book.Estado === 0 ? styles.disabledButton : {}]} disabled={book.Estado === 0} onPress={() => setConfirmModalVisible(true)}>
+              <TouchableOpacity style={[styles.buttonConfirm, book.Estado_Reserva === 0 ? styles.disabledButton : {}]} disabled={book.Estado_Reserva === 0} onPress={() => setConfirmModalVisible(true)}>
                 <Text style={styles.buttonCText}>Confirmar llegada</Text>
               </TouchableOpacity>
             </View>
@@ -367,6 +563,46 @@ const BookingItem = ({ book, onDeleteComplete, onModifyComplete }) => {
         <View style={{ margin: 10 }}>
           <View style={styles.header}>
             <Text style={styles.productTitle}>{book.Titulo}</Text>
+            {book.PagoQR === 1 && (
+              <TouchableOpacity style={styles.qrButton} onPress={() => setQrModalVisible(true)}>
+                <Text style={styles.qrButtonText}>Pago QR</Text>
+              </TouchableOpacity>
+
+            )}
+            <Modal
+              animationType="fade"
+              transparent={true}
+              visible={qrModalVisible}
+              onRequestClose={() => {
+                setQrModalVisible(!qrModalVisible);
+              }}
+            >
+              <View style={styles.centeredView}>
+                <View style={styles.modalView}>
+                  <Text style={styles.productTitle}>Hacer un Pago mediante QR</Text>
+                  <View style={styles.vehicleCard}>
+                    <Image style={styles.vehicleImage} source={{ uri: imageQR }} />
+                    <View style={styles.cardFooter}>
+                      {book.ConfirmacionSalida === 0 && (
+                        <>
+                          <TouchableOpacity style={styles.btnAdd} onPress={editImageChangeQR}>
+                            <Text style={styles.buttonText2}>Subir imagen</Text>
+                          </TouchableOpacity>
+                          <TouchableOpacity style={styles.btnAdd2} onPress={dropImageQR}>
+                            <Text style={styles.buttonText2}>Quitar imagen</Text>
+                          </TouchableOpacity>
+                        </>
+                      )}
+                    </View>
+                  </View>
+                  {book.ConfirmacionSalida === 0 && (
+                    <TouchableOpacity onPress={onUploadOrderQR} style={[styles.buttonConfirm, { marginTop: 10 }]} >
+                      <Text style={styles.buttonCText}>ENVIAR COMPROBANTE</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+              </View>
+            </Modal>
           </View>
           <View style={styles.productCard}>
             <Image source={{ uri: parkImage }} style={styles.productImage} />
@@ -378,7 +614,7 @@ const BookingItem = ({ book, onDeleteComplete, onModifyComplete }) => {
                 <Text style={styles.productPrice}>Ingreso: <Text style={styles.productPriceText}>{formattedStartTime}</Text></Text>
                 <Text style={styles.productPrice}>Salida: <Text style={styles.productPriceText}>{formattedEndTime}</Text></Text>
               </View>
-              <TouchableOpacity style={[styles.buttonConfirm, book.Estado === 0 ? styles.disabledButton : {}]} disabled={book.Estado === 0} onPress={() => setConfirmModalVisible(true)}>
+              <TouchableOpacity style={[styles.buttonConfirm, book.Estado_Reserva === 0 ? styles.disabledButton : {}]} disabled={book.Estado_Reserva === 0} onPress={() => setConfirmModalVisible(true)}>
                 <Text style={styles.buttonCText}>Confirmar llegada</Text>
               </TouchableOpacity>
             </View>
@@ -442,6 +678,46 @@ const BookingItem = ({ book, onDeleteComplete, onModifyComplete }) => {
         <View style={{ margin: 10 }}>
           <View style={styles.header}>
             <Text style={styles.productTitle}>{book.Titulo}</Text>
+            {book.PagoQR === 1 && (
+              <TouchableOpacity style={styles.qrButton} onPress={() => setQrModalVisible(true)}>
+                <Text style={styles.qrButtonText}>Pago QR</Text>
+              </TouchableOpacity>
+
+            )}
+            <Modal
+              animationType="fade"
+              transparent={true}
+              visible={qrModalVisible}
+              onRequestClose={() => {
+                setQrModalVisible(!qrModalVisible);
+              }}
+            >
+              <View style={styles.centeredView}>
+                <View style={styles.modalView}>
+                  <Text style={styles.productTitle}>Hacer un Pago mediante QR</Text>
+                  <View style={styles.vehicleCard}>
+                    <Image style={styles.vehicleImage} source={{ uri: imageQR }} />
+                    <View style={styles.cardFooter}>
+                      {book.ConfirmacionSalida === 0 && (
+                        <>
+                          <TouchableOpacity style={styles.btnAdd} onPress={editImageChangeQR}>
+                            <Text style={styles.buttonText2}>Subir imagen</Text>
+                          </TouchableOpacity>
+                          <TouchableOpacity style={styles.btnAdd2} onPress={dropImageQR}>
+                            <Text style={styles.buttonText2}>Quitar imagen</Text>
+                          </TouchableOpacity>
+                        </>
+                      )}
+                    </View>
+                  </View>
+                  {book.ConfirmacionSalida === 0 && (
+                    <TouchableOpacity onPress={onUploadOrderQR} style={[styles.buttonConfirm, { marginTop: 10 }]} >
+                      <Text style={styles.buttonCText}>ENVIAR COMPROBANTE</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+              </View>
+            </Modal>
           </View>
           <View style={styles.productCard}>
             <Image source={{ uri: parkImage }} style={styles.productImage} />
@@ -453,7 +729,7 @@ const BookingItem = ({ book, onDeleteComplete, onModifyComplete }) => {
                 <Text style={styles.productPrice}>Ingreso: <Text style={styles.productPriceText}>{formattedStartTime}</Text></Text>
                 <Text style={styles.productPrice}>Salida: <Text style={styles.productPriceText}>{formattedEndTime}</Text></Text>
               </View>
-              <TouchableOpacity style={[styles.buttonConfirm, book.Estado === 0 ? styles.disabledButton : {}]} disabled={book.Estado === 0} onPress={() => setConfirmModalVisible(true)}>
+              <TouchableOpacity style={[styles.buttonConfirm, book.Estado_Reserva === 0 ? styles.disabledButton : {}]} disabled={book.Estado_Reserva === 0} onPress={() => setConfirmModalVisible(true)}>
                 <Text style={styles.buttonCText}>Confirmar llegada</Text>
               </TouchableOpacity>
             </View>
@@ -709,6 +985,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
+  qrButton: {
+    position: 'absolute',
+    right: 0,
+    backgroundColor: 'purple',
+    padding: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  qrButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  input: {
+    marginTop: 10,
+    marginBottom: 10,
+  }
 });
 
 export default BookingItem;

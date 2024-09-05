@@ -8,6 +8,7 @@ import MyPlacesItem from '../../../components/MyPlacesItem';
 import MyCardPlace from "../MyParkOptions/MyCardPlace";
 import { GOOGLE_MAPS_KEY } from '@env';
 import { AuthContext } from '../../../context/AuthContext';
+import Ionicons from 'react-native-vector-icons/Ionicons'
 
 const MyParkScreen = ({ navigation }) => {
   const { userInfo } = React.useContext(AuthContext);
@@ -76,7 +77,7 @@ const MyParkScreen = ({ navigation }) => {
     setSelectedPark(park);
     setModalVisible(true);
   };
-  
+
 
   const closeModal = () => {
     setSelectedPark(null);
@@ -116,6 +117,15 @@ const MyParkScreen = ({ navigation }) => {
           );
         })}
       </MapView>
+      <TouchableOpacity
+        style={styles.searcherButton}
+        onPress={() => (getLocationPermission())}
+      >
+        <View style={styles.viewUnion}>
+          <Ionicons name="refresh-outline" size={24} color="white" />
+          <Text style={styles.buttonText}>Recargar</Text>
+        </View>
+      </TouchableOpacity>
       <View>
         <TouchableOpacity
           style={styles.roundButton}
@@ -195,6 +205,20 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5
+  },
+  searcherButton: {
+    backgroundColor: '#8b27e9',
+    borderRadius: 25,
+    padding: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'absolute',
+    top: 100,
+    left: 30,
+  },
+  viewUnion: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 });
 

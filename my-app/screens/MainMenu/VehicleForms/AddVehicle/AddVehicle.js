@@ -95,8 +95,8 @@ const AddVehicle = ({ closeModal, onComplete }) => {
         vehicle.Tipo_Vehiculo_idTipo_Vehiculo = value;
         vehicle.usuario_idUsuario = userInfo.idUsuario;
 
-        console.log(vehicle);
-        console.log(value);
+        //console.log(vehicle);
+        //console.log(value);
         setIsSubmitting(true);
 
         //vehicle.Url_imagen = actualImage;
@@ -118,11 +118,11 @@ const AddVehicle = ({ closeModal, onComplete }) => {
             } catch (error) {
                 console.error("Error al subir la imagen:", error);
             }
+            onComplete();
         } else {
             ToastAndroid.show('Completa los campos restantes!', ToastAndroid.SHORT);
         }
         setIsSubmitting(false);
-        onComplete();
     }
 
     async function takePic() {

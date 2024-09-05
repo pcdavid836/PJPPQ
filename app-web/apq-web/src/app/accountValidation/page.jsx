@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form'
 import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import axios from 'axios';;
+import Link from 'next/link';
 
 function BaptismPage() {
     const { register, handleSubmit, formState: { errors }, watch } = useForm();
@@ -36,7 +37,9 @@ function BaptismPage() {
     return (
         <section className="vh-100 gradient-custom">
             {userData && userData.Estado === 1 ? (
+                <Link href={`/dashboard`} >
                 <button className="btn btn-primary" onClick={() => router.push('/dashboard')}>Volver</button>
+                </Link>
             ) : (
                 <form onSubmit={onSubmit}>
 

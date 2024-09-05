@@ -18,6 +18,8 @@ import parkUserRoutes from "./routes/parkUser";
 import reportsRoutes from "./routes/reports";
 import sidekickRoutes from "./routes/sidekick";
 import muteRoutes from "./routes/mute";
+import imageqrRoutes from "./routes/imageqr";
+import qrRoutes from "./routes/qrpayment";
 
 
 const app = express();
@@ -37,6 +39,8 @@ app.use(parkUserRoutes);
 app.use(reportsRoutes);
 app.use(sidekickRoutes);
 app.use(muteRoutes);
+app.use(imageqrRoutes);
+app.use(qrRoutes);
 
 app.use("/docs", swaggerUI.serve, swaggerUI.setup(specs));
 

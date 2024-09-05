@@ -56,14 +56,53 @@ export const createBook = async (req, res) => {
     }
 };
 
+//Editable 
 
 export const getBookByUser = async (req, res) => {
     const connection = await connect()
-    const [rows] = await connection.query("SELECT r.idReserva, r.Parqueo_idParqueo, r.Usuario_idUsuario, r.Estado, r.Fecha_Reserva, r.Hora_Reserva_Inicio, r.Hora_Reserva_Fin, r.Rechazado, r.Cancelado, r.vehiculo_idVehiculo, r.Realizado, v.Tipo_Vehiculo_idTipo_Vehiculo AS Tipo_Vehiculo_id, p.Titulo, p.Tipo_Parqueo_idTipo_Parqueo, p.Url_imagen AS Url_imagen_Parqueo, p.Ubicacion FROM reserva r JOIN vehiculo v ON r.vehiculo_idVehiculo = v.idVehiculo JOIN parqueo p ON r.Parqueo_idParqueo = p.idParqueo WHERE r.Usuario_idUsuario = ? ORDER BY r.Estado DESC, r.idReserva DESC;", [
+    const [rows] = await connection.query(`
+        SELECT 
+            r.idReserva, 
+            r.Parqueo_idParqueo, 
+            r.Usuario_idUsuario, 
+            r.Estado AS Estado_Reserva, 
+            r.Fecha_Reserva, 
+            r.Hora_Reserva_Inicio, 
+            r.Hora_Reserva_Fin, 
+            r.Rechazado, 
+            r.Cancelado, 
+            r.vehiculo_idVehiculo, 
+            r.Realizado, 
+            v.Tipo_Vehiculo_idTipo_Vehiculo AS Tipo_Vehiculo_id, 
+            p.Titulo, 
+            p.Tipo_Parqueo_idTipo_Parqueo, 
+            p.Url_imagen AS Url_imagen_Parqueo, 
+            p.Ubicacion,
+            pv.*,
+            qr.*,
+            qr.Estado AS Estado_QR
+        FROM 
+            reserva r 
+        JOIN 
+            vehiculo v ON r.vehiculo_idVehiculo = v.idVehiculo 
+        JOIN 
+            parqueo p ON r.Parqueo_idParqueo = p.idParqueo 
+        LEFT JOIN 
+            parqueo_vehiculo pv ON r.idReserva = pv.reserva_idReserva 
+        LEFT JOIN 
+            qr ON pv.idParqueo_Vehiculo = qr.idParqueo_Vehiculo 
+        WHERE 
+            r.Usuario_idUsuario = ? 
+        ORDER BY 
+            r.Estado DESC, r.idReserva DESC
+    `, [
         req.params.id,
     ]);
     res.json(rows);
 }
+
+
+//
 
 export const getBookByUserTrue = async (req, res) => {
     const connection = await connect()

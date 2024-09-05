@@ -1,12 +1,13 @@
 import React, { useState, useContext } from 'react';
-import { View, Text, StyleSheet, Image, Modal, Alert, TouchableOpacity, Button, TextInput } from 'react-native'
-import { parkVehicleDeny, parkVehicleFinish, createReportParkUser, muteParkToUser } from '../../../api'
+import { View, Text, StyleSheet, Image, Modal, Alert, TouchableOpacity, Button, TextInput, ActivityIndicator } from 'react-native';
+import { parkVehicleDeny, parkVehicleFinish, createReportParkUser, muteParkToUser, addQRPayment, denyQRPayment, repeatQRPayment, parkVehicleQRPayUpdateByPark } from '../../../api'
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { SelectCountry } from 'react-native-element-dropdown';
+import UnknownImage from '../../../assets/images/unknown.png';
 
 
 const ParkedVehicleItem = ({ vehicles, onDeleteComplete }) => {
-    //console.log(vehicles)
+    //console.log(vehicles);
     const local_data = [
         {
             value: 'Informacion incorrecta',
@@ -39,6 +40,7 @@ const ParkedVehicleItem = ({ vehicles, onDeleteComplete }) => {
     ];
 
     const [report, setReport] = useState();
+    const [buttonDisabled, setButtonDisabled] = useState(false);
 
     const [reporInfo, setReportInfo] = useState({
         Motivo: '',
@@ -53,8 +55,15 @@ const ParkedVehicleItem = ({ vehicles, onDeleteComplete }) => {
     const [image, setImage] = useState(vehicles.Url_Imagen);
     const [modalVisible, setModalVisible] = useState(false);
     const [secondModalVisible, setSecondModalVisible] = useState(false);
+    const [thirdModalVisible, setThirdModalVisible] = useState(false);
     //console.log(vehicles)
 
+    const [tosendQR, setToSendQR] = useState({
+        Monto: 0.00,
+        idParqueo_Vehiculo: vehicles.idParqueo_Vehiculo
+    });
+
+    const handleChange2 = (name, value) => setToSendQR({ ...tosendQR, [name]: value });
 
 
     switch (vehicles.idTipo_Vehiculo) {
@@ -220,6 +229,74 @@ const ParkedVehicleItem = ({ vehicles, onDeleteComplete }) => {
         }
     };
 
+    const handleButtonPress = async () => {
+        setButtonDisabled(true); // Deshabilita el botón al inicio del procedimiento
+        try {
+            let response;
+            if (vehicles.idQR === null && vehicles.PagoQR === 0) {
+                response = await addQRPayment({ idParqueo_Vehiculo: vehicles.idParqueo_Vehiculo });
+                if (response && response.message === 'QR creado exitosamente') {
+                    onDeleteComplete();
+                } else {
+                    Alert.alert('Error', 'La respuesta de la API no fue exitosa: ' + JSON.stringify(response));
+                }
+            } else {
+                response = await repeatQRPayment(vehicles.idParqueo_Vehiculo);
+                if (response && response.message === 'Pago QR revivido exitosamente') {
+                    onDeleteComplete();
+                } else {
+                    Alert.alert('Error', 'La respuesta de la API no fue exitosa: ' + JSON.stringify(response));
+                }
+            }
+        } catch (error) {
+            Alert.alert('Error', 'Ocurrió un error al llamar a la API: ' + error.message);
+        } finally {
+            setButtonDisabled(false); // Habilita el botón al final del procedimiento, independientemente de si se produjo un error o no
+        }
+    };
+
+    const handleButtonCancel = async () => {
+        //console.log('nimodo1');
+        try {
+            const response = await denyQRPayment(vehicles.idParqueo_Vehiculo);
+            console.log(response);
+            // Verifica si la respuesta es positiva. Aquí debes ajustar la condición según lo que consideres una respuesta positiva.
+            if (response && response.message === 'Pago QR cancelado exitosamente') {
+                onDeleteComplete();
+            } else {
+                console.log('La respuesta de la API no fue exitosa:', response);
+            }
+        } catch (error) {
+            console.error('Ocurrió un error al llamar a la API:', error);
+        }
+    };
+
+    const handleButtonSave = async () => {
+        // Verificar si el campo Monto está vacío
+        if (!tosendQR.Monto.trim()) {
+            Alert.alert("Error", "Por favor, ingresa el monto.");
+            return;
+        }
+        // Verificar si el valor ingresado es un número válido
+        if (isNaN(tosendQR.Monto) || !/^\d+(\.\d{1,2})?$/.test(tosendQR.Monto)) {
+            Alert.alert("Error", "Por favor, ingresa un valor monetario válido.");
+            return;
+        }
+        // Si el monto es mayor a 10000, mostrar una alerta
+        if (parseFloat(tosendQR.Monto) > 10000.00) {
+            Alert.alert("Error", "El monto no puede ser mayor a 10,000.00 Bs.");
+            return;
+        }
+
+
+        try {
+            const updateQR = await parkVehicleQRPayUpdateByPark(vehicles.idQR, tosendQR);
+            Alert.alert("Exito!", "El cambio de monto fue realizado con exito.");
+            return;
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
 
     const renderAdditionalText = () => {
         const numericValue = parseInt(vehicles.idTipo_Vehiculo);
@@ -343,6 +420,77 @@ const ParkedVehicleItem = ({ vehicles, onDeleteComplete }) => {
             <View style={{ margin: 10 }}>
                 <View style={styles.header}>
                     <Text style={styles.productTitle}>{veh}</Text>
+                    <TouchableOpacity
+                        style={styles.button}
+                        onPress={() => setThirdModalVisible(true)}
+                    >
+                        <Modal
+                            animationType="fade"
+                            transparent={true}
+                            visible={thirdModalVisible}
+                            onRequestClose={() => {
+                                setThirdModalVisible(!thirdModalVisible);
+                            }}
+                        >
+                            <View style={styles.centeredView}>
+                                <View style={styles.modalView}>
+                                    <TouchableOpacity style={styles.closeButton2} onPress={() => setThirdModalVisible(false)}>
+                                        <Ionicons name="close-circle-outline" size={30} color="gray" />
+                                    </TouchableOpacity>
+                                    <Text style={{ ...styles.modalTitle, width: 300, textAlign: 'center' }}>
+                                        {vehicles.Estado === 0 && vehicles.PagoQR === 0 ? 'NO SE REALIZO UN PAGO MEDIANTE QR' : 'Pagar Mediante QR'}
+                                    </Text>
+                                    {vehicles.PagoQR === 0 && vehicles.Estado === 1 ? (
+                                        <TouchableOpacity
+                                            disabled={buttonDisabled}
+                                            style={{ ...styles.button, backgroundColor: buttonDisabled ? 'gray' : 'green', width: 300 }}
+                                            onPress={handleButtonPress}
+                                        >
+                                            {buttonDisabled ? <ActivityIndicator color="white" /> : <Text style={{ ...styles.buttonText, color: 'white', textAlign: 'center' }}>Permitir al Usuario hacer pago QR</Text>}
+                                        </TouchableOpacity>
+                                    ) : null}
+                                    {vehicles.PagoQR === 1 && vehicles.idQR !== null ? (
+                                        <>
+                                            <Image
+                                                source={(vehicles.Comprobante === null || vehicles.Comprobante === 'none') ? UnknownImage : { uri: vehicles.Comprobante }}
+                                                style={{ width: 300, height: 225, marginTop: 10 }}
+                                            />
+                                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                                <Text style={{ marginLeft: 5, fontSize: 20 }}>Monto: </Text>
+                                                <TextInput
+                                                    style={styles.input}
+                                                    placeholder="Monto en Bs."
+                                                    keyboardType="numeric"
+                                                    maxLength={8} // Maximum length of 8 characters (including decimal point)
+                                                    placeholderTextColor="#888"
+                                                    onChangeText={(text) => handleChange2('Monto', text)}
+                                                    defaultValue={vehicles.Monto}
+                                                />
+                                                <Text style={{ marginLeft: 5, fontSize: 20 }}>Bs.</Text>
+                                            </View>
+                                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20 }}>
+                                                <TouchableOpacity
+                                                    style={{ ...styles.button, backgroundColor: '#FF8000' }}
+                                                    onPress={() => { handleButtonSave() }}
+                                                >
+                                                    <Text style={{ ...styles.buttonText, color: 'white', textAlign: 'center' }}>Guardar{'\n'}Monto Nuevo</Text>
+                                                </TouchableOpacity>
+                                                {vehicles.Estado === 1 && (
+                                                    <TouchableOpacity
+                                                        style={{ ...styles.button, backgroundColor: '#b8281d' }}
+                                                        onPress={() => { handleButtonCancel() }}
+                                                    >
+                                                        <Text style={{ ...styles.buttonText, color: 'white', textAlign: 'center' }}>Cancelar{'\n'}Transaccion</Text>
+                                                    </TouchableOpacity>
+                                                )}
+                                            </View>
+                                        </>
+                                    ) : null}
+                                </View>
+                            </View>
+                        </Modal>
+                        <Text style={styles.buttonText}>Pago QR</Text>
+                    </TouchableOpacity>
                 </View>
                 <View style={styles.productCard}>
                     <TouchableOpacity onPress={() => setModalVisible(true)}>
@@ -605,6 +753,12 @@ const styles = StyleSheet.create({
         left: 280,
         zIndex: 1,
     },
+    closeButton2: {
+        position: 'absolute',
+        top: 20,
+        left: 310,
+        zIndex: 1,
+    },
     muteButton: {
         position: 'absolute',
         top: 20,
@@ -657,6 +811,31 @@ const styles = StyleSheet.create({
         padding: 10,
         borderRadius: 5,
     },
+    header: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingVertical: 10,
+        paddingHorizontal: 16,
+        backgroundColor: '#f9f9f9',
+        borderBottomWidth: 1,
+        borderBottomColor: '#eee'
+    },
+    button: {
+        backgroundColor: 'purple',
+        padding: 10,
+        borderRadius: 5,
+    },
+    buttonText: {
+        color: 'white',
+        fontWeight: 'bold',
+    },
+    input: {
+        marginTop: 10,
+        marginBottom: 10,
+        fontSize: 20,
+        // ... otros estilos que ya tengas definidos para 'input' ...
+    }
 });
 
 export default ParkedVehicleItem

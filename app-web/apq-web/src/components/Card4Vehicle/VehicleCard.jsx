@@ -113,7 +113,7 @@ function VehicleCard({ car }) {
                     style={{ width: '600px', height: '250px', objectFit: 'cover' }}
                 />
                 <div className="card-body">
-                    <h5 className="card-title">{role}</h5>
+                    <h5 className="card-title"><a href={`/dashboard/options/vehicles/profileView/${car.idVehiculo}`}  target="_blank">{role}</a></h5>
                     <p className="card-text"><strong>Placa:</strong> {car.Placa}</p>
                 </div>
 

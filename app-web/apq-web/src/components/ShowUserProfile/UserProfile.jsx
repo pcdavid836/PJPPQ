@@ -145,15 +145,19 @@ function UserProfile({ newReqId }) {
                                 </div>
                             </div>
                             <div className="row mt-4">
-                                <div className="col">
-                                    <button type="button" className="btn btn-primary" onClick={handleRemoveImage}>Quitar imagen</button>
-                                </div>
-                                <div className="col">
-                                    <button type="button" className="btn btn-warning" onClick={handleBanUser}>Banear Usuario</button>
-                                </div>
-                                <div className="col">
-                                    <button type="button" className="btn btn-success" onClick={handleUpdateClick}>Modificar</button>
-                                </div>
+                                {requestUser.Tipo_Usuario_idTipo_Usuario !== 3 && requestUser.Tipo_Usuario_idTipo_Usuario !== 4 && (
+                                    <>
+                                        <div className="col">
+                                            <button type="button" className="btn btn-primary" onClick={handleRemoveImage}>Quitar imagen</button>
+                                        </div>
+                                        <div className="col">
+                                            <button type="button" className="btn btn-warning" onClick={handleBanUser}>Banear Usuario</button>
+                                        </div>
+                                        <div className="col">
+                                            <button type="button" className="btn btn-success" onClick={handleUpdateClick}>Modificar</button>
+                                        </div>
+                                    </>
+                                )}
                                 <div className="col">
                                     <Link href={`/dashboard/options/users/userVehicles/${requestUser.idUsuario}`}>
                                         <button type="button" className="btn btn-secondary">Ver vehiculos</button>

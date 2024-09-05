@@ -88,7 +88,7 @@ function VehicleProfile({ carData }) {
             <p><strong>Placa:</strong> {carData.Placa}</p>
             <p><strong>Color:</strong> {carData.Color}</p>
             <p><strong>Marca:</strong> {carData.Marca}</p>
-            <p><strong>Dueño:</strong><a href={`/dashboard/options/users/${carData.usuario_idUsuario}`} target="_blank"> Ir a su Información</a></p>
+            <p><strong>Dueño:</strong><a href={`/dashboard/options/users/${carData.usuario_idUsuario}`} target="_blank"> {carData.Nombres} {carData.Primer_Apellido} {carData.Segundo_Apellido}</a></p>
             <p><strong>Fecha Creación:</strong> {formattedDate(carData.Fecha_Creacion)}</p>
             <p><strong>Fecha Actualización:</strong> {formattedDate(carData.Fecha_Actualizacion)}</p>
 

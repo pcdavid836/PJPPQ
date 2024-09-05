@@ -35,35 +35,40 @@ export const postEnter = async (req, res) => {
     res.sendStatus(204);
 };
 
+
 export const getParkVehicleByParkId = async (req, res) => {
     const connection = await connect()
     const [rows] = await connection.query(`
-        SELECT 
+            SELECT 
             v.Placa, v.Color, v.Descripcion, 
             v.Tipo_Vehiculo_idTipo_Vehiculo AS idTipo_Vehiculo, 
             v.Url_imagen AS Url_Imagen, 
             r.Fecha_Reserva, r.Hora_Reserva_Inicio, r.Hora_Reserva_Fin,
             u.Nombres, u.Primer_Apellido, u.Segundo_Apellido, u.idUsuario, u.Celular,
-            pv.* 
-        FROM 
-            vehiculo v 
-        JOIN 
-            reserva r ON v.idVehiculo = r.vehiculo_idVehiculo 
-        JOIN 
-            parqueo_vehiculo pv ON r.Parqueo_idParqueo = pv.Parqueo_idParqueo AND r.idReserva = pv.reserva_idReserva 
-        JOIN
-            usuario u ON r.Usuario_idUsuario = u.idUsuario
-        WHERE 
-            pv.ConfirmacionEntrada = 1 
-            AND pv.Cancelado = 0 
-            AND pv.Parqueo_idParqueo = ? 
-        ORDER BY 
-            pv.Estado DESC, pv.idParqueo_Vehiculo DESC
+            pv.*, 
+            qr.idQR, qr.Monto, qr.Comprobante, qr.Estado AS EstadoQR, qr.Confirmacion AS ConfirmacionQR
+            FROM 
+                vehiculo v 
+            JOIN 
+                reserva r ON v.idVehiculo = r.vehiculo_idVehiculo 
+            JOIN 
+                parqueo_vehiculo pv ON r.Parqueo_idParqueo = pv.Parqueo_idParqueo AND r.idReserva = pv.reserva_idReserva 
+            LEFT JOIN
+                qr ON pv.idParqueo_Vehiculo = qr.idParqueo_Vehiculo
+            JOIN
+                usuario u ON r.Usuario_idUsuario = u.idUsuario
+            WHERE 
+                pv.ConfirmacionEntrada = 1 
+                AND pv.Cancelado = 0 
+                AND pv.Parqueo_idParqueo = ? 
+            ORDER BY 
+                pv.Estado DESC, pv.idParqueo_Vehiculo DESC
     `, [
         req.params.id,
     ]);
     res.json(rows);
 };
+
 
 
 export const getFilteredParkVehicleByParkId = async (req, res) => {

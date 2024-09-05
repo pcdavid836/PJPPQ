@@ -66,7 +66,7 @@ function ParkPage() {
           <div className="row align-items-center">
             <div className="col-lg-6 mb-4 mb-lg-0 d-flex">
               <div style={{ width: '100%', height: '100%' }}>
-                <h3 className="pb-3">SELECCIONE UNA LOCACION</h3>
+                <h3 className="pb-3">SELECCIONE UNA LOCACIÓN</h3>
                 <Map onSelectPark={handleSelectPark} />
                 <Link href={'/dashboard/options/parks/ListMode'}>
                   <div className="d-grid gap-2 pt-2 pb-2">
@@ -88,10 +88,10 @@ function ParkPage() {
               <h3>Informacion parqueo Seleccionado</h3>
               {selectedPark && (
                 <div>
-                  <h5>{selectedPark.Titulo}</h5>
+                  <h5> <a href={`/dashboard/options/parks/profileView/${selectedPark.idParqueo}`} target="_blank">{selectedPark.Titulo}</a></h5>
                   <div className="d-flex justify-content-center mb-3">
                     <img
-                      src={selectedPark.Url_imagen === 'defaultPark' ? 'https://firebasestorage.googleapis.com/v0/b/pkpq-74307.appspot.com/o/GarageImages%2FdefaulttPark.jpg?alt=media&token=829c6cfc-bfda-45ef-a172-7f6086d260c7' : selectedPark.Url_imagen}
+                      src={selectedPark.Url_imagen === 'defaultPark' ? 'https://firebasestorage.googleapis.com/v0/b/pkpq-74307.appspot.com/o/GarageImages%2Fpark.jpg?alt=media&token=afdcbfac-645f-4392-8c1f-ed69015e92d6' : selectedPark.Url_imagen}
                       className="img-fluid"
                       alt="..."
                       style={{ width: '500px', height: '250px', objectFit: 'cover' }}
@@ -172,14 +172,14 @@ function ParkPage() {
                     </button>
                   </Link>
                   <div className="d-flex mt-2 mb-2">
-                    <div className="flex-fill mr-1">
+                    <div className="col mr-1">
                       <Link href={`/dashboard/options/parks/${selectedPark.idParqueo}`}>
                         <button className="btn btn-warning btn-block w-100" type="button">
                           Modificar
                         </button>
                       </Link>
                     </div>
-                    <div className="flex-fill ml-1">
+                    <div className="col ml-1">
                       <Button className="btn btn-danger btn-block w-100" color="danger" onClick={toggle}>
                         Mover al Baul
                       </Button>
@@ -200,15 +200,15 @@ function ParkPage() {
                     </Modal>
                   </div>
 
-                  <div className="row  mt-1 mb-1">
-                    <div className="col">
+                  <div className="d-flex mt-2 mb-2">
+                    <div className="col mr-1">
                       <Link href={`/dashboard/options/parks/sidekicks/${selectedPark.idParqueo}`}>
                         <button className="btn btn-primary btn-block w-100" type="button">
                           Lista de Ayudantes
                         </button>
                       </Link>
                     </div>
-                    <div className="col">
+                    <div className="col ml-1">
                       <Link href={`/dashboard/options/parks/stunnedUsers/${selectedPark.idParqueo}`}>
                         <button className="btn btn-secondary btn-block w-100" type="button">
                           Silenciados

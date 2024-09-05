@@ -61,7 +61,7 @@ function ParkProfile({ parkData, schedules }) {
             <h5>{parkData.Titulo}</h5>
             <div className="d-flex justify-content-center mb-3">
                 <img
-                    src={parkData.Url_imagen === 'defaultPark' ? 'https://firebasestorage.googleapis.com/v0/b/pkpq-74307.appspot.com/o/GarageImages%2FdefaulttPark.jpg?alt=media&token=829c6cfc-bfda-45ef-a172-7f6086d260c7' : parkData.Url_imagen}
+                    src={parkData.Url_imagen === 'defaultPark' ? 'https://firebasestorage.googleapis.com/v0/b/pkpq-74307.appspot.com/o/GarageImages%2Fpark.jpg?alt=media&token=afdcbfac-645f-4392-8c1f-ed69015e92d6' : parkData.Url_imagen}
                     className="img-fluid"
                     alt="Imagen del parqueo"
                     style={{ width: '500px', height: '250px', objectFit: 'cover' }}

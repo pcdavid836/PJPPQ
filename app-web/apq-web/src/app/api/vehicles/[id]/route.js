@@ -4,14 +4,24 @@ import { conn } from "@/libs/mysql";
 
 export async function GET(request, { params }) {
     try {
-        const result = await conn.query("SELECT * FROM vehiculo WHERE idVehiculo = ?", [
-            params.id,
-        ]);
+        const result = await conn.query(`
+            SELECT 
+                v.*, 
+                u.Nombres, 
+                u.Primer_Apellido, 
+                u.Segundo_Apellido 
+            FROM 
+                vehiculo AS v
+            JOIN 
+                usuario AS u ON v.usuario_idUsuario = u.idUsuario
+            WHERE 
+                v.idVehiculo = ?
+        `, [params.id]);
 
         if (result.length === 0) {
             return NextResponse.json(
                 {
-                    message: "Usuario no encontrado",
+                    message: "Vehículo o usuario no encontrado",
                 },
                 {
                     status: 404,
@@ -28,6 +38,7 @@ export async function GET(request, { params }) {
         );
     }
 }
+
 
 export async function PUT(request, { params }) {
     try {

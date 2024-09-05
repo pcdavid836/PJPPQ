@@ -20,17 +20,29 @@ export async function GET() {
 export async function POST(request) {
     try {
         const data = await request.json();
-        const result = await conn.query("INSERT INTO horarios_atencion SET ?", data);
-        if (result.affectedRows === 0) {
-            return NextResponse.json(
-                {
-                    message: "Insert failed",
-                },
-                {
-                    status: 404,
-                }
-            );
+        const { parqueo_idParqueo, hora_apertura, hora_cierre, Estado, cantidad } = data;
+
+        for (let diasSemanaIdDia = 1; diasSemanaIdDia <= cantidad; diasSemanaIdDia++) {
+            const result = await conn.query("INSERT INTO horarios_atencion SET ?", {
+                parqueo_idParqueo,
+                dias_semana_idDia: diasSemanaIdDia,
+                hora_apertura,
+                hora_cierre,
+                Estado
+            });
+
+            if (result.affectedRows === 0) {
+                return NextResponse.json(
+                    {
+                        message: "Insert failed",
+                    },
+                    {
+                        status: 404,
+                    }
+                );
+            }
         }
+
         return NextResponse.json({ message: "Insertado correctamente" });
     } catch (error) {
         return NextResponse.json({
@@ -40,3 +52,4 @@ export async function POST(request) {
         );
     }
 }
+

@@ -86,3 +86,30 @@ export async function GET(request, { params }) {
         );
     }
 }
+
+
+export async function PUT(request, { params }) {
+    try {
+        const data = await request.json();
+        const result = await conn.query("UPDATE qr SET ? WHERE idQR = ?", [
+            data,
+            params.id,
+        ]);
+        if (result.affectedRows === 0) {
+            return NextResponse.json(
+                {
+                    message: "IdQR no encontrado",
+                },
+                {
+                    status: 404,
+                }
+            );
+        }
+    } catch (error) {
+        return NextResponse.json({
+            message: error.message,
+        },
+            { status: 500 }
+        );
+    }
+}

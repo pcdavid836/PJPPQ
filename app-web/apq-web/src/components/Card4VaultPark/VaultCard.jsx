@@ -94,7 +94,7 @@ function VaultCard({ place }) {
         const res = await axios.put("/api/parks/" + place.idParqueo, toRestore);
         //console.log(res);
         toggle(); // This will close all modals immediately
-        router.refresh();
+        window.location.reload();
     }
 
 

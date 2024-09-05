@@ -45,6 +45,12 @@ function UserCard({ user }) {
         case 2:
             role = "Cuidador";
             break;
+        case 3:
+            role = "Administrador";
+            break;
+        case 4:
+            role = "Super Admin";
+            break;
         default:
             role = "Usuario";
             break;
@@ -87,7 +93,7 @@ function UserCard({ user }) {
                 <div className="card-body text-center">
                     <h6 className="card-title">{user.Correo}</h6>
                     <p className="card-text">
-                    <Link href={`/dashboard/options/users/${user.idUsuario}`}> {user.Nombres} {user.Primer_Apellido} {user.Segundo_Apellido}</Link>
+                        <Link href={`/dashboard/options/users/${user.idUsuario}`}> {user.Nombres} {user.Primer_Apellido} {user.Segundo_Apellido}</Link>
                     </p>
                 </div>
                 <div className="card-footer text-center">

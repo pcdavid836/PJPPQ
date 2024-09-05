@@ -1,0 +1,13 @@
+.nav-item-margin {
+    margin-right: 1rem;
+}
+
+.navbar-list {
+    display: flex;
+    justify-content: center;
+    /* Alineación horizontal */
+    align-items: center;
+    /* Alineación vertical */
+    height: 100%;
+    /* O la altura que prefieras */
+}

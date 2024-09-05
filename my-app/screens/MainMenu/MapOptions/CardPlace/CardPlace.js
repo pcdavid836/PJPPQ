@@ -212,7 +212,7 @@ const CardPlace = ({ park, closeModal }) => {
   }
 
   if (park.Url_imagen === "defaultPark") {
-    parkImage = "https://firebasestorage.googleapis.com/v0/b/pkpq-74307.appspot.com/o/GarageImages%2FdefaulttPark.jpg?alt=media&token=829c6cfc-bfda-45ef-a172-7f6086d260c7&_gl=1*1yfph6u*_ga*MTkxMTcyMTI0MC4xNjk0ODIyNzI3*_ga_CW55HF8NVT*MTY5ODA0NDQxNi40NC4xLjE2OTgwNDQ3NjguNTguMC4w";
+    parkImage = "https://firebasestorage.googleapis.com/v0/b/pkpq-74307.appspot.com/o/GarageImages%2Fpark.jpg?alt=media&token=afdcbfac-645f-4392-8c1f-ed69015e92d6";
   } else {
     parkImage = park.Url_imagen;
   }

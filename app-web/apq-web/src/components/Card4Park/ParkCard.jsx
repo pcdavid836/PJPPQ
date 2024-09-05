@@ -106,7 +106,7 @@ function ParkCard({ place }) {
         const res = await axios.put("/api/parks/" + place.idParqueo, toDeny);
         //console.log(res);
         toggle(); // This will close all modals immediately
-        router.refresh();
+        window.location.reload();
     }
 
 
@@ -149,14 +149,14 @@ function ParkCard({ place }) {
                         <ModalBody className='m-2'>
                             <div>
                                 <img
-                                    src={place.Url_imagen === 'defaultPark' ? 'https://firebasestorage.googleapis.com/v0/b/pkpq-74307.appspot.com/o/GarageImages%2FdefaulttPark.jpg?alt=media&token=829c6cfc-bfda-45ef-a172-7f6086d260c7' : place.Url_imagen}
+                                    src={place.Url_imagen === 'defaultPark' ? 'https://firebasestorage.googleapis.com/v0/b/pkpq-74307.appspot.com/o/GarageImages%2Fpark.jpg?alt=media&token=afdcbfac-645f-4392-8c1f-ed69015e92d6' : place.Url_imagen}
                                     className="img-fluid"
                                     alt="..."
                                     style={{ width: '500px', height: '250px', objectFit: 'cover' }}
                                 />
                                 <p><strong>Id:</strong> {place.idParqueo}</p>
                                 <p><strong>Tipo de parqueo:</strong> {role}</p>
-                                <p><strong>Dueño:</strong> <Link href={`/dashboard/options/users/${place.usuario_idUsuario}`} >{reqName.Nombres} {reqName.Primer_Apellido} {reqName.Segundo_Apellido}</Link></p>
+                                <p><strong>Dueño:</strong> <a href={`/dashboard/options/users/${place.usuario_idUsuario}`} >{reqName.Nombres} {reqName.Primer_Apellido} {reqName.Segundo_Apellido}</a></p>
                                 <p><strong>Ubicacion:</strong> {place.Ubicacion}</p>
                                 <p><strong>Descripcion:</strong> {place.Descripcion}</p>
                                 <p><strong>Tamaño:</strong> {place.Tamaño} m2</p>

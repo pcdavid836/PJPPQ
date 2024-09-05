@@ -8,13 +8,11 @@ import { useRouter } from 'next/navigation';
 
 
 function PlaceCard({ place }) {
-    console.log(place)
     const [reqName, setReqName] = useState({
         Nombres: "",
         Primer_Apellido: "",
         Segundo_Apellido: "",
     });
-
 
     const [toHelper, setToHelper] = useState({
         Tipo_Usuario_idTipo_Usuario: 2,
@@ -41,7 +39,6 @@ function PlaceCard({ place }) {
 
     const router = useRouter();
 
-
     const [modal, setModal] = useState(false);
     const [nestedModal, setNestedModal] = useState(false);
     const [nestedModalReject, setNestedModalReject] = useState(false);
@@ -58,76 +55,60 @@ function PlaceCard({ place }) {
         setCloseAll(true);
     };
 
-
-
     const toggleAll = () => {
         setNestedModal(!nestedModal);
         setCloseAll(true);
     };
 
-
     const toggle = () => setModal(!modal);
 
     async function addHorariosAtencion(parqueoId, horaApertura, horaCierre) {
-        // Loop over each day of the week
-        for (let diasSemanaIdDia = 1; diasSemanaIdDia <= 7; diasSemanaIdDia++) {
-            // Prepare the data to be sent
-            const data = {
-                parqueo_idParqueo: parqueoId,
-                dias_semana_idDia: diasSemanaIdDia,
-                hora_apertura: horaApertura,
-                hora_cierre: horaCierre,
-                Estado: 0
-            };
+        const data = {
+            parqueo_idParqueo: parqueoId,
+            hora_apertura: horaApertura,
+            hora_cierre: horaCierre,
+            Estado: 0,
+            cantidad: 7 // Número de inserciones a realizar
+        };
 
-            // Send the POST request
-            const res = await axios.post('/api/requests', data);
-
-            console.log(res.data);
-        }
+        const res = await axios.post('/api/requests', data);
+        console.log(res.data);
     }
 
     async function addSelectCarTypes(parqueoId) {
-        // Loop over each day of the week
-        for (let nVehicles = 1; nVehicles <= 7; nVehicles++) {
-            // Prepare the data to be sent
-            const data = {
-                tipo_vehiculo_idTipo_Vehiculo: nVehicles,
-                parqueo_idParqueo: parqueoId,
-                Estado: 0
-            };
+        const data2 = {
+            parqueo_idParqueo: parqueoId,
+            Estado: 0,
+            cantidad: 7 // Número de inserciones a realizar
+        };
 
-            // Send the POST request
-            const res = await axios.post('/api/requests/requestsTypeVehicle', data);
-
-            //console.log(res.data);
-        }
+        const res2 = await axios.post('/api/requests/requestsTypeVehicle', data2);
+        console.log(res2.data2);
     }
 
     const aprobeSub = async () => {
-        setToAprobe({ Aprobacion: 1 }); // Use setToAprobe to update the state
+        setToAprobe({ Aprobacion: 1 });
         const res = await axios.put("/api/requests/" + place.idParqueo, toAprobe);
-        //console.log(res);
+        console.log(res);
 
-        addHorariosAtencion(place.idParqueo, '08:00:00', '18:00:00');
-        addSelectCarTypes(place.idParqueo);
+        await addHorariosAtencion(place.idParqueo, '08:00:00', '18:00:00');
+        await addSelectCarTypes(place.idParqueo);
+
         setToHelper({ Tipo_Usuario_idTipo_Usuario: 2 });
         const res2 = await axios.put('/api/users/' + place.usuario_idUsuario, toHelper);
-        //console.log(res2);
-
+        console.log(res2);
 
         toggleAll(true);
-        router.refresh();
+        window.location.reload();
     }
 
     const denySub = async () => {
-        setToDeny({ Estado: 0 }); // Use setToAprobe to update the state
+        setToDeny({ Estado: 0 });
         const res = await axios.put("/api/requests/" + place.idParqueo, toDeny);
         console.log(res);
-        toggle(); // This will close all modals immediately
-        router.refresh();
+        toggle();
+        window.location.reload();
     }
-
 
     let role = ""
 
@@ -148,7 +129,6 @@ function PlaceCard({ place }) {
             role = "Privado";
             break;
     }
-
 
     return (
         <div className='col d-flex justify-content-center'>
