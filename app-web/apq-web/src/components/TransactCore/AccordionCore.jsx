@@ -43,7 +43,7 @@ function AccordionCore({ transactCards }) {
             // Realiza la solicitud PUT para actualizar el monto en el backend
             const res = await axios.put(`/api/parks/parksrecord/${id}`, { Monto: montoQR[id] });
             console.log(`Respuesta del servidor al actualizar el monto para QR ID ${id}:`, res.data);
-            
+
 
         } catch (error) {
             console.error('Error al actualizar el monto de QR:', error);
@@ -256,12 +256,18 @@ function AccordionCore({ transactCards }) {
                                                     </div>
 
                                                     <p><strong>Comprobante de QR:</strong></p>
-                                                    <img
-                                                        src={transactCard.QR_Comprobante === '' ? 'https://firebasestorage.googleapis.com/v0/b/pkpq-74307.appspot.com/o/VehicleImages%2Fvehicle_default.jpg?alt=media&token=a9055e84-5ca2-49cc-a4ee-9dab61d076fe' : transactCard.QR_Comprobante}
-                                                        className="img-fluid"
-                                                        alt="..."
-                                                        style={{ width: '600px', height: '300px', objectFit: 'cover' }}
-                                                    />
+                                                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', margin: '5px' }}>
+                                                        <Button
+                                                            style={{ width: '300px', height: '300px', objectFit: 'cover' }}
+                                                            color="success"
+                                                            onClick={() => {
+                                                                console.log('QR_Comprobante:', transactCard.QR_Comprobante);
+                                                                window.open(transactCard.QR_Comprobante, '_blank');
+                                                            }}
+                                                        >
+                                                            MOSTRAR COMPROBANTE
+                                                        </Button>
+                                                    </div>
                                                     <p><strong>Estado de QR:</strong> {transactCard.QR_Estado}</p>
                                                     <p><strong>Confirmación de QR:</strong> {transactCard.QR_Confirmacion}</p>
                                                 </ModalBody>

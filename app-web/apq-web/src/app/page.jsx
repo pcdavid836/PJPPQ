@@ -75,9 +75,10 @@ function Homepage() {
                     </svg>
                     Como funciona?
                   </h2>
-                  <p>Paragraph of text beneath the heading to explain the heading. We'll add onto it with another sentence and probably just keep going until we run out of words.</p>
+                  <p>Exploras nuevas posibilidades y te transformas en una mente conectada a un sistema inteligente, dando el primer paso hacia una nueva manera de obtener información sobre los lugares más adecuados para guardar tu vehículo.
+                  </p>
                   <a className="text-decoration-none" href="#!">
-                    Call to action
+                    Ver mas
                     <i className="bi bi-arrow-right"></i>
                   </a>
                 </div>
@@ -93,9 +94,10 @@ function Homepage() {
                     </svg>
                     Tiene algun costo?
                   </h2>
-                  <p>Paragraph of text beneath the heading to explain the heading. We'll add onto it with another sentence and probably just keep going until we run out of words.</p>
+                  <p>La aplicación es completamente gratuita y está disponible para cualquier tipo de dispositivo. Para asegurar su continuidad y funcionamiento, incluye anuncios que contribuyen al sostenimiento de la plataforma. Sin embargo, no se descartan futuras alternativas de colaboración en las que los usuarios puedan apoyar el desarrollo y mantenimiento del proyecto.
+                  </p>
                   <a className="text-decoration-none" href="#!">
-                    Call to action
+                    Ver mas
                     <i class="bi bi-arrow-right"></i>
                   </a>
                 </div>
@@ -111,9 +113,9 @@ function Homepage() {
                     </svg>
                     Como me postulo?
                   </h2>
-                  <p>Paragraph of text beneath the heading to explain the heading. We'll add onto it with another sentence and probably just keep going until we run out of words.</p>
+                  <p>PSimplemente descargas la app en tu tienda virtual de preferencia, seguidamente te creas una cuenta y ya puedes comenzar a usarla para postular tu hogar como un espacio de parqueo requieres unos pasos mas!</p>
                   <a className="text-decoration-none" href="#!">
-                    Call to action
+                    Ver mas
                     <i className="bi bi-arrow-right"></i>
                   </a>
                 </div>
@@ -124,16 +126,16 @@ function Homepage() {
           <div className="row align-items-md-stretch mt-4">
             <div className="col-md-6">
               <div className="h-100 p-5 text-bg-dark rounded-3">
-                <h2>Change the background</h2>
-                <p>Swap the background-color utility and add a `.text-*` color utility to mix up the jumbotron look. Then, mix and match with additional component themes and more.</p>
-                <button className="btn btn-outline-light" type="button">Example button</button>
+                <h2>Te llama la atención?</h2>
+                <p>Actualmente estamos en busqueda de nuevas personas capaces de coordinar cosas tan importantes como este proyecto y requerimos gente que se una a nuestro equipo. Podrias empezar enviando un EMAIL a nuestra direccion.</p>
+                <button className="btn btn-outline-light" type="button">Enviar Correo</button>
               </div>
             </div>
             <div className="col-md-6">
               <div className="h-100 p-5 bg-body-tertiary border rounded-3">
-                <h2>Add borders</h2>
-                <p>Or, keep it light and add a border for some added definition to the boundaries of your content. Be sure to look under the hood at the source HTML here as we've adjusted the alignment and sizing of both column's content for equal-height.</p>
-                <button className="btn btn-outline-secondary" type="button">Example button</button>
+                <h2>Quienes somos?</h2>
+                <p>El proyecto APQ Fue creado el año 2023 al momento de que dos neuronas hicieron clic en la mente de una persona, al principio la idea escalo bastante rapido pero luego tuvo una aparatosa caida....</p>
+                <button className="btn btn-outline-secondary" type="button">Saber mas</button>
               </div>
             </div>
           </div>

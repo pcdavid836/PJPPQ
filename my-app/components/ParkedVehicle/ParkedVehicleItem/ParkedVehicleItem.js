@@ -4,6 +4,7 @@ import { parkVehicleDeny, parkVehicleFinish, createReportParkUser, muteParkToUse
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { SelectCountry } from 'react-native-element-dropdown';
 import UnknownImage from '../../../assets/images/unknown.png';
+import { Linking } from 'react-native';
 
 
 const ParkedVehicleItem = ({ vehicles, onDeleteComplete }) => {
@@ -451,10 +452,22 @@ const ParkedVehicleItem = ({ vehicles, onDeleteComplete }) => {
                                     ) : null}
                                     {vehicles.PagoQR === 1 && vehicles.idQR !== null ? (
                                         <>
-                                            <Image
-                                                source={(vehicles.Comprobante === null || vehicles.Comprobante === 'none') ? UnknownImage : { uri: vehicles.Comprobante }}
-                                                style={{ width: 300, height: 225, marginTop: 10 }}
-                                            />
+                                            <TouchableOpacity
+                                                style={{
+                                                    width: 300,
+                                                    height: 225,
+                                                    backgroundColor: '#2ecc71',
+                                                    borderRadius: 20,
+                                                    justifyContent: 'center',
+                                                    alignItems: 'center',
+                                                    margin: 15
+                                                }}
+                                                onPress={() => Linking.openURL(vehicles.Comprobante)}
+                                            >
+                                                <Text style={{ color: 'white', fontSize: 16, fontWeight: 'bold' }}>
+                                                    Ver Comprobante
+                                                </Text>
+                                            </TouchableOpacity>
                                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                                 <Text style={{ marginLeft: 5, fontSize: 20 }}>Monto: </Text>
                                                 <TextInput

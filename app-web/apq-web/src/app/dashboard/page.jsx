@@ -4,7 +4,7 @@ function DashboardPage() {
             <div className="bg-gray-100" style={{ minHeight: '100vh' }}>
                 <main className="col-md-10 ms-sm-auto col-lg-10 px-md-5">
                     <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center p-3 mb-3 border-bottom bg-dark-subtle">
-                        <h1 className="h2">Dashboard</h1>
+                        <h1 className="h2">Menú Principal</h1>
                         <div className="btn-toolbar mb-2 mb-md-0">
 
                         </div>
@@ -16,7 +16,7 @@ function DashboardPage() {
                         </a>
                         <div className="container-fluid py-5">
                             <h1 className="display-5 fw-bold">Version 0.0.9</h1>
-                            <p className="col-md-8 fs-4">Esta vista a futuro sera mejor presentada y contara con informacion destacada, mensajes o resumenes utiles para la administracion de este sistema.</p>
+                            <p className="col-md-8 fs-4">📢 Bienvenido a la release 0.0.91 del Proyecto APQ En esta actualización, se han realizado ajustes menores enfocados principalmente en la optimización de la aplicación móvil. Destaca la incorporación de mejoras relacionadas con el manejo de transacciones vía código QR, fortaleciendo así la funcionalidad financiera del sistema</p>
                             <button className="btn btn-primary btn-lg" type="button">Que hay de nuevo?</button>
                         </div>
                     </div>
@@ -24,16 +24,18 @@ function DashboardPage() {
                     <div className="row align-items-md-stretch">
                         <div className="col-md-6">
                             <div className="h-100 p-5 text-bg-dark rounded-3">
-                                <h2>Card de prueba</h2>
-                                <p>Swap the background-color utility and add a `.text-*` color utility to mix up the jumbotron look. Then, mix and match with additional component themes and more.</p>
-                                <button className="btn btn-outline-light" type="button">Example button</button>
+                                <h2>🧪 Registro de Búsqueda y Recopilación de Bugs</h2>
+                                <p>Este módulo documenta de forma detallada la identificación, seguimiento y recolección de errores (bugs) detectados durante el desarrollo y pruebas de la aplicación. La información registrada incluye:
+                                    Este registro forma parte del entorno del desarrollador backend y sirve como referencia para futuras versiones, mejoras funcionales y control de calidad general del sistema.
+                                </p>
+                                <button className="btn btn-outline-light" type="button">Ver Registro</button>
                             </div>
                         </div>
                         <div className="col-md-6">
                             <div className="h-100 p-5 bg-body-tertiary border rounded-3">
-                                <h2>Card de prueba</h2>
-                                <p>Or, keep it light and add a border for some added definition to the boundaries of your content. Be sure to look under the hood at the source HTML here as we've adjusted the alignment and sizing of both column's content for equal-height.</p>
-                                <button className="btn btn-outline-secondary" type="button">Example button</button>
+                                <h2>💡 Sugerencias de Mejora</h2>
+                                <p>Los moderadores y administradores que deseen proponer cambios relacionados con el uso del programa pueden enviar sus sugerencias al equipo de desarrollo por correo electrónico. Todas las recomendaciones serán consideradas para mejorar la experiencia y optimizar las funciones disponibles en el sistema.</p>
+                                <button className="btn btn-outline-secondary" type="button">Escribir Correo</button>
                             </div>
                         </div>
                     </div>

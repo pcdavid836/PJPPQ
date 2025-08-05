@@ -30,7 +30,7 @@ const ForgotPasswordScreen = () => {
             const response = await emailSearchPasswordRecover(email);
             if (response.mensaje === "Correo de verificación enviado") {
                 setUser(response.usuario);
-                //console.log(response.usuario);
+                //console.log(response.usuario); RESPONSE VERIFICATION
                 navigation.navigate('NewPasswordScreen', { user: response.usuario });
             } else {
                 Alert.alert("Error", response.mensaje);

@@ -478,7 +478,7 @@ export default function MyCardPlace({ myparkto, onModifyComplete }) {
                     <View style={styles.modalBackground}>
                         <View style={styles.centeredView}>
                             <View style={styles.modalView}>
-                                <Text style={styles.title}>Ver reservas por dia</Text>
+                                <Text style={styles.title}>Ver vehiculos estacionados por dia</Text>
                                 <TouchableOpacity style={styles.modButton2} onPress={() => setShowDatePicker(true)}>
                                     <View style={styles.buttonTextContainer}>
                                         <Text style={styles.shareButtonText}>{date.toLocaleDateString()}</Text>
@@ -492,7 +492,7 @@ export default function MyCardPlace({ myparkto, onModifyComplete }) {
                                         onChange={handleDateChange2}
                                     />
                                 )}
-                                <Text style={styles.dispT}>Estado de reserva:</Text>
+                                <Text style={styles.dispT}>Estado de vehiculo en parqueo:</Text>
                                 <SelectCountry
                                     style={styles.dropdown}
                                     selectedTextStyle={styles.selectedTextStyle}
