@@ -38,7 +38,7 @@ export function SideNavbar({ ownData }) {
                             <Link className="flex mb-2 justify-start items-center gap-4 pl-5 hover:bg-gray-900 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto" href="/dashboard" style={{ textDecoration: 'none' }}>
                                 <MdOutlineSpaceDashboard className="text-2xl text-gray-600 group-hover:text-white " />
                                 <h3 className="text-base text-gray-800 group-hover:text-white font-semibold ">
-                                    Changelog
+                                    Bienvenid@
                                 </h3>
                             </Link>
                             <Link className="flex mb-2 justify-start items-center gap-4 pl-5 hover:bg-gray-900 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto" href="/dashboard/options/parks" style={{ textDecoration: 'none' }}>

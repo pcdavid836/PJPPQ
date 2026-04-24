@@ -6,6 +6,11 @@ import { MenuProvider } from 'react-native-popup-menu';
 import { AuthProvider } from './context/AuthContext';
 import AppNav from './screens/Navigation/AppNav';
 
+import { LogBox } from 'react-native';
+
+LogBox.ignoreAllLogs(true);
+
+
 const Stack = createNativeStackNavigator();
 
 //AppStack para testing sin login

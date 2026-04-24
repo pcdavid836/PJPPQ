@@ -141,13 +141,32 @@ function ParkPage() {
                         return (
                           <tr key={index}>
                             <td>{day}</td>
-                            <td>{new Date(`1970-01-01T${schedule.hora_apertura}Z`).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</td>
-                            <td>{new Date(`1970-01-01T${schedule.hora_cierre}Z`).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</td>
+
+                            {/* Control day */}
+                            <td>
+                              <input
+                                type="time"
+                                value={(schedule.hora_apertura || '').slice(0, 5)}
+                                onChange={(e) => handleTimeChange(e, index, 'hora_apertura')}
+                              />
+                            </td>
+
+                            {/* Control day */}
+                            <td>
+                              <input
+                                type="time"
+                                value={(schedule.hora_cierre || '').slice(0, 5)}
+                                onChange={(e) => handleTimeChange(e, index, 'hora_cierre')}
+                              />
+                            </td>
+
+                            {/* 🔹 fine momment */}
                             <td>{schedule.Estado === 1 ? 'Activo' : 'Desactivado'}</td>
                           </tr>
                         );
                       })}
                     </tbody>
+
                   </table>
                   <Button className="btn w-100" color="secondary" onClick={toggle2}>
                     Eliminar Imagen

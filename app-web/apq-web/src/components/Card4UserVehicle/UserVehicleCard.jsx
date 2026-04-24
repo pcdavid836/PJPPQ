@@ -14,7 +14,7 @@ function UserVehicleCard({ car }) {
     });
 
     useEffect(() => {
-        axios.get('/api/vehicles/userVehicles' + car.usuario_idUsuario)
+        axios.get('/api/vehicles/userVehicles/' + car.usuario_idUsuario)
             .then(res => {
                 setReqName({
                     Placa: res.data.Placa,
