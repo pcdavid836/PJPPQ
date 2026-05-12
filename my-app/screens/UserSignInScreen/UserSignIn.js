@@ -146,15 +146,15 @@ const UserSignIn = () => {
             return;
         }
 
-        //console.log(user);
+        console.log(user);
         const email = user.Correo;
         const mainpassword = user.Contrasena;
         //const mainId = user.idUsuario;
 
-        /* Mostrar Contrasena y Email
+        // Mostrar Contrasena y Email
         console.log(email);
         console.log(mainpassword);
-        */
+        //
 
         //console.log(mainpassword); ver Contrasena despues del proceso
 

@@ -60,7 +60,8 @@
     "react-native-svg": "13.9.0",
     "react-native-tab-view": "^3.5.2",
     "react-native-vector-icons": "^9.2.0",
-    "react-phone-number-input": "^3.3.9"
+    "react-phone-number-input": "^3.3.9",
+    "expo-checkbox": "~2.4.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

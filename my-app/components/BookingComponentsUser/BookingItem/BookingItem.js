@@ -13,7 +13,7 @@ import * as DocumentPicker from 'expo-document-picker';
 
 
 const BookingItem = ({ book, onDeleteComplete, onModifyComplete }) => {
-  //console.log(book);
+  console.log(book);
 
   let veh = "";
   let parkImage = "";
