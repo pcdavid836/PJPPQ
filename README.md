@@ -9,3 +9,27 @@ react native google signin: https://react-native-google-signin.github.io/docs/or
 react native dropdown: https://www.npmjs.com/package/react-native-element-dropdown
 
 react email: https://resend.com/api-keys
+
+VARIABLES DE ENTORNO:
+
+DEBE HABER VARIABLES DE ENTORNO DENTRO DE app-web/apqweb
+
+.env
+
+DATABASE_URL="mysql://root:usuario@localhost:3306/pqdb"
+
+NEXTAUTH_URL="http://localhost:3000"
+
+NEXTAUTH_SECRET="APISECRETA"
+
+RESEND_API_KEY="APISECRETA"
+
+# react email (ahi se manejan los dominios).
+
+NEXT_PUBLIC_MAPS_API_KEY="APISECRETA
+
+DEBE HABER VARIABLES DE ENTORNO DENTRO DE /myapp
+
+.env
+
+GOOGLE_MAPS_KEY = API SECRETA DE GOOGLEMAPS
