@@ -35,37 +35,37 @@ export function SideNavbar({ ownData }) {
                             Virtual Controller
                         </h1>
                         <div className=" my-4 border-b border-gray-100 pb-4">
-                            <Link className="flex mb-2 justify-start items-center gap-4 pl-5 hover:bg-gray-900 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto" href="/dashboard" style={{ textDecoration: 'none' }}>
+                            <Link className="flex mb-2 justify-start items-center gap-4 pl-5 hover:bg-blue-600 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto" href="/dashboard" style={{ textDecoration: 'none' }}>
                                 <MdOutlineSpaceDashboard className="text-2xl text-gray-600 group-hover:text-white " />
                                 <h3 className="text-base text-gray-800 group-hover:text-white font-semibold ">
                                     Bienvenid@
                                 </h3>
                             </Link>
-                            <Link className="flex mb-2 justify-start items-center gap-4 pl-5 hover:bg-gray-900 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto" href="/dashboard/options/parks" style={{ textDecoration: 'none' }}>
+                            <Link className="flex mb-2 justify-start items-center gap-4 pl-5 hover:bg-blue-600 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto" href="/dashboard/options/parks" style={{ textDecoration: 'none' }}>
                                 <MdOutlineMap className="text-2xl text-gray-600 group-hover:text-white " />
                                 <h3 className="text-base text-gray-800 group-hover:text-white font-semibold ">
                                     Parqueos
                                 </h3>
                             </Link>
-                            <Link className="flex  mb-2 justify-start items-center gap-4 pl-5 hover:bg-gray-900 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto" href="/dashboard/options/requests" style={{ textDecoration: 'none' }}>
+                            <Link className="flex  mb-2 justify-start items-center gap-4 pl-5 hover:bg-blue-600 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto" href="/dashboard/options/requests" style={{ textDecoration: 'none' }}>
                                 <MdOutlineLibraryBooks className="text-2xl text-gray-600 group-hover:text-white " />
                                 <h3 className="text-base text-gray-800 group-hover:text-white font-semibold ">
                                     Solicitudes
                                 </h3>
                             </Link>
-                            <Link className="flex  mb-2 justify-start items-center gap-4 pl-5 hover:bg-gray-900 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto" href="/dashboard/options/users" style={{ textDecoration: 'none' }}>
+                            <Link className="flex  mb-2 justify-start items-center gap-4 pl-5 hover:bg-blue-600 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto" href="/dashboard/options/users" style={{ textDecoration: 'none' }}>
                                 <MdPeopleOutline className="text-2xl text-gray-600 group-hover:text-white " />
                                 <h3 className="text-base text-gray-800 group-hover:text-white font-semibold ">
                                     Usuarios
                                 </h3>
                             </Link>
-                            <Link className="flex  mb-2 justify-start items-center gap-4 pl-5 hover:bg-gray-900 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto" href="/dashboard/options/vehicles" style={{ textDecoration: 'none' }}>
+                            <Link className="flex  mb-2 justify-start items-center gap-4 pl-5 hover:bg-blue-600 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto" href="/dashboard/options/vehicles" style={{ textDecoration: 'none' }}>
                                 <MdOutlineCarCrash className="text-2xl text-gray-600 group-hover:text-white " />
                                 <h3 className="text-base text-gray-800 group-hover:text-white font-semibold ">
                                     Vehículos
                                 </h3>
                             </Link>
-                            <Link className="flex  mb-2 justify-start items-center gap-4 pl-5 hover:bg-gray-900 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto" href="/dashboard/options/reports" style={{ textDecoration: 'none' }}>
+                            <Link className="flex  mb-2 justify-start items-center gap-4 pl-5 hover:bg-blue-600 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto" href="/dashboard/options/reports" style={{ textDecoration: 'none' }}>
                                 <MdOutlineReport className="text-2xl text-gray-600 group-hover:text-white " />
                                 <h3 className="text-base text-gray-800 group-hover:text-white font-semibold ">
                                     Reportes
@@ -74,7 +74,7 @@ export function SideNavbar({ ownData }) {
                         </div>
                         {/* setting  */}
                         <div className=" my-4 border-b border-gray-100 pb-4">
-                            <Link className="flex mb-2 justify-start items-center gap-4 pl-5 hover:bg-gray-900 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto" href="/dashboard/options/myinfo" style={{ textDecoration: 'none' }}>
+                            <Link className="flex mb-2 justify-start items-center gap-4 pl-5 hover:bg-blue-600 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto" href="/dashboard/options/myinfo" style={{ textDecoration: 'none' }}>
                                 <CgProfile className="text-2xl text-gray-600 group-hover:text-white " />
                                 <h3 className="text-base text-gray-800 group-hover:text-white font-semibold ">
                                     Mi perfil
@@ -82,7 +82,7 @@ export function SideNavbar({ ownData }) {
                             </Link>
                             {/* agregar un if si soy usuario tipo 4 */}
                             {ownData.Tipo_Usuario_idTipo_Usuario === 4 && (
-                                <Link className="flex mb-2 justify-start items-center gap-4 pl-5 hover:bg-gray-900 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto" href="/dashboard/options/newplayer" style={{ textDecoration: 'none' }}>
+                                <Link className="flex mb-2 justify-start items-center gap-4 pl-5 hover:bg-blue-600 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto" href="/dashboard/options/newplayer" style={{ textDecoration: 'none' }}>
                                     <MdPersonAddAlt className="text-2xl text-gray-600 group-hover:text-white " />
                                     <h3 className="text-base text-gray-800 group-hover:text-white font-semibold ">
                                         Agregar usuario
@@ -93,7 +93,7 @@ export function SideNavbar({ ownData }) {
                         {/* logout */}
                         <div className=" my-4">
                             <div
-                                className="flex mb-2 justify-start items-center gap-4 pl-5 border border-gray-200  hover:bg-gray-900 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto"
+                                className="flex mb-2 justify-start items-center gap-4 pl-5 border border-gray-200  hover:bg-red-600 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto"
                                 onClick={() => signOut()}
                             >
                                 <MdOutlineLogout className="text-2xl text-gray-600 group-hover:text-white " />

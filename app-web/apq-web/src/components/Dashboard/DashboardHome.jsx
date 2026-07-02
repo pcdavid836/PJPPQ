@@ -1,23 +1,77 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
-const kpiData = [
-  { label: 'Usuarios Activos', value: '2,847', change: '+12.5%', positive: true },
-  { label: 'Parqueos Registrados', value: '532', change: '+8.2%', positive: true },
-  { label: 'Transacciones Hoy', value: '156', change: '-3.1%', positive: false },
-  { label: 'Ingresos del Mes', value: '$12,450', change: '+24.3%', positive: true },
+const defaultKpiData = [
+  { label: 'Usuarios Activos', value: '0', change: '0%', positive: true },
+  { label: 'Parqueos Registrados', value: '0', change: '0%', positive: true },
+  { label: 'Transacciones Hoy', value: '0', change: '0%', positive: true },
+  { label: 'Ingresos del Mes', value: '$0', change: '0%', positive: true },
 ];
 
-const recentActivity = [
-  { id: 1, user: 'María González', action: 'Nuevo parqueo registrado', time: 'Hace 5 min', type: 'park' },
-  { id: 2, user: 'Carlos Ruiz', action: 'Reporte enviado', time: 'Hace 12 min', type: 'report' },
-  { id: 3, user: 'Ana Martínez', action: 'Solicitud completada', time: 'Hace 25 min', type: 'request' },
-  { id: 4, user: 'Luis Pérez', action: 'Usuario verificado', time: 'Hace 1 hora', type: 'user' },
-];
+const defaultActivity = [];
 
 export function DashboardHome() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [kpiData, setKpiData] = useState(defaultKpiData);
+  const [recentActivity, setRecentActivity] = useState(defaultActivity);
+  const [pendingRequests, setPendingRequests] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchDashboardData() {
+      try {
+        const response = await axios.get('/api/dashboard');
+        const data = response.data;
+
+        // Transformar datos de la API al formato esperado
+        setKpiData([
+          { 
+            label: 'Usuarios Activos', 
+            value: data.kpis.users.value.toString(), 
+            change: data.kpis.users.change, 
+            positive: data.kpis.users.positive 
+          },
+          { 
+            label: 'Parqueos Registrados', 
+            value: data.kpis.parks.value.toString(), 
+            change: data.kpis.parks.change, 
+            positive: data.kpis.parks.positive 
+          },
+          { 
+            label: 'Transacciones Hoy', 
+            value: data.kpis.transactions.value.toString(), 
+            change: data.kpis.transactions.change, 
+            positive: data.kpis.transactions.positive 
+          },
+          { 
+            label: 'Ingresos del Mes', 
+            value: `$${data.kpis.income.value.toLocaleString()}`, 
+            change: data.kpis.income.change, 
+            positive: data.kpis.income.positive 
+          },
+        ]);
+
+        setRecentActivity(data.recentActivity || []);
+        setPendingRequests(data.kpis.pendingRequests || 0);
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchDashboardData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
@@ -63,17 +117,17 @@ export function DashboardHome() {
         <aside className={`${sidebarCollapsed ? 'w-20' : 'w-64'} bg-white dark:bg-gray-800 min-h-[calc(100vh-73px)] sticky top-[73px] transition-all duration-300`}>
           <nav className="p-4 space-y-2">
             {[
-              { icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6', label: 'Dashboard', active: true },
-              { icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4', label: 'Parqueos', active: false },
-              { icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01', label: 'Solicitudes', active: false },
-              { icon: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z', label: 'Usuarios', active: false },
-              { icon: 'M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z', label: 'Vehículos', active: false },
-              { icon: 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z', label: 'Reportes', active: false },
+              { icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6', label: 'Dashboard', href: '/dashboard', active: true },
+              { icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4', label: 'Parqueos', href: '/dashboard/options/parks', active: false },
+              { icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01', label: 'Solicitudes', href: '/dashboard/options/requests', active: false, badge: pendingRequests > 0 ? pendingRequests : null },
+              { icon: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z', label: 'Usuarios', href: '/dashboard/options/users', active: false },
+              { icon: 'M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z', label: 'Vehículos', href: '/dashboard/options/vehicles', active: false },
+              { icon: 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z', label: 'Reportes', href: '/dashboard/options/reports', active: false },
             ].map((item, index) => (
               <a
                 key={index}
-                href="#"
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+                href={item.href}
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all relative ${
                   item.active
                     ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
                     : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
@@ -82,7 +136,16 @@ export function DashboardHome() {
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.icon} />
                 </svg>
-                {!sidebarCollapsed && <span className="font-medium">{item.label}</span>}
+                {!sidebarCollapsed && (
+                  <>
+                    <span className="font-medium">{item.label}</span>
+                    {item.badge && (
+                      <span className="absolute right-3 top-3 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                        {item.badge}
+                      </span>
+                    )}
+                  </>
+                )}
               </a>
             ))}
           </nav>
@@ -123,31 +186,40 @@ export function DashboardHome() {
           <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold text-gray-900 dark:text-white">Actividad Reciente</h2>
-              <button className="text-blue-600 dark:text-blue-400 text-sm font-semibold hover:underline">
+              <a href="/dashboard/options/reports" className="text-blue-600 dark:text-blue-400 text-sm font-semibold hover:underline">
                 Ver todo
-              </button>
+              </a>
             </div>
-            <div className="space-y-4">
-              {recentActivity.map((activity) => (
-                <div key={activity.id} className="flex items-center gap-4 p-4 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                    activity.type === 'park' ? 'bg-blue-100 text-blue-600' :
-                    activity.type === 'report' ? 'bg-orange-100 text-orange-600' :
-                    activity.type === 'request' ? 'bg-green-100 text-green-600' :
-                    'bg-purple-100 text-purple-600'
-                  }`}>
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
+            {recentActivity.length === 0 ? (
+              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                <svg className="w-16 h-16 mx-auto mb-4 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+                <p>No hay actividad reciente</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {recentActivity.map((activity) => (
+                  <div key={activity.id} className="flex items-center gap-4 p-4 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                      activity.type === 'park' ? 'bg-blue-100 text-blue-600' :
+                      activity.type === 'report' ? 'bg-orange-100 text-orange-600' :
+                      activity.type === 'request' ? 'bg-green-100 text-green-600' :
+                      'bg-purple-100 text-purple-600'
+                    }`}>
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-semibold text-gray-900 dark:text-white">{activity.user}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">{activity.action}</p>
+                    </div>
+                    <span className="text-sm text-gray-400">{activity.time}</span>
                   </div>
-                  <div className="flex-1">
-                    <p className="font-semibold text-gray-900 dark:text-white">{activity.user}</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">{activity.action}</p>
-                  </div>
-                  <span className="text-sm text-gray-400">{activity.time}</span>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         </main>
       </div>
