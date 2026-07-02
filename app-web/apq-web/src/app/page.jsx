@@ -1,153 +1,80 @@
 import React from 'react';
-import Link from 'next/link';
-import './stylesOwnPage.css';
+import { Navbar } from '../components/Navbar/Navbar';
+import { Hero } from '../components/Hero/Hero';
+import { Features } from '../components/Features/Features';
 
 function Homepage() {
-
-  const verticalSpacing = {
-    marginBottom: '2rem', // Ajusta este valor según necesites
-  };
-
   return (
-    <main>
-
-      <div className="container py-4">
-        <nav className="navbar navbar-expand-lg navbar-dark bg-dark justify-content-center fixed-top">
-          <div className="container d-flex justify-content-between">
-            <Link href="/" className="navbar-brand">
-              <img src="https://boardgamemanufacturing.com/wp-content/uploads/2019/04/free-parking1.png" alt="Logo" style={{ height: '60px' }} />
-            </Link>
-            <div className="d-flex flex-row">
-              <ul className="navbar-nav d-flex flex-row navbar-list">
-                <li className="nav-item" style={{ marginLeft: '10px' }}>
-                  <Link href="#" className="nav-link active nav-item-margin" aria-current="page">¿Qué es el proyecto APQ?</Link>
-                </li>
-                <li className="nav-item">
-                  <Link href="#" className="nav-link active nav-item-margin" aria-current="page">¿Quiénes somos?</Link>
-                </li>
-                <li className="nav-item">
-                  <Link href="#" className="nav-link active nav-item-margin" aria-current="page">Contáctanos</Link>
-                </li>
-                <li className="nav-item">
-                  <button className="btn btn-outline-light">
-                    <Link href="/auth/login" className="nav-link active" aria-current="page">Acceder</Link>
-                  </button>
-                </li>
+    <main className="min-h-screen">
+      {/* Modern Navbar */}
+      <Navbar />
+      
+      {/* Hero Section with Search */}
+      <Hero />
+      
+      {/* Features Section */}
+      <Features />
+      
+      {/* Footer */}
+      <footer className="py-12 bg-gray-900 dark:bg-black">
+        <div className="container mx-auto px-4">
+          <div className="grid md:grid-cols-4 gap-8 mb-8">
+            <div>
+              <div className="flex items-center gap-3 mb-4">
+                <img 
+                  src="https://boardgamemanufacturing.com/wp-content/uploads/2019/04/free-parking1.png" 
+                  alt="Logo" 
+                  className="h-10 w-10 object-contain"
+                />
+                <span className="font-bold text-xl text-white">PJ-APQ</span>
+              </div>
+              <p className="text-gray-400 text-sm">
+                La plataforma líder para encontrar y ofrecer espacios de parqueo seguros y confiables.
+              </p>
+            </div>
+            
+            <div>
+              <h4 className="text-white font-semibold mb-4">Enlaces Rápidos</h4>
+              <ul className="space-y-2 text-gray-400">
+                <li><a href="#about" className="hover:text-white transition-colors">¿Qué es APQ?</a></li>
+                <li><a href="#features" className="hover:text-white transition-colors">Características</a></li>
+                <li><a href="#team" className="hover:text-white transition-colors">Equipo</a></li>
+                <li><a href="#contact" className="hover:text-white transition-colors">Contacto</a></li>
               </ul>
             </div>
+            
+            <div>
+              <h4 className="text-white font-semibold mb-4">Legal</h4>
+              <ul className="space-y-2 text-gray-400">
+                <li><a href="#" className="hover:text-white transition-colors">Términos de Servicio</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Política de Privacidad</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Cookies</a></li>
+              </ul>
+            </div>
+            
+            <div>
+              <h4 className="text-white font-semibold mb-4">Síguenos</h4>
+              <div className="flex gap-4">
+                <a href="#" className="w-10 h-10 bg-gray-800 hover:bg-blue-600 rounded-full flex items-center justify-center transition-colors">
+                  <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg>
+                </a>
+                <a href="#" className="w-10 h-10 bg-gray-800 hover:bg-blue-800 rounded-full flex items-center justify-center transition-colors">
+                  <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                </a>
+                <a href="#" className="w-10 h-10 bg-gray-800 hover:bg-pink-600 rounded-full flex items-center justify-center transition-colors">
+                  <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-2.917 16.083c-2.258 0-4.083-1.825-4.083-4.083s1.825-4.083 4.083-4.083c1.083 0 2.083.417 2.833 1.083l.833-.833v4.917c-.75.666-1.75 1.083-2.833 1.083h-.833zm6.917 0h-2.5v-6.167h2.5v6.167z"/></svg>
+                </a>
+              </div>
+            </div>
           </div>
-        </nav>
-
-        <div className='mt-5 p-3' style={verticalSpacing}>
-          <header className="text-white m-2 py-3" style={{
-            backgroundImage: 'url("https://content.r9cdn.net/rimg/dimg/cc/78/4dd70310-city-18972-169edc202ea.jpg?width=1366&height=768&xhint=2841&yhint=2969&crop=true")',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            position: 'relative'
-          }}>
-            <div style={{
-              position: 'absolute',
-              top: 0,
-              right: 0,
-              bottom: 0,
-              left: 0,
-              backgroundColor: 'rgba(0, 0, 0, 0.5)'
-            }}></div>
-            <div className="container px-4 text-center p-3" style={{ position: 'relative' }}>
-              <h1 className="fw-bolder">Bienvenido a la web PJ-APQ</h1>
-              <p className="lead">La pagina web principal del proyecto APQ.</p>
-              <a className="btn btn-lg btn-light" href="#about">Ver aplicacion en PlayStore!</a>
-            </div>
-          </header>
-
-          <section className="h-100 py-5 border-bottom bg-light m-2 mt-4" id="features" style={verticalSpacing}>
-            <div className="container px-5 my-5">
-              <div className="row gx-5">
-                <div className="col-lg-4 mb-5 mb-lg-0">
-                  <div className="feature bg-primary bg-gradient text-white rounded-3 mb-3">
-                    <i className="bi bi-collection"></i>
-                  </div>
-                  <h2 className="h4 fw-bolder d-flex align-items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="bi bi-patch-question" viewBox="0 0 16 16" style={{ marginRight: '10px' }}>
-                      <path d="M8.05 9.6c.336 0 .504-.24.554-.627.04-.534.198-.815.847-1.26.673-.475 1.049-1.09 1.049-1.986 0-1.325-.92-2.227-2.262-2.227-1.02 0-1.792.492-2.1 1.29A1.7 1.7 0 0 0 6 5.48c0 .393.203.64.545.64.272 0 .455-.147.564-.51.158-.592.525-.915 1.074-.915.61 0 1.03.446 1.03 1.084 0 .563-.208.885-.822 1.325-.619.433-.926.914-.926 1.64v.111c0 .428.208.745.585.745" />
-                      <path d="m10.273 2.513-.921-.944.715-.698.622.637.89-.011a2.89 2.89 0 0 1 2.924 2.924l-.01.89.636.622a2.89 2.89 0 0 1 0 4.134l-.637.622.011.89a2.89 2.89 0 0 1-2.924 2.924l-.89-.01-.622.636a2.89 2.89 0 0 1-4.134 0l-.622-.637-.89.011a2.89 2.89 0 0 1-2.924-2.924l.01-.89-.636-.622a2.89 2.89 0 0 1 0-4.134l.637-.622-.011-.89a2.89 2.89 0 0 1 2.924-2.924l.89.01.622-.636a2.89 2.89 0 0 1 4.134 0l-.715.698a1.89 1.89 0 0 0-2.704 0l-.92.944-1.32-.016a1.89 1.89 0 0 0-1.911 1.912l.016 1.318-.944.921a1.89 1.89 0 0 0 0 2.704l.944.92-.016 1.32a1.89 1.89 0 0 0 1.912 1.911l1.318-.016.921.944a1.89 1.89 0 0 0 2.704 0l.92-.944 1.32.016a1.89 1.89 0 0 0 1.911-1.912l-.016-1.318.944-.921a1.89 1.89 0 0 0 0-2.704l-.944-.92.016-1.32a1.89 1.89 0 0 0-1.912-1.911z" />
-                      <path d="M7.001 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0" />
-                    </svg>
-                    Como funciona?
-                  </h2>
-                  <p>Exploras nuevas posibilidades y te transformas en una mente conectada a un sistema inteligente, dando el primer paso hacia una nueva manera de obtener información sobre los lugares más adecuados para guardar tu vehículo.
-                  </p>
-                  <a className="text-decoration-none" href="#!">
-                    Ver mas
-                    <i className="bi bi-arrow-right"></i>
-                  </a>
-                </div>
-                <div className="col-lg-4 mb-5 mb-lg-0">
-                  <div className="feature bg-primary bg-gradient text-white rounded-3 mb-3">
-                    <i className="bi bi-collection"></i>
-                  </div>
-                  <h2 className="h4 fw-bolder d-flex align-items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="bi bi-patch-question" viewBox="0 0 16 16" style={{ marginRight: '10px' }}>
-                      <path d="M8.05 9.6c.336 0 .504-.24.554-.627.04-.534.198-.815.847-1.26.673-.475 1.049-1.09 1.049-1.986 0-1.325-.92-2.227-2.262-2.227-1.02 0-1.792.492-2.1 1.29A1.7 1.7 0 0 0 6 5.48c0 .393.203.64.545.64.272 0 .455-.147.564-.51.158-.592.525-.915 1.074-.915.61 0 1.03.446 1.03 1.084 0 .563-.208.885-.822 1.325-.619.433-.926.914-.926 1.64v.111c0 .428.208.745.585.745" />
-                      <path d="m10.273 2.513-.921-.944.715-.698.622.637.89-.011a2.89 2.89 0 0 1 2.924 2.924l-.01.89.636.622a2.89 2.89 0 0 1 0 4.134l-.637.622.011.89a2.89 2.89 0 0 1-2.924 2.924l-.89-.01-.622.636a2.89 2.89 0 0 1-4.134 0l-.622-.637-.89.011a2.89 2.89 0 0 1-2.924-2.924l.01-.89-.636-.622a2.89 2.89 0 0 1 0-4.134l.637-.622-.011-.89a2.89 2.89 0 0 1 2.924-2.924l.89.01.622-.636a2.89 2.89 0 0 1 4.134 0l-.715.698a1.89 1.89 0 0 0-2.704 0l-.92.944-1.32-.016a1.89 1.89 0 0 0-1.911 1.912l.016 1.318-.944.921a1.89 1.89 0 0 0 0 2.704l.944.92-.016 1.32a1.89 1.89 0 0 0 1.912 1.911l1.318-.016.921.944a1.89 1.89 0 0 0 2.704 0l.92-.944 1.32.016a1.89 1.89 0 0 0 1.911-1.912l-.016-1.318.944-.921a1.89 1.89 0 0 0 0-2.704l-.944-.92.016-1.32a1.89 1.89 0 0 0-1.912-1.911z" />
-                      <path d="M7.001 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0" />
-                    </svg>
-                    Tiene algun costo?
-                  </h2>
-                  <p>La aplicación es completamente gratuita y está disponible para cualquier tipo de dispositivo. Para asegurar su continuidad y funcionamiento, incluye anuncios que contribuyen al sostenimiento de la plataforma. Sin embargo, no se descartan futuras alternativas de colaboración en las que los usuarios puedan apoyar el desarrollo y mantenimiento del proyecto.
-                  </p>
-                  <a className="text-decoration-none" href="#!">
-                    Ver mas
-                    <i class="bi bi-arrow-right"></i>
-                  </a>
-                </div>
-                <div className="col-lg-4 mb-5 mb-lg-0">
-                  <div className="feature bg-primary bg-gradient text-white rounded-3 mb-3">
-                    <i className="bi bi-collection"></i>
-                  </div>
-                  <h2 className="h4 fw-bolder d-flex align-items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="bi bi-patch-question" viewBox="0 0 16 16" style={{ marginRight: '10px' }}>
-                      <path d="M8.05 9.6c.336 0 .504-.24.554-.627.04-.534.198-.815.847-1.26.673-.475 1.049-1.09 1.049-1.986 0-1.325-.92-2.227-2.262-2.227-1.02 0-1.792.492-2.1 1.29A1.7 1.7 0 0 0 6 5.48c0 .393.203.64.545.64.272 0 .455-.147.564-.51.158-.592.525-.915 1.074-.915.61 0 1.03.446 1.03 1.084 0 .563-.208.885-.822 1.325-.619.433-.926.914-.926 1.64v.111c0 .428.208.745.585.745" />
-                      <path d="m10.273 2.513-.921-.944.715-.698.622.637.89-.011a2.89 2.89 0 0 1 2.924 2.924l-.01.89.636.622a2.89 2.89 0 0 1 0 4.134l-.637.622.011.89a2.89 2.89 0 0 1-2.924 2.924l-.89-.01-.622.636a2.89 2.89 0 0 1-4.134 0l-.622-.637-.89.011a2.89 2.89 0 0 1-2.924-2.924l.01-.89-.636-.622a2.89 2.89 0 0 1 0-4.134l.637-.622-.011-.89a2.89 2.89 0 0 1 2.924-2.924l.89.01.622-.636a2.89 2.89 0 0 1 4.134 0l-.715.698a1.89 1.89 0 0 0-2.704 0l-.92.944-1.32-.016a1.89 1.89 0 0 0-1.911 1.912l.016 1.318-.944.921a1.89 1.89 0 0 0 0 2.704l.944.92-.016 1.32a1.89 1.89 0 0 0 1.912 1.911l1.318-.016.921.944a1.89 1.89 0 0 0 2.704 0l.92-.944 1.32.016a1.89 1.89 0 0 0 1.911-1.912l-.016-1.318.944-.921a1.89 1.89 0 0 0 0-2.704l-.944-.92.016-1.32a1.89 1.89 0 0 0-1.912-1.911z" />
-                      <path d="M7.001 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0" />
-                    </svg>
-                    Como me postulo?
-                  </h2>
-                  <p>PSimplemente descargas la app en tu tienda virtual de preferencia, seguidamente te creas una cuenta y ya puedes comenzar a usarla para postular tu hogar como un espacio de parqueo requieres unos pasos mas!</p>
-                  <a className="text-decoration-none" href="#!">
-                    Ver mas
-                    <i className="bi bi-arrow-right"></i>
-                  </a>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <div className="row align-items-md-stretch mt-4">
-            <div className="col-md-6">
-              <div className="h-100 p-5 text-bg-dark rounded-3">
-                <h2>Te llama la atención?</h2>
-                <p>Actualmente estamos en busqueda de nuevas personas capaces de coordinar cosas tan importantes como este proyecto y requerimos gente que se una a nuestro equipo. Podrias empezar enviando un EMAIL a nuestra direccion.</p>
-                <button className="btn btn-outline-light" type="button">Enviar Correo</button>
-              </div>
-            </div>
-            <div className="col-md-6">
-              <div className="h-100 p-5 bg-body-tertiary border rounded-3">
-                <h2>Quienes somos?</h2>
-                <p>El proyecto APQ Fue creado el año 2023 al momento de que dos neuronas hicieron clic en la mente de una persona, al principio la idea escalo bastante rapido pero luego tuvo una aparatosa caida....</p>
-                <button className="btn btn-outline-secondary" type="button">Saber mas</button>
-              </div>
-            </div>
+          
+          <div className="border-t border-gray-800 pt-8 text-center text-gray-400 text-sm">
+            <p>&copy; {new Date().getFullYear()} PJ-APQ. Todos los derechos reservados.</p>
           </div>
         </div>
-
-        <footer className="pt-3 mt-4 text-body-secondary border-top bg-light">
-          &copy; 2023 PJ-APQ
-        </footer>
-      </div>
-
+      </footer>
     </main>
-  )
+  );
 }
 
-export default Homepage
+export default Homepage;
